@@ -1,3 +1,4 @@
+
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
@@ -22,10 +23,13 @@ configurations {
 }
 
 repositories {
+    maven { url = uri("https://jitpack.io") }
     mavenCentral()
 }
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("com.github.Bindambc:whatsapp-business-java-api:v0.6.1")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
