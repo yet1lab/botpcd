@@ -7,15 +7,17 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import jakarta.validation.constraints.NotEmpty
 import lombok.Data
 
 @Entity
 @Data
 @Table(name = "tb_monitor")
 class Monitor(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    id: Long,
+    name: String,
+    phoneNumber: String,
     @Enumerated(value = EnumType.STRING)
-    var assistanceTypes: MutableSet<AssistanceType> = mutableSetOf(),
-)
+    @NotEmpty(message = "Monitor needs to have an assistance type")
+    var assistanceTypes: AssistanceType,
+) : User(id, name, phoneNumber)

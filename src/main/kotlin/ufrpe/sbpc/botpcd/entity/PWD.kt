@@ -17,13 +17,10 @@ import org.springframework.data.repository.NoRepositoryBean
  * Pessoa com deficiência
  */
 class PWD(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
-    var name: String,
-    @NotEmpty(message = "The PWD needs to have a phone number")
-    val phoneNumber: String,
+    id: Long,
+    name: String,
+    phoneNumber: String,
     @NotEmpty(message = "The PWD needs to have a disability")
     @Enumerated(value = EnumType.STRING)
     var disability: MutableSet<Disability> = mutableSetOf()
-)
+): User(id, name, phoneNumber)
