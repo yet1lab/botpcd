@@ -1,9 +1,14 @@
 package ufrpe.sbpc.botpcd.entity
-import ufrpe.sbpc.botpcd.entity.AssistanceType.LIBRAS_MONITOR
 
+/**
+ * Represents the type of assistance a monitor can provide.
+ *
+ */
 enum class Disability {
     DEAFNESS,
     BLINDED,
     NEURODIVERGENT,
-    MOBILITY_IMPAIRED
+    MOBILITY_IMPAIRED,
+    PHYSICAL_DISABILITY,
+    DEAFBLINDNESS
 }

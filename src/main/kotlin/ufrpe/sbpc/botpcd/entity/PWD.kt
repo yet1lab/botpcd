@@ -10,6 +10,7 @@ import org.springframework.data.repository.NoRepositoryBean
 /**
  * Represents a person with disabilities.
  * Pessoa com deficiência
+ *
  */
 @Entity
 @Table(name = "tb_pwd")

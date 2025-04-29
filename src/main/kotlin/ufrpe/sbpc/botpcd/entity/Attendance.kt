@@ -1,10 +1,12 @@
 package ufrpe.sbpc.botpcd.entity
 
-import com.whatsapp.api.domain.webhook.Location
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 
+/**
+ * Tanto quem tem deficiencia visua quanto de mobilidade pode requisitar um monitor de mobilidade
+ */
 @Entity
 @Table(name = "tb_attendance")
 class Attendance(
@@ -14,7 +16,7 @@ class Attendance(
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "The service type is required")
-    val serviceType: AssistanceType,
+    val serviceType: MonitorAssistanceType,
 
     @NotNull(message = "The request date and time is required")
     val requestDateTime: LocalDateTime,
