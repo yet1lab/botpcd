@@ -3,6 +3,7 @@ package ufrpe.sbpc.botpcd.entity
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.Table
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.repository.NoRepositoryBean
 
@@ -11,6 +12,7 @@ import org.springframework.data.repository.NoRepositoryBean
  * Pessoa com deficiência
  */
 @Entity
+@Table(name = "tb_pwd")
 class PWD(
     id: Long,
     name: String,
