@@ -14,9 +14,8 @@ import lombok.Data
 @Table(name = "tb_monitor")
 class Monitor(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
     @Enumerated(value = EnumType.STRING)
     var assistanceTypes: MutableSet<AssistanceType> = mutableSetOf(),
-
 )

@@ -1,6 +1,6 @@
 package ufrpe.sbpc.botpcd.entity
 
-enum class AssistanceType(val disability: Disability) {
+enum class AssistanceType {
     LIBRAS_MONITOR,
     MOBILITY_MONITOR,
     NEURODIVERGENT_WELCOME_MONITOR,
