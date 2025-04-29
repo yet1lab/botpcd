@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotEmpty
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-class User(
+abstract class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
