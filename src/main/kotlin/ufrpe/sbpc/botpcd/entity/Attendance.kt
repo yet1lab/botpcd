@@ -14,9 +14,9 @@ class Attendance(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @Enumerated(EnumType.STRING)
     @NotNull(message = "The service type is required")
-    val serviceType: MonitorAssistanceType,
+    @Convert(converter = ServiceTypeConverter::class)
+    val serviceType: ServiceType,
 
     @NotNull(message = "The request date and time is required")
     val requestDateTime: LocalDateTime,
