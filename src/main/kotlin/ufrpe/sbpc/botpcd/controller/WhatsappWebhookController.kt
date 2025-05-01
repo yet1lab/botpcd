@@ -12,7 +12,7 @@ import java.util.logging.Logger
 @Log
 class WhatsappWebhookController {
 	@PostMapping("/whatsapp")
-	fun paginaExemplo(@RequestBody request: String): ResponseEntity<String> {
+	fun whatsappCall(@RequestBody request: String): ResponseEntity<String> {
 		Logger.getLogger(WhatsappWebhookController::class.java.name).info("Webhook recebido: $request")
 		return ResponseEntity.ok("Webhook recebido com sucesso: $request")
 	}
