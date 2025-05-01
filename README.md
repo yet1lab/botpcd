@@ -1,4 +1,8 @@
-O que precisa para rodar o projeto:
+## Como rodar o projeto (debian)
 
-JDK 17
-distributionUrl=https\://services.gradle.org/distributions/gradle-8.13-bin.zip
+```sh
+> apt install openjdk-17
+> wget https\://services.gradle.org/distributions/gradle-8.13-bin.zip
+
+```
+
