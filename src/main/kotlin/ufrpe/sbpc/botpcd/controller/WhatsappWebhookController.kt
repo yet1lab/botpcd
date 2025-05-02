@@ -29,7 +29,7 @@ class WhatsappWebhookController(private val firstContactService: FirstContactSer
 		val event: WebHookEvent = WebHook.constructEvent(body)
 		for(entry in event.entry) {
 			for(change in entry.changes) {
-				firstContactService.redirectFluxByUserType(change.value.phoneNumber, change.value)
+				firstContactService.redirectFluxByUserType(change.value.phoneNumber, change)
 			}
 		}
 		// Opcional: validar assinatura com 'signature'
