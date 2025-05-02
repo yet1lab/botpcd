@@ -12,7 +12,7 @@ class FirstContactService(
     private val monitorRepository: MonitorRepository,
     private val committeeMemberRepository: CommitteeMemberRepository
 ) {
-    fun redirectFluxByUserType(phoneNumber: String, changeValue: Value) {
+    fun redirectFluxByUserType(phoneNumber: String, webhookChangeValue: Value) {
         when {
             pwdRepository.findByPhoneNumber(phoneNumber) != null -> {
 
