@@ -13,10 +13,9 @@ import jakarta.validation.constraints.NotEmpty
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "tb_user")
 abstract class User(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
-    var name: String,
+    @Id @GeneratedValue
+    var id: Long? = null,
+    var name: String? = null,
     @NotEmpty(message = "The User needs to have a phone number")
-    val phoneNumber: String
+    var phoneNumber: String
 )
