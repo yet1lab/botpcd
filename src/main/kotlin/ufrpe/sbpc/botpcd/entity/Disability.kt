@@ -1,8 +1,9 @@
 package ufrpe.sbpc.botpcd.entity
 
-//=============================================================
-//  Represents the type of assistance a monitor can provide.
-//=============================================================
+
+/**
+ * Represents the type of assistance a monitor can provide.
+ */
 enum class Disability(val textOption: String) {
 	BLINDED("Deficiência visual"),
 	DEAFNESS("Deficiência auditiva/surdez"),
@@ -11,11 +12,14 @@ enum class Disability(val textOption: String) {
 	PHYSICAL_DISABILITY("Deficiência física"),
 	INTELLECTUAL_DISABILITY("Deficiência intelectual"),
 	MOBILITY_IMPAIRED("Não tenho deficiência, mas tenho mobilidade reduzida"),
-	NOTHING("Não tenho deficiência, nem mobilidade reduzida");
 
 	companion object {
-		fun parse(text: String): Disability? {
-			return Disability.entries.find { it.textOption.equals(text, ignoreCase = true) }
+		fun parse(text: String): Disability {
+			val disability = Disability.entries.find { it.textOption.equals(text, ignoreCase = true) }
+			if(disability == null) {
+				throw IllegalArgumentException("Invalid disability type: $text")
+			}
+			return disability
 		}
 		fun textList(): Array<String> {
 			return Disability.entries.map { it.textOption }.toTypedArray()
