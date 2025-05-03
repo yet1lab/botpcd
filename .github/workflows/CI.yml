@@ -31,3 +31,15 @@ jobs:
 
       - name: Push to Dockerhub
         run: docker push victoryghor/botpcd:latest
+
+  deploy:
+    runs-on: self-hosted
+    needs: test
+    steps:
+      - name: Pull Docker image
+        run: sudo docker pull victoryghor/botpcd:latest
+      - name: Delete Old docker container
+        run: sudo docker rm -f botpcd-container || true
+      - name: Run Docker Container
+        run: docker run -d -p 8080:8080 --name botpcd-container
+
