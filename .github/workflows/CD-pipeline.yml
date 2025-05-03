@@ -2,7 +2,7 @@ name: CD Pipeline
 
 on:
   workflow_run:
-    workflows: ["CD Pipeline"]
+    workflows: ["CI + Docker Build & Push"]
 
 jobs:
   build:
