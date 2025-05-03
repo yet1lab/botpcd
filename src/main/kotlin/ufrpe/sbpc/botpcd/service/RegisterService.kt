@@ -1,25 +1,46 @@
 package ufrpe.sbpc.botpcd.service
 
+import ufrpe.sbpc.botpcd.entity.PWD
+import ufrpe.sbpc.botpcd.entity.Disability
+import org.springframework.stereotype.Service
 import com.whatsapp.api.domain.webhook.Change
+import ufrpe.sbpc.botpcd.repository.PWDRepository
 import com.whatsapp.api.impl.WhatsappBusinessCloudApi
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Service
-import ufrpe.sbpc.botpcd.entity.PWD
-import ufrpe.sbpc.botpcd.repository.PWDRepository
 
 @Service
 class RegisterService(
-    private val pwdRepository: PWDRepository,
-    private val whatsappBusinessCloudApi: WhatsappBusinessCloudApi,
+	private val pwdRepository: PWDRepository,
+	private val whatsappBusinessCloudApi: WhatsappBusinessCloudApi,
 ) {
-    /**
-     * Essa função vai ser chamada várias vezes no processo de cadastro
-     */
-    fun registerPWD(phoneNumber: String, change: Change) {
-        if(pwdRepository.findByPhoneNumber(phoneNumber) != null) {
+	fun registerPWD(phoneNumber: String, change: Change) {
+		val menssage = change.value.menssages[0].text
+		val User = pwdRepository.findByPhoneNumber(phoneNumber)
+		val isDesability = Disability.parse(menssage) !in listOf(null, Disability.NOTHING);
+		val isCadastred = User != null;
+		
+		if(!isCadastred && !isDisability){ // 1. ASK DISABILITY
+			// ask disability
+			return 200
+		}
 
-        }
-        // primeiro eu posso perguntar o tipo de deficiencia que é o mais importante para fazer o cadastro
-        // depois de ter salvado eu pergunto o nome
-    }
+		if(!isCadastred && isDisability){  // 2. REGISTER AND ASK NAME
+			val pwd = PWD(
+				phoneNumber   = phoneNumber,
+				phoneNumberID = change.value.phoneNumberID,
+				disability    = Disability.parse(menssage)
+			)
+
+			pwdRepository.save(pwd)
+			// ask name
+			return 200
+		}
+	
+		if(isCadastred && !isDisability){  // 3. REGISTER NAME AND PUT IN QUEUE
+			val pwd = PWD(name = menssage)
+			pwdRepository.save(pwd)
+			// put user in queue
+			return 200
+		}
+	}
 }
