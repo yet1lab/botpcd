@@ -37,7 +37,7 @@ jobs:
     needs: test
     steps:
       - name: Pull Docker image
-        run: sudo docker pull victoryghor/botpcd:latest
+        run: sudo docker pull -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} victoryghor/botpcd:latest
       - name: Delete Old docker container
         run: sudo docker rm -f botpcd-container || true
       - name: Run Docker Container
