@@ -8,10 +8,9 @@ enum class Disability(val textOption: String) {
 	BLINDED("Deficiência visual"),
 	DEAFNESS("Deficiência auditiva/surdez"),
 	DEAFBLINDNESS("Surdocegueira"),
-	AUTIST("Transtorno do Espectro Autista"),
+	NEURODIVERGENT("Transtorno do Espectro Autista/Neurodivergente"),
 	PHYSICAL_DISABILITY("Deficiência física"),
-	INTELLECTUAL_DISABILITY("Deficiência intelectual"),
-	MOBILITY_IMPAIRED("Não tenho deficiência, mas tenho mobilidade reduzida"),
+	MOBILITY_IMPAIRED("Não tenho deficiência, mas tenho mobilidade reduzida");
 
 	companion object {
 		fun parse(text: String): Disability {
