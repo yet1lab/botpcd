@@ -30,6 +30,7 @@ class Attendance(
     @JoinColumn(name = "monitor_id")
     @NotNull(message = "The monitor is required")
     var monitor: Monitor,
+    var committeemember: CommitteeMember,
 
     // Campos opcionais que serão atualizados durante o ciclo de vida do atendimento
     var acceptDateTime: LocalDateTime? = null,
