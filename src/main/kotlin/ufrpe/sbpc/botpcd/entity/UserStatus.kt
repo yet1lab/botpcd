@@ -6,7 +6,7 @@ package ufrpe.sbpc.botpcd.entity
 (INDISPONIVEL) ele foi ao banheiro / esta ocupado. Nao vai receber chamado ate que altere seu status manualmente para available
 */
 enum class UserStatus {
-    AVAILABLE, 
-    BUSY, 
-    UNAVAILABLE 
+    AVAILABLE("Disponível"), 
+    BUSY("Ocupado"), 
+    UNAVAILABLE("Indisponível") 
 }
