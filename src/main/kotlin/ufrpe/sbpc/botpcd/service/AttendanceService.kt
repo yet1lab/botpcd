@@ -22,6 +22,22 @@ class AttendanceService(
         attendanceRepository.save(attendance)
     }
 
+    fun botCommand(attendance: Attendance) {
+        if (attendance.monitor.status == UserStatus.UNAVAILABLE) {
+            /*Ficar Disponível 1*/
+        }
+        if (attendance.committeemember.status == UserStatus.BUSY) {
+            /*
+            Encerrar atendimento 1 (vai internamente mudar o status dele pra disponível)
+
+            Ficar indisponível 2 (ele para de ser chamado para atendimentos)
+            */
+        }
+        if (attendance.monitor.status == UserStatus.AVAILABLE) {
+            /*Ficar indisponível 1*/
+        }
+    }
+
     @Transactional
     fun endAttendance(attendance: Attendance) {
         userStatusService.setMonitorStatus(attendance.monitor, UserStatus.AVAILABLE)
