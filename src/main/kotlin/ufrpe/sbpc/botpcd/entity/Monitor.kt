@@ -14,9 +14,8 @@ import jakarta.validation.constraints.NotEmpty
 class Monitor(
     name: String,
     phoneNumber: String,
+    status: UserStatus,
     @Enumerated(value = EnumType.STRING)
     @NotEmpty(message = "Monitor needs to have an assistance type")
-    var assistanceTypes: MonitorAssistanceType,
-    @Enumerated(EnumType.STRING)
-    var status: UserStatus = UserStatus.AVAILABLE
-) : User(name = name, phoneNumber = phoneNumber)
+    var assistanceTypes: MonitorAssistanceType
+) : Attendant(name = name, phoneNumber = phoneNumber, status = status)
