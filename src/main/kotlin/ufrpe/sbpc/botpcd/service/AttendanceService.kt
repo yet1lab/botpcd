@@ -8,34 +8,27 @@ import ufrpe.sbpc.botpcd.repository.AttendanceRepository
 @Service
 class AttendanceService(
     private val attendanceRepository: AttendanceRepository,
-    private val userStatusService: UserStatusService
+    private val userStatusService: StatusAttendService
 ) {
 
     fun searchAttendances(): List<Attendance> {
         return attendanceRepository.findAll()
     }
 
-    @Transactional
-    fun beginAttendance(attendance: Attendance) {
-        userStatusService.setMonitorStatus(attendance.monitor, UserStatus.BUSY)
-        userStatusService.setCommitteeMemberStatus(attendance.committeemember, UserStatus.BUSY)
-        attendanceRepository.save(attendance)
+    fun getAttendant(attendant: Attendant): Any {
+        return when (attendant) {
+            Attendant.MONITOR -> attendance.attendant as Monitor
+            Attendant.COMMITTEE_MEMBER -> attendance.provider as CommitteeMember
+        }
     }
 
-    fun botCommand(attendance: Attendance) {
-        if (attendance.monitor.status == UserStatus.UNAVAILABLE) {
-            /*Ficar Disponível 1*/
+    @Transactional
+    fun beginAttendance(attendance: Attendance) {
+        when (attendance.attendantType) {
+            Attendant.MONITOR -> userStatusService.setMonitorStatus(attendance.attendant as Monitor, UserStatus.BUSY)
+            Attendant.COMMITTEE_MEMBER -> userStatusService.setCommitteeMemberStatus(attendance.attendant as CommitteeMember, UserStatus.BUSY)
         }
-        if (attendance.committeemember.status == UserStatus.BUSY) {
-            /*
-            Encerrar atendimento 1 (vai internamente mudar o status dele pra disponível)
-
-            Ficar indisponível 2 (ele para de ser chamado para atendimentos)
-            */
-        }
-        if (attendance.monitor.status == UserStatus.AVAILABLE) {
-            /*Ficar indisponível 1*/
-        }
+        attendanceRepository.save(attendance)
     }
 
     @Transactional
