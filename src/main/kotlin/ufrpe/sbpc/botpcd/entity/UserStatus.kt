@@ -5,7 +5,7 @@ package ufrpe.sbpc.botpcd.entity
 (OCUPADO) ele esta em atendimento, mas quando finalizar o codigo trocara para disponivel
 (INDISPONIVEL) ele foi ao banheiro / esta ocupado. Nao vai receber chamado ate que altere seu status manualmente para available
 */
-enum class UserStatus {
+enum class UserStatus(val text: String) {
     AVAILABLE("Disponível"), 
     BUSY("Ocupado"), 
     UNAVAILABLE("Indisponível") 
