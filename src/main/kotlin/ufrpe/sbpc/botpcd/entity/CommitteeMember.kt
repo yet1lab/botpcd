@@ -12,6 +12,5 @@ import jakarta.validation.constraints.NotEmpty
 class CommitteeMember(
     name: String,
     phoneNumber: String,
-    @Enumerated(EnumType.STRING)
-    var status: UserStatus = UserStatus.AVAILABLE
-): User(name = name, phoneNumber = phoneNumber)
+    status: UserStatus
+): Attendant(name = name, phoneNumber = phoneNumber, status = status)
