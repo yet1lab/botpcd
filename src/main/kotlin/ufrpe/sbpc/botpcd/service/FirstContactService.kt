@@ -2,6 +2,7 @@ package ufrpe.sbpc.botpcd.service
 
 import com.whatsapp.api.domain.webhook.Change
 import org.springframework.stereotype.Service
+import ufrpe.sbpc.botpcd.entity.UserStatus
 import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
 import ufrpe.sbpc.botpcd.repository.MonitorRepository
 import ufrpe.sbpc.botpcd.repository.PWDRepository
