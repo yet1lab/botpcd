@@ -5,7 +5,7 @@ import ufrpe.sbpc.botpcd.entity.Disability
 import org.springframework.stereotype.Service
 import com.whatsapp.api.domain.webhook.Change
 import ufrpe.sbpc.botpcd.repository.PWDRepository
-import com.whatsapp.api.impl.WhatsappBusinessCloudApi
+import ufrpe.sbpc.botpcd.service.WhatsappService
 
 @Service
 class RegisterService(
