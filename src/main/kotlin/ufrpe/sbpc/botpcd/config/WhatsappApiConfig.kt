@@ -10,7 +10,7 @@ import java.beans.BeanProperty
 
 @Configuration
 class WhatsappApiConfig {
-    @Value("\${whatsapp.api.version")
+    @Value("\${whatsapp.api.version}")
     private lateinit var version: String
     @Value("\${whatsapp.api.token}")
     private lateinit var token: String
