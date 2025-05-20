@@ -14,7 +14,7 @@ import java.util.logging.Logger
 @RestController
 @Log
 class WhatsappWebhookController(private val firstContactService: FirstContactService) {
-	@Value("\${whatsapp.token}")
+	@Value("\${whatsapp.api.token}")
 	lateinit var VERIFY_TOKEN: String
 
 	@PostMapping("/webhooks")
