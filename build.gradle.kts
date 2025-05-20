@@ -1,4 +1,3 @@
-
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
@@ -52,6 +51,14 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.22.2"))
+    testImplementation(platform("org.assertj:assertj-bom:3.27.3"))
+    testImplementation("io.cucumber:cucumber-java")
+    testImplementation("io.cucumber:cucumber-junit-platform-engine")
+    testImplementation("org.junit.platform:junit-platform-suite")
+    testImplementation("org.assertj:assertj-core")
 }
 
 kotlin {
@@ -68,4 +75,7 @@ allOpen {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    // Work around. Gradle does not include enough information to disambiguate
+    // between different examples and scenarios.
+    systemProperty("cucumber.junit-platform.naming-strategy", "long")
 }

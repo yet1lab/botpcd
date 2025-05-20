@@ -11,7 +11,7 @@ sealed class ServiceType(val provider: Provider, val disability: Set<Disability>
     object Mobility: ServiceType(provider = Provider.MONITOR, disability = mutableSetOf(Disability.MOBILITY_IMPAIRED, Disability.PHYSICAL_DISABILITY, Disability.BLINDED)) {
         val monitorAssistanceType = MonitorAssistanceType.MOBILITY_MONITOR
     }
-    object AudioDescription: ServiceType(provider = Provider.COMMITTEE_MEMBER, disability = mutableSetOf(Disability.DEAFNESS))
+    object AudioDescription: ServiceType(provider = Provider.COMMITTEE_MEMBER, disability = mutableSetOf(Disability.BLINDED))
     object NeurodivergentSupport: ServiceType(provider = Provider.MONITOR, disability = mutableSetOf(Disability.NEURODIVERGENT)) {
         val monitorAssistanceType = MonitorAssistanceType.NEURODIVERGENT_SUPPORT_MONITOR
     }
