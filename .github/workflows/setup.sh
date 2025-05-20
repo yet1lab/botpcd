@@ -23,4 +23,11 @@ sudo apt-get update
 #==============================================
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+#==============================================
+#               Automated the setup of the github actions
+#==============================================
+sudo ./svc.sh install
+sudo ./svc.sh start
+
+
 

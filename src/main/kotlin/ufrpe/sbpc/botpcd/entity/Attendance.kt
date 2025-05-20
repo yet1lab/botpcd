@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 
 /**
- * Tanto quem tem deficiencia visua quanto de mobilidade pode requisitar um monitor de mobilidade
+ *
  */
 @Entity
 @Table(name = "tb_attendance")
