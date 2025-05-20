@@ -37,9 +37,8 @@ class FirstContactService(
 
             else -> {
                 // Usuario não cadastrado
-                registerService.registerPWD(phoneNumber, change)
+//                registerService.registerPWD(phoneNumber, change)
             }
         }
     }
-
 }

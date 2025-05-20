@@ -8,7 +8,7 @@ import ufrpe.sbpc.botpcd.repository.AttendanceRepository
 @Service
 class AttendanceService(
     private val attendanceRepository: AttendanceRepository,
-    private val userStatusService: StatusAttendService
+    private val userStatusService: AttendantStatusService
 ) {
 
     fun searchAttendances(): List<Attendance> {

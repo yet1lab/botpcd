@@ -1,4 +1,4 @@
-name: CI + Docker Build & Push
+name: CI_CD
 
 on:
   push:
@@ -31,3 +31,17 @@ jobs:
 
       - name: Push to Dockerhub
         run: docker push victoryghor/botpcd:latest
+
+  build:
+    runs-on: self-hosted
+    needs: test
+    steps:
+      - name: Login Dockerhub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Pull Docker image
+        run: docker pull victoryghor/botpcd:latest
+      - name: Delete Old docker container
+        run: docker rm -f botpcd-container || true
+      - name: Run Docker Container
+        run: docker run -d -p 8080:8080 --name botpcd-container victoryghor/botpcd:latest
+

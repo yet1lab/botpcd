@@ -1,7 +1,7 @@
 package ufrpe.sbpc.botpcd.entity
 
 /**
- * Quando for um porfissional de audio_description ou libras_interpreter precisa redirecionar diretamente para o profissional
+ * Quando for um profissional de audio_description ou libras_interpreter precisa redirecionar diretamente para o profissional
  *
  */
 enum class MonitorAssistanceType {

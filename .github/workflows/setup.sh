@@ -23,4 +23,18 @@ sudo apt-get update
 #==============================================
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+#==============================================
+#     Certbot and https
+#==============================================
+sudo apt install certbot python-certbot-nginx
+sudo certbot --nginx
+
+#==============================================
+#       Automated the setup of the github actions
+#==============================================
+cd actions-runner/
+sudo ./svc.sh install
+sudo ./svc.sh start
+
+
 
