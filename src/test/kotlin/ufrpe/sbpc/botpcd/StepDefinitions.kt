@@ -1,7 +1,7 @@
 package ufrpe.sbpc.botpcd
 
-import io.cucumber.java.en.Given
-
-class StepDefinitions {
-
-}
+//import io.cucumber.java.en.Given
+//
+//class StepDefinitions {
+//
+//}
