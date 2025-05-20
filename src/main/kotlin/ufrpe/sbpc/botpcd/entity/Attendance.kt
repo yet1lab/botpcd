@@ -12,24 +12,24 @@ import java.time.LocalDateTime
 class Attendance(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    var id: Long? = null,
 
     @NotNull(message = "The service type is required")
     @Convert(converter = ServiceTypeConverter::class)
-    val serviceType: ServiceType,
+    var serviceType: ServiceType,
 
     @NotNull(message = "The request date and time is required")
-    val requestDateTime: LocalDateTime,
+    var requestDateTime: LocalDateTime,
 
     @ManyToOne
     @JoinColumn(name = "pwd_id")
     @NotNull(message = "The PWD is required")
-    val pwd: PWD,
+    var pwd: PWD,
 
     @ManyToOne
     @JoinColumn(name = "monitor_id")
     @NotNull(message = "The monitor is required")
-    val monitor: Monitor,
+    var monitor: Monitor,
 
     // Campos opcionais que serão atualizados durante o ciclo de vida do atendimento
     var acceptDateTime: LocalDateTime? = null,

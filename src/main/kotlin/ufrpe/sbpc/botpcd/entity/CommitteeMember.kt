@@ -1,13 +1,14 @@
 package ufrpe.sbpc.botpcd.entity
 
 import jakarta.persistence.Entity
+import jakarta.persistence.Table
 
 /**
  *
  */
 @Entity
+@Table(name = "committee_member")
 class CommitteeMember(
-    id: Long,
     name: String,
     phoneNumber: String
-): User(id, name, phoneNumber)
+): User(name = name, phoneNumber = phoneNumber)

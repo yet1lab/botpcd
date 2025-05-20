@@ -1,21 +1,19 @@
 package ufrpe.sbpc.botpcd.controller
 
+import com.whatsapp.api.domain.webhook.WebHook
+import com.whatsapp.api.domain.webhook.WebHookEvent
 import lombok.extern.java.Log
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.Mapping
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*
+import ufrpe.sbpc.botpcd.service.FirstContactService
 import java.util.logging.Logger
+
 
 @RestController
 @Log
-class WhatsappWebhookController {
+class WhatsappWebhookController(private val firstContactService: FirstContactService) {
 	@Value("\${whatsapp.token}")
 	lateinit var VERIFY_TOKEN: String
 
@@ -25,12 +23,15 @@ class WhatsappWebhookController {
 		@RequestBody body: String
 	): ResponseEntity<String> {
 		val mapper = com.fasterxml.jackson.module.kotlin.jacksonObjectMapper()
-		val payload = mapper.readTree(body)
-
 		Logger.getLogger(WhatsappWebhookController::class.java.name).info(
-			"Evento recebido, objeto: \${payload.get(\"object\")?.asText()}"
+			"Evento recebido, $body"
 		)
-
+		val event: WebHookEvent = WebHook.constructEvent(body)
+		for(entry in event.entry) {
+			for(change in entry.changes) {
+				firstContactService.redirectFluxByUserType(change.value.phoneNumber, change)
+			}
+		}
 		// Opcional: validar assinatura com 'signature'
 		return ResponseEntity.ok("Evento processado")
 	}
