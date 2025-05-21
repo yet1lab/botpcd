@@ -43,5 +43,5 @@ jobs:
       - name: Delete Old docker container
         run: docker rm -f botpcd-container || true
       - name: Run Docker Container
-        run: docker run -d -p 8080:8080 --name botpcd-container victoryghor/botpcd:latest -e DB_USERNAME=${{secrets.DB_USER}} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e WHATSAPP_DATABASE_URL=${{ secrets.WHATSAPP_DATABASE_URL }}
+        run: docker run -d -p 8080:8080 --name botpcd-container victoryghor/botpcd:latest -e DB_USERNAME=${{secrets.DB_USER}} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e DB_HOST=${{ secrets.DB_HOST }}
 
