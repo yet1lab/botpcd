@@ -5,24 +5,24 @@ Funcionalidade: Mudar status do Atendente(Monitor ou membro da comissão)
   *Ocupado durante um atendimento
   *Indisponível quando encerrar o dia ou quando for ao banheiro, por exemplo.
 
+
   Esquema do Cenário: Solicitar mudança de status
     Dado que um <tipo_de_atendente> está com status <status_atual>
     Quando inicia a interação para mudar o status
-    Então o sistema deve apresentar uma <mensagem_de_troca_de_status>
-
+    Então o bot envia a mensagem “Olá, <tipo_de_atendente>! No momento, seu status está como <status_atual>. Para mudar para algum desses status <novo_status>, basta clicar no botão correspondente abaixo.” E o bot envia a lista de botões dos possíveis novos status.
     Exemplos:
-      | tipo_de_atendente   | status_atual | mensagem_de_troca_de_status                                                                           |
-      | monitor             | disponível   | Olá, você está Disponível no momento. Deseja ficar Indisponível para não receber atendimentos?        |
-      | monitor             | indisponível | Olá, você está Indisponível no momento. Deseja ficar Disponível para receber atendimentos?            |
-      | monitor             | ocupado      | Olá, você está em atendimento. Deseja encerrá-lo e continuar Disnpoível ou deseja ficar Indisponível? |
-      | membro da comissão  | disponível   | Olá, você está Disponível no momento. Deseja ficar Indisponível para não receber atendimentos?        |
-      | membro da comissão  | indisponível | Olá, você está Indisponível no momento. Deseja ficar Disponível para receber atendimentos?            |
-      | membro da commissão | ocupado      | Olá, você está em atendimento. Deseja encerrá-lo e continuar Disnpoível ou deseja ficar Indisponível? |
+      | tipo_de_atendente  | status_atual | novo_status             |
+      | monitor            | disponível   | indisponível            |
+      | monitor            | indisponível | disponível              |
+      | monitor            | ocupado      | disponível,indisponível |
+      | membro da comissão | disponível   | indisponível            |
+      | membro da comissão | indisponível | indisponível            |
+      | membro da comissão | ocupado      | disponível,indisponível |
 
   Esquema do Cenário: Confirmar mudança de status
     Dado que o <tipo_de_atendente> está no <antigo_status> recebeu uma solicitação para mudar para o status <novo_status>
     Quando o <tipo_de_atendente> confirma a mudança
-    Então o status do <tipo_de_atendente> deve ser atualizado para <novo_status> E o sistema deve notificar sobre a mudança bem-sucedida
+    Então o status do <tipo_de_atendente> deve ser atualizado para <novo_status> E o bot deve enviar a mensagem “Mudança realizada com sucesso agora seu novo status é <novo_status>”.
 
     Exemplos:
       | tipo_de_atendente  | antigo_status | novo_status  |
