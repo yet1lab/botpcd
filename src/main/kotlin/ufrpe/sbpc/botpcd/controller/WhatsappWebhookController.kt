@@ -12,7 +12,7 @@ import ufrpe.sbpc.botpcd.service.FirstContactService
 
 @RestController
 class WhatsappWebhookController(private val firstContactService: FirstContactService) {
-	@Value("\${whatsapp.api.token}")
+	@Value("\${whatsapp.verify.token}")
 	lateinit var VERIFY_TOKEN: String
 	var logger = LoggerFactory.getLogger(WhatsappWebhookController::class.java)
 
