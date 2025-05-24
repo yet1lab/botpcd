@@ -27,6 +27,7 @@ repositories {
 }
 
 dependencies {
+    implementation(kotlin("reflect"))
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("com.github.Bindambc:whatsapp-business-java-api:v0.6.1")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
@@ -41,6 +42,7 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("com.h2database:h2")
+    implementation(platform("com.google.cloud:spring-cloud-gcp-dependencies:6.2.1"))
     runtimeOnly("org.postgresql:postgresql")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
