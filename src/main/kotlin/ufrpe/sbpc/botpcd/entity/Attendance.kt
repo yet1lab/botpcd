@@ -27,9 +27,13 @@ class Attendance(
     var pwd: PWD,
 
     @ManyToOne
-    @JoinColumn(name = "monitor_id")
-    @NotNull(message = "The monitor is required")
-    var monitor: Monitor,
+    @JoinColumn(name = "attendant_id")
+    @NotNull(message = "The attendant ID is required")
+    var attendant: Attendant,
+
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "The attendant type is required")
+    var attendantType: Provider,
 
     // Campos opcionais que serão atualizados durante o ciclo de vida do atendimento
     var acceptDateTime: LocalDateTime? = null,
@@ -41,4 +45,3 @@ class Attendance(
 
     var endDateTime: LocalDateTime? = null
 )
-
