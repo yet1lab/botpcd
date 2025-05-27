@@ -23,7 +23,7 @@ class WhatsappService(
         val message = Message.MessageBuilder.builder()
             .setTo(destinyNumberID)
             .buildTextMessage(TextMessage().setBody(msg))
-        cloudApi.sendMessage(destinyNumberID, message)
+        cloudApi.sendMessage(botNumber, message)
     }
 
     fun sendButtons(botNumber: String, destinyNumberID: String, buttons: List<String>, titleMessage: String) {
@@ -45,7 +45,7 @@ class WhatsappService(
         val message = Message.MessageBuilder.builder()
             .setTo(destinyNumberID)
             .buildInteractiveMessage(interactiveMessage)
-        cloudApi.sendMessage(destinyNumberID, message)
+        cloudApi.sendMessage(botNumber, message)
     }
 }
  
