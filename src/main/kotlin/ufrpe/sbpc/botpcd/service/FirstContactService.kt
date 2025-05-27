@@ -16,6 +16,7 @@ class FirstContactService(
 ) {
     fun redirectFluxByUserType(phoneNumber: String, change: Change) {
         // to get a message from the change change.value.messages[0].text.body
+        val botNumber = change.value.metadata.phoneNumberId
         when {
             pwdRepository.findByPhoneNumber(phoneNumber) != null -> {
                 val pwd = pwdRepository.findByPhoneNumber(phoneNumber)!!
@@ -31,7 +32,7 @@ class FirstContactService(
             }
             else -> {
                 // Usuario não cadastrado
-                registerPWDService.whatIsYourDisability(phoneNumber)
+                registerPWDService.whatIsYourDisability(botNumber, phoneNumber)
             }
         }
     }

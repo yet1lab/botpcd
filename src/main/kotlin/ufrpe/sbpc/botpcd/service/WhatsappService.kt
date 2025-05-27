@@ -10,6 +10,7 @@ import com.whatsapp.api.domain.messages.TextMessage
 import com.whatsapp.api.domain.messages.type.ButtonType
 import com.whatsapp.api.domain.messages.type.InteractiveMessageType
 import com.whatsapp.api.impl.WhatsappBusinessCloudApi
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 
@@ -18,14 +19,14 @@ class WhatsappService(
     private val cloudApi: WhatsappBusinessCloudApi
 ) {
 
-    fun sendMessage(destinyNumberID: String, msg: String) {
+    fun sendMessage(botNumber: String, destinyNumberID: String, msg: String) {
         val message = Message.MessageBuilder.builder()
             .setTo(destinyNumberID)
             .buildTextMessage(TextMessage().setBody(msg))
         cloudApi.sendMessage(destinyNumberID, message)
     }
 
-    fun sendButtons(destinyNumberID: String, buttons: List<String>, titleMessage: String) {
+    fun sendButtons(botNumber: String, destinyNumberID: String, buttons: List<String>, titleMessage: String) {
         val action = Action()
         buttons.forEachIndexed { index, title ->
             val button = Button()
