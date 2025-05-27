@@ -23,5 +23,8 @@ enum class Disability(val textOption: String) {
 		fun textList(): Array<String> {
 			return Disability.entries.map { it.textOption }.toTypedArray()
 		}
+		fun disabilitiesOptions(): List<String> {
+			return listOf(*textList(), "Não preciso de suporte")
+		}
 	}
 }

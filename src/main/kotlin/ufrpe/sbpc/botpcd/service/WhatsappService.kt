@@ -25,7 +25,7 @@ class WhatsappService(
         cloudApi.sendMessage(destinyNumberID, message)
     }
 
-    fun sendButtons(destinyNumberID: String, buttons: Array<String>, titleMessage: String) {
+    fun sendButtons(destinyNumberID: String, buttons: List<String>, titleMessage: String) {
         val action = Action()
         buttons.forEachIndexed { index, title ->
             val button = Button()

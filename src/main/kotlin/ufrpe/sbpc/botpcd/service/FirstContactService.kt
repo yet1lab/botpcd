@@ -11,7 +11,8 @@ class FirstContactService(
     private val pwdRepository: PWDRepository,
     private val monitorRepository: MonitorRepository,
     private val committeeMemberRepository: CommitteeMemberRepository,
-    private val registerPWDService: RegisterPWDService
+    private val registerPWDService: RegisterPWDService,
+    private val whatsappService: WhatsappService
 ) {
     fun redirectFluxByUserType(phoneNumber: String, change: Change) {
         // to get a message from the change change.value.messages[0].text.body
@@ -30,7 +31,7 @@ class FirstContactService(
             }
             else -> {
                 // Usuario não cadastrado
-                registerPWDService.sendDisabilities(phoneNumber)
+                registerPWDService.whatIsYourDisability(phoneNumber)
             }
         }
     }
