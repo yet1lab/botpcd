@@ -11,12 +11,16 @@ class FirstContactService(
     private val pwdRepository: PWDRepository,
     private val monitorRepository: MonitorRepository,
     private val committeeMemberRepository: CommitteeMemberRepository,
-    private val registerService: RegisterService
+    private val registerService: RegisterPWDService
 ) {
     fun redirectFluxByUserType(phoneNumber: String, change: Change) {
+        // to get a message from the change change.value.messages[0].text.body
         when {
             pwdRepository.findByPhoneNumber(phoneNumber) != null -> {
-
+                val pwd = pwdRepository.findByPhoneNumber(phoneNumber)!!
+                if(pwd.name == null) {
+//                    registerService.
+                }
             }
             monitorRepository.findByPhoneNumber(phoneNumber) != null -> {
 

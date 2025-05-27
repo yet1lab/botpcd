@@ -22,12 +22,12 @@ class WhatsappWebhookController(private val firstContactService: FirstContactSer
 		@RequestBody body: String
 	): ResponseEntity<String> {
 		logger.warn(
-			"Evento recebido, $body"
+			body
 		)
 		val event: WebHookEvent = WebHook.constructEvent(body)
 		for(entry in event.entry) {
 			for(change in entry.changes) {
-				firstContactService.redirectFluxByUserType(change.value.phoneNumber, change)
+				firstContactService.redirectFluxByUserType(change.value.contacts[0].waId, change)
 			}
 		}
 		// Opcional: validar assinatura com 'signature'
