@@ -19,7 +19,7 @@ class RegisterPWDService(
 
 	}
 	fun whatIsYourDisability(botNumber: String, pwdPhoneNumber: String) {
-		whatsappService.sendButtons(botNumber,pwdPhoneNumber, Disability.disabilitiesOptions(), "Qual sua deficiência")
+		whatsappService.sendMessage(botNumber,pwdPhoneNumber, Disability.disabilitiesOptions(), "Qual sua deficiência")
 	}
 
 	fun whatsIsYourName(pwdPhoneNumber: String) {
