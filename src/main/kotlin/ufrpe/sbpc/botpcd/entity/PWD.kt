@@ -17,8 +17,7 @@ import org.springframework.data.repository.NoRepositoryBean
 class PWD(
     name: String? = null,
     phoneNumber: String,
-    phoneNumberId: String,
     @NotEmpty(message = "The PWD needs to have a disability")
     @Enumerated(value = EnumType.STRING)
     var disability: MutableSet<Disability>
-): User(name = name, phoneNumber = phoneNumber, phoneNumberId = phoneNumberId)
+): User(name = name, phoneNumber = phoneNumber)

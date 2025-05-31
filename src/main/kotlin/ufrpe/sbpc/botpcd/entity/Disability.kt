@@ -12,6 +12,7 @@ enum class Disability(val textOption: String) {
 	PHYSICAL_DISABILITY("Deficiência física"),
 	MOBILITY_IMPAIRED("Não tenho deficiência, mas tenho mobilidade reduzida");
 
+
 	companion object {
 		fun parse(text: String): Disability {
 			val disability = Disability.entries.find { it.textOption.equals(text, ignoreCase = true) }
@@ -26,5 +27,6 @@ enum class Disability(val textOption: String) {
 		fun disabilitiesOptions(): List<String> {
 			return listOf(*textList(), "Não preciso de suporte")
 		}
+		fun getByOrdinal(ordinal: Int) = Disability.entries.find { it.ordinal == ordinal }
 	}
 }

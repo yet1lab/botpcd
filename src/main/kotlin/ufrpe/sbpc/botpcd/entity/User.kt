@@ -25,6 +25,5 @@ abstract class User(
     var id: Long? = null,
     var name: String? = null,
     @NotEmpty(message = "The User needs to have a phone number")
-    var phoneNumber: String,
-    var phoneNumberId: String? = null
+    var phoneNumber: String
 )

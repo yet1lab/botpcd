@@ -2,6 +2,7 @@ package ufrpe.sbpc.botpcd.controller
 
 import com.whatsapp.api.domain.webhook.WebHook
 import com.whatsapp.api.domain.webhook.WebHookEvent
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
@@ -14,7 +15,7 @@ import ufrpe.sbpc.botpcd.service.FirstContactService
 class WhatsappWebhookController(private val firstContactService: FirstContactService) {
 	@Value("\${whatsapp.verify.token}")
 	lateinit var VERIFY_TOKEN: String
-	var logger = LoggerFactory.getLogger(WhatsappWebhookController::class.java)
+	val logger: Logger = LoggerFactory.getLogger(WhatsappWebhookController::class.java)
 
 	@PostMapping("/webhooks")
 	fun eventNotification(
@@ -27,11 +28,14 @@ class WhatsappWebhookController(private val firstContactService: FirstContactSer
 		val event: WebHookEvent = WebHook.constructEvent(body)
 		for(entry in event.entry) {
 			for(change in entry.changes) {
+				if(change.value?.messages == null) {
+					return ResponseEntity.ok("We don't handle this type of message")
+				}
 				firstContactService.redirectFluxByUserType(change.value.contacts[0].waId, change)
 			}
 		}
 		// Opcional: validar assinatura com 'signature'
-		return ResponseEntity.ok("Evento processado")
+		return ResponseEntity.ok("Event process")
 	}
 
 	@GetMapping("/webhooks")

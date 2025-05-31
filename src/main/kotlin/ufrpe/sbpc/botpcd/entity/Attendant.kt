@@ -13,6 +13,4 @@ abstract class Attendant(
     phoneNumber: String,
     @Enumerated(EnumType.STRING)
     var status: UserStatus = UserStatus.AVAILABLE
-) : User(name = name, phoneNumber = phoneNumber) {
-
-}
+) : User(name = name, phoneNumber = phoneNumber)

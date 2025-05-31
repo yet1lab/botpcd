@@ -15,6 +15,10 @@ Funcionalidade: Cadastro do PCD
       Quando O usuário envia a mensagem 7.
       Então O bot envia a mensagem Agradecemos o contato! Este canal é exclusivo para atendimento de pessoas com deficiência ou mobilidade reduzida que participarão do evento. Desejamos a você uma excelente participação na 77ª Reunião Anual da SBPC.
 
+    Cenario:
+      Quando o usuário envia mensagem 10
+      Entao bot envia a mensagem Olá, qual sua deficiência? Digite 1 para Deficiência visual, Digite 2 para Deficiência auditiva/surdez, Digite 3 para Surdocegueira, Digite 4 para TEA/Neurodivergente, Digite 5 para Deficiência física, Digite 6 para Mobilidade reduzida, Digite 7 para Não preciso de suporte.
+
     Esquema do Cenario: O usuário responde que tem deficiência
       Quando usuário envia a mensagem <numero_da_deficiencia>.
       Então o bot vai registrar o tipo de deficiência do usuário E bot vai envia a mensagem Qual o seu nome?
@@ -29,4 +33,4 @@ Funcionalidade: Cadastro do PCD
     Cenario: O usuário responde com o seu nome
       Dado usuário recebeu a mensagem do bot Qual o seu nome?
       Quando usuário mandar qualquer mensagem para o botpcd
-      Entao o bot precisa Salvar o nome do usuário
+      Entao o bot precisa Salvar o nome do usuário E o bot vai envia a mensagem Cadastro realizado.

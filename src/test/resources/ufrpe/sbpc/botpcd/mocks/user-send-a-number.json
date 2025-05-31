@@ -1,0 +1,39 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1944143699658447",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "15556557522",
+              "phone_number_id": "610886818782897"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "joazinho da terra"
+                },
+                "wa_id": "558112345678"
+              }
+            ],
+            "messages": [
+              {
+                "from": "558112345678",
+                "id": "wamid.jfiajdsijfiqbeufbausdf",
+                "timestamp": "1748715839",
+                "text": {
+                  "body": "1"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}
