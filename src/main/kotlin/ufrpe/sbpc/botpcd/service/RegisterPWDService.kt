@@ -19,7 +19,15 @@ class RegisterPWDService(
 
 	}
 	fun whatIsYourDisability(botNumber: String, pwdPhoneNumber: String) {
-		whatsappService.sendMessage(botNumber,pwdPhoneNumber, Disability.disabilitiesOptions(), "Qual sua deficiência")
+		val message = """Olá, qual sua deficiência?
+			|Digite 1 para Deficiência visual, 
+			|Digite 2 para Deficiência auditiva/surdez, 
+			|Digite 3 para Surdocegueira, 
+			|Digite 4 para TEA/Neurodivergente, 
+			|Digite 5 para Deficiência física, 
+			|Digite 6 para Mobilidade reduzida, 
+			|Digite 7 para Não preciso de suporte.""".trimMargin()
+		whatsappService.sendMessage(botNumber,pwdPhoneNumber, message)
 	}
 
 	fun whatsIsYourName(pwdPhoneNumber: String) {
