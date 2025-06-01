@@ -5,11 +5,10 @@ Funcionalidade: Cadastro do PCD
   Cenario: Usuário não cadastrado manda qualquer mensagem
     Dado usuário não cadastrado
     Quando usuário mandar qualquer mensagem para o botpcd
-    Entao bot envia mensagens com o tipo de deficiencia
+    Entao bot envia mensagem "com os tipos de deficiencias"
 
   Regra: Apenas Usuarios com deficiência podem ser cadastrados no sistema
-    Cenario de Fundo:
-      usuário que recebeu a mensagem Você possui algum tipo de deficiencia? E usuário não cadastrado
+    Cenário de Fundo: usuário que recebeu a mensagem com os tipos de deficiencias E usuário não cadastrado
 
     Cenario: O usuário responde que não precisa de suporte
       Quando O usuário envia a mensagem 7.
