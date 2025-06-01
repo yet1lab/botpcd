@@ -67,6 +67,6 @@ Digite 7 para Não preciso de suporte.
     }
     @Given("usuário que recebeu a mensagem {string}")
     fun `usuário que recebeu a mensagem`(message: String) {
-
+        val latestMessage = messageExchangeRepository.findLatestMessage()
     }
 }
