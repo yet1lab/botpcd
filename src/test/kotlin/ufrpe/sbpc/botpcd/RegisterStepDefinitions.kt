@@ -30,7 +30,15 @@ class RegisterStepDefinitions {
     }
     @Then("^bot envia mensagens com o tipo de deficiencia$")
     fun `bot envia qualquer mensagem`() {
-        val mensagemEsperada = Disability.getOptions()
+        val mensagemEsperada = """Olá, qual sua deficiência?
+Digite 1 para Deficiência visual 
+Digite 2 para Deficiência auditiva/surdez 
+Digite 3 para Surdocegueira 
+Digite 4 para Transtorno do Espectro Autista/Neurodivergente 
+Digite 5 para Deficiência física 
+Digite 6 para Não tenho deficiência, mas tenho mobilidade reduzida 
+Digite 7 para Não preciso de suporte.
+        """.trimIndent()
         val apiMock = whatsappBusinessCloudApiMock
         val mensagemEnviada = apiMock.capturedMessage!!.textMessage!!.body
         assertEquals(mensagemEnviada, mensagemEsperada)
