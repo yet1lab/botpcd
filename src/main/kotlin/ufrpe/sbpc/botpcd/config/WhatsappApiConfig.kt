@@ -6,8 +6,10 @@ import com.whatsapp.api.impl.WhatsappBusinessCloudApi
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import java.beans.BeanProperty
 
+@Profile("!test")
 @Configuration
 class WhatsappApiConfig {
     @Value("\${whatsapp.api.token}")

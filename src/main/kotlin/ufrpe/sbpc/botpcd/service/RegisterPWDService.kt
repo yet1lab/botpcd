@@ -19,12 +19,7 @@ class RegisterPWDService(
 			pwdRepository.save(pwd)
 	}
 	fun whatIsYourDisability(botPhoneNumber: String, pwdPhoneNumber: String) {
-		var message = "Olá, qual sua deficiência?\n"
-		for (disability in Disability.entries) {
-			message += "Digite ${disability.ordinal + 1} para ${disability.textOption} \n"
-		}
-		message += "Digite 7 para Não preciso de suporte."
-		whatsappService.sendMessage(botPhoneNumber,pwdPhoneNumber, message)
+		whatsappService.sendMessage(botPhoneNumber,pwdPhoneNumber, Disability.getOptions())
 	}
 
 	fun whatsIsYourName(botPhoneNumber: String, pwdPhoneNumber: String) {

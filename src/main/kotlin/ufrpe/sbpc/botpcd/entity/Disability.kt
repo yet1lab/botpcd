@@ -21,11 +21,13 @@ enum class Disability(val textOption: String) {
 			}
 			return disability
 		}
-		fun textList(): Array<String> {
-			return Disability.entries.map { it.textOption }.toTypedArray()
-		}
-		fun disabilitiesOptions(): List<String> {
-			return listOf(*textList(), "Não preciso de suporte")
+		fun getOptions(): String {
+			var message = "Olá, qual sua deficiência?\n"
+			for (disability in Disability.entries) {
+				message += "Digite ${disability.ordinal + 1} para ${disability.textOption} \n"
+			}
+			message += "Digite 7 para Não preciso de suporte."
+			return message
 		}
 		fun getByOrdinal(ordinal: Int) = Disability.entries.find { it.ordinal == ordinal }
 	}
