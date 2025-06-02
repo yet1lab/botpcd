@@ -36,10 +36,7 @@ class FirstContactService(
                     whatsappService.sendMessage(botNumber, phoneNumber, "Olá, ${pwd.name}.")
                 }
             }
-            monitorRepository.findByPhoneNumber(phoneNumber) != null -> {
-
-            }
-            committeeMemberRepository.findByPhoneNumber(phoneNumber) != null -> {
+            monitorRepository.findByPhoneNumber(phoneNumber) != null || committeeMemberRepository.findByPhoneNumber(phoneNumber) != null-> {
 
             }
             message in disabilityNumberOptions -> {
