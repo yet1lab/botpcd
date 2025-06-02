@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Profile
 import java.time.LocalDateTime
 
 @Entity
-@Profile("test")
 class MessageExchange(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
