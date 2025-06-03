@@ -22,9 +22,9 @@ enum class Disability(val textOption: String) {
 			return disability
 		}
 		fun getOptions(): String {
-			var message = "Olá, qual sua deficiência?\n"
+			var message = "Olá, qual sua deficiência?"
 			for (disability in Disability.entries) {
-				message += "Digite ${disability.ordinal + 1} para ${disability.textOption} \n"
+				message += "- Digite ${disability.ordinal + 1} para ${disability.textOption} \n"
 			}
 			message += "Digite 7 para Não preciso de suporte."
 			return message

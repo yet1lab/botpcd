@@ -2,8 +2,6 @@
 Funcionalidade: Acessar serviços de assistência
   Como um PCD, quero poder acessar os serviços que estão disponíveis para o meu tipo de deficiência, para que eu consiga aproveitar o evento da SBPC.
 
-    Cenário de Fundo: pcd está cadastrado
-
     Esquema do Cenário Listar serviços de acordo com meu tipo de deficiência
       Quando O PCD com a deficiência de <tipo_de_deficiencia> mandar qualquer mensagem
       Entao O bot vai enviar uma lista de opções de acordo com a <opccoes_de_servico>
@@ -18,8 +16,8 @@ Funcionalidade: Acessar serviços de assistência
         | Surdocegueira       | guia-intérprete                                                                            |
 
   Esquema do Cenário Direcionar para o atendente(monitor ou membro da comissão)
-      Dado o bot enviou a mensagem de opção de serviço
-      Quando o PCD selecionar o <servico_desejado>
+      Dado bot enviou a mensagem de opção de serviço
+      Quando PCD envia a mensagem "<servico_desejado>"
       Entao bot vai direcionar para o <tipo_de_atendente> disponível no momento
 
       Exemplos:
@@ -35,12 +33,12 @@ Funcionalidade: Acessar serviços de assistência
 
   Cenário: Bot direciona mensagem do PCD para o atendente correto
     Dado Atendente aceitou o atendimento do PCD
-    Quando o PCD envia uma mensagem para o bot
+    Quando pcd envia qualquer mensagem para o bot
     Então o Atendente deve receber a mensagem do PCD
-    E NENHUM outro Atendente ou PCD deve receber a mesma mensagem
+    E nemhum outro Atendente ou PCD deve receber a mesma mensagem
 
   Cenário: Bot direciona mensagem do atendente para o PCD correto
     Dado que o Atendente aceitou o atendimento do PCD
-    Quando o Atendente envia uma mensagem para o bot
+    Quando atendente envia uma mensagem para o bot
     Então o PCD deve receber a mensagem do Atendente
-    E NENHUM outro PCD ou Atendente deve receber a mesma mensagem
+    E nemhum outro PCD ou Atendente deve receber a mesma mensagem
