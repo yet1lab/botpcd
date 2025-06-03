@@ -16,7 +16,8 @@ class FirstContactService(
     private val monitorRepository: MonitorRepository,
     private val committeeMemberRepository: CommitteeMemberRepository,
     private val registerPWDService: RegisterPWDService,
-    private val whatsappService: WhatsappService
+    private val whatsappService: WhatsappService,
+    private val attendanceService: AttendanceService
 ) {
     val logger: Logger = LoggerFactory.getLogger(WhatsappWebhookController::class.java)
     fun redirectFluxByUserType(phoneNumber: String, change: Change) {
@@ -34,6 +35,7 @@ class FirstContactService(
                 } else {
                     // Completar com o resto da menssagem
                     whatsappService.sendMessage(botNumber, phoneNumber, "Olá, ${pwd.name}.")
+                    attendanceService.sendServices(botNumber,phoneNumber, pwd.disability.first())
                 }
             }
             monitorRepository.findByPhoneNumber(phoneNumber) != null || committeeMemberRepository.findByPhoneNumber(phoneNumber) != null-> {

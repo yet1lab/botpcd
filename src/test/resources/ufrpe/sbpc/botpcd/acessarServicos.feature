@@ -10,14 +10,14 @@ Funcionalidade: Acessar serviços de assistência
 
       Exemplos:
         | tipo_de_deficiência | opccoes_de_servico                                                                         |
-        | Surdez              | Informações em Libras,atividade com interpretação em Libras                                |
+        | Surdez              | informações em Libras,atividade com interpretação em Libras                                |
         | Mobilidade Reduzida | ajuda na mobilidade,transporte para deslocamento no evento                                 |
         | Deficiência Física  | ajuda na mobilidade,ajuda com alimentação e higiene,transporte para deslocamento no evento |
         | Cegueira            | ajuda na mobilidade,programação com audiodescrição                                         |
         | Neurodivergente     | suporte para pessoas neurodivergentes                                                      |
         | Surdocegueira       | guia-intérprete                                                                            |
 
-    Esquema do Cenário Direcionar para o atendente(monitor ou membro da comissão)
+  Esquema do Cenário Direcionar para o atendente(monitor ou membro da comissão)
       Dado o bot enviou a mensagem de opção de serviço
       Quando o PCD selecionar o <servico_desejado>
       Entao bot vai direcionar para o <tipo_de_atendente> disponível no momento
