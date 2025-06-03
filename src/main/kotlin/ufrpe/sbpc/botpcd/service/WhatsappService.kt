@@ -15,11 +15,19 @@ import org.springframework.stereotype.Service
 class WhatsappService(
     private val cloudApi: WhatsappBusinessCloudApi
 ) {
-   fun sendMessage(botNumber: String, destinyNumberID: String, msg: String) {
+    fun sendMessage(botNumber: String, destinyNumberID: String, msg: String) {
         val message = Message.MessageBuilder.builder()
             .setTo(destinyNumberID)
             .buildTextMessage(TextMessage().setBody(msg))
         cloudApi.sendMessage(botNumber, message)
+    }
+
+    fun createOptions(options: List<String>, header: String = ""): String {
+        var mensage = "${header}\n"
+        for (i in options.indices) {
+            mensage += "- Digite ${i + 1} para ${options[i]}\n"
+        }
+        return mensage
     }
 }
  
