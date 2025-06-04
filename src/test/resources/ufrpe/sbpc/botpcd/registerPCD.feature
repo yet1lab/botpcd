@@ -18,7 +18,8 @@ Olá, qual sua deficiência?
 """
 
   Regra: Apenas Usuarios com deficiência podem ser cadastrados no sistema
-    Cenário de Fundo: usuário recebeu mensagem
+    Cenário de Fundo: Dado usuário não cadastrado
+      E usuário recebeu mensagem
     """
 Olá, qual sua deficiência?
 - Digite 1 para Deficiência visual
@@ -29,7 +30,6 @@ Olá, qual sua deficiência?
 - Digite 6 para Não tenho deficiência, mas tenho mobilidade reduzida
 - Digite 7 para Não preciso de suporte.
 """
-      E usuário não cadastrado
 
     Cenario: O usuário responde que não precisa de suporte
       Quando usuário envia mensagem "7"
@@ -48,21 +48,21 @@ Olá, qual sua deficiência?
 - Digite 6 para Não tenho deficiência, mas tenho mobilidade reduzida
 - Digite 7 para Não preciso de suporte.
 """
-
     Esquema do Cenario: O usuário responde que tem deficiência
       Quando usuário envia mensagem "<numero_da_deficiencia>"
-      Então bot registrar o usuário com "<tipo_deficiencia>"
+      Então bot registra o usuário com deficiencia "<tipo_deficiencia>"
       E bot envia mensagem "Qual o seu nome?"
 
       Exemplos:
-        | numero_da_deficiencia | tipo_deficiencia                                      |
-        | 1                     | Deficiência visual                                    |
-        | 2                     | Deficiência auditiva/surdez                             |
-        | 3                     | Surdocegueira                                         |
-        | 4                     | Transtorno do Espectro Autista/Neurodivergente          |
-        | 5                     | Deficiência física                                    |
-        | 6                     | Não tenho deficiência, mas tenho mobilidade reduzida   |
+        | numero_da_deficiencia | tipo_deficiencia                                     |
+        | 1                     | Deficiência visual                                   |
+        | 2                     | Deficiência auditiva/surdez                          |
+        | 3                     | Surdocegueira                                        |
+        | 4                     | Transtorno do Espectro Autista/Neurodivergente       |
+        | 5                     | Deficiência física                                   |
+        | 6                     | Não tenho deficiência, mas tenho mobilidade reduzida |
     Cenario: O usuário responde com o seu nome
     Dado usuário recebeu mensagem "Qual o seu nome?"
     Quando usuário envia mensagem "João Victor"
-    Entao bot envia a mensagem "Cadastro realizado" E bot salva o nome do usuário
+    Entao bot envia mensagem "Cadastro realizado"
+      E bot salva o nome do usuário "João Victor"

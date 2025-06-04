@@ -5,7 +5,9 @@ import com.whatsapp.api.domain.webhook.WebHook
 import io.cucumber.java.pt.Dado
 import io.cucumber.java.pt.Entao
 import io.cucumber.java.pt.Quando
+import io.cucumber.spring.ScenarioScope
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -13,6 +15,7 @@ import ufrpe.sbpc.botpcd.entity.MessageExchange
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.repository.PWDRepository
 import java.io.File
+
 
 class StepDefinitions(
     private val mockMvc: MockMvc,
@@ -24,7 +27,7 @@ class StepDefinitions(
     private val botNumber: String = "15556557522"
     @Dado("usuário não cadastrado")
     fun `usuário não cadastrado`() {
-        assertEquals(pwdRepository.findByPhoneNumber(numberUserNotRegister), null)
+        assertNull(pwdRepository.findByPhoneNumber(numberUserNotRegister))
     }
     @Quando("usuário envia mensagem {string}")
     fun `usuário envia a mensagem`(mensagemEnviada: String) {
@@ -34,9 +37,22 @@ class StepDefinitions(
     fun `bot envia mensagem quotes strings`(mensagemEsperada: String) {
         testarMensagemEnviada(mensagemEsperada)
     }
-    @Entao("bot registrar o usuário com {string}")
+    @Entao("bot registra o usuário com deficiencia {string}")
     fun `bot registra deficiencia do usuário`(deficiencia: String) {
-        assertEquals(pwdRepository.findByPhoneNumber(numberUserNotRegister)!!.disability.first().textOption, deficiencia)
+        assertEquals(pwdRepository.findByPhoneNumber(numberUserNotRegister)!!.disabilities.first().textOption, deficiencia)
+    }
+    @Entao("bot salva o nome do usuário {string}")
+    fun `bot salva o nome do usuário`(nome: String) {
+        assertEquals(pwdRepository.findByPhoneNumber(numberUserNotRegister)!!.name, nome)
+    }
+    @Entao("o bot deve registrar a deficiência {string} para o usuário")
+    fun oBotRegistraDeficienciaUsuario(deficiencia: String) {
+        val registro = pwdRepository.findByPhoneNumber(numberUserNotRegister)
+        assertEquals(deficiencia, registro!!.disabilities.first().textOption)
+    }
+    @Entao("o bot deve perguntar o nome do usuário")
+    fun oBotPerguntaNomeUsuario() {
+        testarMensagemEnviada("Qual o seu nome?")
     }
     @Entao("bot envia mensagem")
     fun `bot envia mensagem docs string`(mensagemEsperada: String) {
@@ -57,7 +73,7 @@ class StepDefinitions(
     fun testarMensagemEnviada(mensagemEsperada: String) {
         val apiMock = whatsappBusinessCloudApiMock
         val mensagemEnviada = apiMock.capturedMessage!!.textMessage!!.body
-        assertEquals(mensagemEnviada, mensagemEsperada)
+        assertEquals(mensagemEsperada, mensagemEnviada)
     }
     fun testarMensagemRecibida(mensagemRecebida: String) {
         val latestMessage = messageExchangeRepository.findFirstByToNumberOrderByCreateAtDesc(this.numberUserNotRegister)

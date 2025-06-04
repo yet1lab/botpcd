@@ -6,7 +6,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import ufrpe.sbpc.botpcd.controller.WhatsappWebhookController
 import ufrpe.sbpc.botpcd.entity.Disability
+import ufrpe.sbpc.botpcd.entity.MessageExchange
 import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
+import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.repository.MonitorRepository
 import ufrpe.sbpc.botpcd.repository.PWDRepository
 
@@ -17,31 +19,34 @@ class FirstContactService(
     private val committeeMemberRepository: CommitteeMemberRepository,
     private val registerPWDService: RegisterPWDService,
     private val whatsappService: WhatsappService,
-    private val attendanceService: AttendanceService
+    private val attendanceService: AttendanceService,
+    private val messageExchangeRepository: MessageExchangeRepository
 ) {
     val logger: Logger = LoggerFactory.getLogger(WhatsappWebhookController::class.java)
+
     fun redirectFluxByUserType(phoneNumber: String, change: Change) {
         // to get a message from the change change.value.messages[0].text.body
         val disabilityNumberOptions = Disability.entries.map { it.ordinal.toString() }.toMutableList().apply {  this.add("7") }
         val botNumber = change.value.metadata.phoneNumberId
         val message = change.value.messages[0].text.body.trim()
+        val lastBotMessage = messageExchangeRepository.findFirstByFromNumberOrderByCreateAtDesc(botNumber)
         when {
             pwdRepository.findByPhoneNumber(phoneNumber) != null -> {
                 val pwd = pwdRepository.findByPhoneNumber(phoneNumber)!!
                 // Nome ainda não registrado
-                if(pwd.name == null) {
+                if((lastBotMessage?.message ?: "Qual o seu nome?") == "" && pwd.name == null) {
                     registerPWDService.registerName(pwd, message)
                     whatsappService.sendMessage(botNumber, phoneNumber, "Cadastro realizado.")
                 } else {
                     // Completar com o resto da menssagem
                     whatsappService.sendMessage(botNumber, phoneNumber, "Olá, ${pwd.name}.")
-                    attendanceService.sendServices(botNumber,phoneNumber, pwd.disability.first())
+                    attendanceService.sendServices(botNumber,phoneNumber, pwd.disabilities.first())
                 }
             }
             monitorRepository.findByPhoneNumber(phoneNumber) != null || committeeMemberRepository.findByPhoneNumber(phoneNumber) != null-> {
 
             }
-            message in disabilityNumberOptions -> {
+            (lastBotMessage?.message ?: "") == Disability.getOptions() && message in disabilityNumberOptions -> {
                 val disabilityNumber = message.toInt()
                 val ordinalDisability = disabilityNumber - 1
                 val disability = Disability.getByOrdinal(ordinalDisability)
