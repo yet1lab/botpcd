@@ -19,7 +19,7 @@ Olá, qual sua deficiência?
 
   Regra: Apenas Usuarios com deficiência podem ser cadastrados no sistema
     Cenário de Fundo: Dado usuário não cadastrado
-      E bot enviou mensagem
+      E usuário recebeu mensagem
     """
 Olá, qual sua deficiência?
 - Digite 1 para Deficiência visual

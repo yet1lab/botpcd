@@ -41,8 +41,9 @@ class StepDefinitions(
     }
     @Entao("bot registra o usuário com deficiencia {string}")
     fun `bot registra deficiencia do usuário`(deficiencia: String) {
-        assertEquals(pwdRepository.findByPhoneNumber(numberUserNotRegister)!!.disabilities.first().textOption, deficiencia)
-        pwdRepository.delete(pwdRepository.findByPhoneNumber(numberUserNotRegister)!!)
+        val pwd = pwdRepository.findByPhoneNumberWithDisabilities(numberUserNotRegister)!!
+        assertEquals(pwd.disabilities.first().textOption, deficiencia)
+        pwdRepository.delete(pwd)
     }
     @Entao("bot salva o nome do usuário {string}")
     fun `bot salva o nome do usuário`(nome: String) {
@@ -61,21 +62,32 @@ class StepDefinitions(
     fun `bot envia mensagem docs string`(mensagemEsperada: String) {
         testarMensagemEnviada(mensagemEsperada)
     }
+    @Entao("usuario recebe mensagem {string}")
+    fun `usuario recebe mensagem`(message: String) {
+        testarMensagemRecibida(message)
+    }
+    @Entao("usuario recebe mensagem")
+    fun `usuario recebe mensagem docs string`(message: String) {
+        testarMensagemRecibida(message)
+    }
     @Dado("usuário recebeu mensagem {string}")
     fun `usuário recebeu mensagem`(message: String) {
-        testarMensagemRecibida(message)
+        messageExchangeRepository.save(MessageExchange(fromNumber = botNumber, toNumber = numberUserNotRegister, message = message))
     }
     @Dado("usuário recebeu mensagem")
     fun `usuário recebeu mensagem docs string`(message: String) {
-        testarMensagemRecibida(message)
+        mockUserRecievedMessage(numberUserNotRegister, message)
     }
     @Dado("bot enviou mensagem")
     fun `bot enviou mensagem`(message: String) {
-        messageExchangeRepository.save(MessageExchange(fromNumber = botNumber, toNumber = numberUserNotRegister, message = message))
+        mockUserRecievedMessage(numberUserNotRegister, message)
     }
     @Dado("pcd está cadastrado")
     fun pcdEstaCadastrado() {
         // Implementar lógica para garantir que o PCD está cadastrado no sistema
+    }
+    fun mockUserRecievedMessage(userNumber: String, message: String) {
+        messageExchangeRepository.save(MessageExchange(fromNumber = botNumber, toNumber =  numberUserNotRegister, message = message))
     }
     fun testarMensagemEnviada(mensagemEsperada: String) {
         val apiMock = whatsappBusinessCloudApiMock
