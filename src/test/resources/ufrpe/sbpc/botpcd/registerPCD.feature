@@ -5,7 +5,7 @@ Funcionalidade: Cadastro do PCD
   Cenario: Usuário não cadastrado manda qualquer mensagem
     Dado usuário não cadastrado
     Quando usuário envia mensagem "Oi"
-    Entao bot envia mensagem
+    Entao usuário recebeu mensagem
       """
 Olá, qual sua deficiência?
 - Digite 1 para Deficiência visual
@@ -19,7 +19,7 @@ Olá, qual sua deficiência?
 
   Regra: Apenas Usuarios com deficiência podem ser cadastrados no sistema
     Cenário de Fundo: Dado usuário não cadastrado
-      E usuário recebeu mensagem
+      E bot enviou mensagem
     """
 Olá, qual sua deficiência?
 - Digite 1 para Deficiência visual
@@ -51,7 +51,7 @@ Olá, qual sua deficiência?
     Esquema do Cenario: O usuário responde que tem deficiência
       Quando usuário envia mensagem "<numero_da_deficiencia>"
       Então bot registra o usuário com deficiencia "<tipo_deficiencia>"
-      E bot envia mensagem "Qual o seu nome?"
+      E usuário recebeu mensagem "Qual o seu nome?"
 
       Exemplos:
         | numero_da_deficiencia | tipo_deficiencia                                     |

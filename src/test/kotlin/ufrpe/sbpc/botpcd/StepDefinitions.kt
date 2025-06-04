@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import ufrpe.sbpc.botpcd.entity.Disability
 import ufrpe.sbpc.botpcd.entity.MessageExchange
+import ufrpe.sbpc.botpcd.entity.PWD
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.repository.PWDRepository
 import java.io.File
@@ -65,6 +67,10 @@ class StepDefinitions(
     @Dado("usuário recebeu mensagem")
     fun `usuário recebeu mensagem docs string`(message: String) {
         testarMensagemRecibida(message)
+    }
+    @Dado("bot enviou mensagem")
+    fun `bot enviou mensagem`(message: String) {
+        messageExchangeRepository.save(MessageExchange(fromNumber = botNumber, toNumber = numberUserNotRegister, message = message))
     }
     @Dado("pcd está cadastrado")
     fun pcdEstaCadastrado() {
