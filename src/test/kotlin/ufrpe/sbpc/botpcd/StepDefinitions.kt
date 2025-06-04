@@ -42,6 +42,7 @@ class StepDefinitions(
     @Entao("bot registra o usuário com deficiencia {string}")
     fun `bot registra deficiencia do usuário`(deficiencia: String) {
         assertEquals(pwdRepository.findByPhoneNumber(numberUserNotRegister)!!.disabilities.first().textOption, deficiencia)
+        pwdRepository.delete(pwdRepository.findByPhoneNumber(numberUserNotRegister)!!)
     }
     @Entao("bot salva o nome do usuário {string}")
     fun `bot salva o nome do usuário`(nome: String) {
