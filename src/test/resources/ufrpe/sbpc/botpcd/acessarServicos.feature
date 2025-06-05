@@ -3,7 +3,7 @@ Funcionalidade: Acessar serviços de assistência
   Como um PCD, quero poder acessar os serviços que estão disponíveis para o meu tipo de deficiência, para que eu consiga aproveitar o evento da SBPC.
 
     Esquema do Cenário Listar serviços de acordo com meu tipo de deficiência
-      Quando O PCD com a deficiência de "<tipo_de_deficiência>" mandar qualquer mensagem
+      Quando PCD com a deficiência de "<tipo_de_deficiência>" mandar qualquer mensagem
       Entao O bot vai enviar uma lista de opções de acordo com a <opccoes_de_servico>
 
       Exemplos:

@@ -12,7 +12,7 @@ class AttendanceService(
 ) {
     fun sendServices(botNumber: String, userNumber: String, disability: Disability) {
         val serviceList = ServiceType.getServicesByDisability(disability)
-        val message = whatsappService.createOptions(serviceList.map { it -> it.description })
+        val message = whatsappService.createOptions(serviceList.map { it -> it.description }, header = "Percebi que você tem ${if(disability.ordinal + 1 != 6) disability.textOption else "mobilidade reduzida"}. Os serviços disponíveis para você são:")
         whatsappService.sendMessage(botNumber, userNumber, message)
     }
 }
