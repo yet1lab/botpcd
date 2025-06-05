@@ -1,25 +1,24 @@
 package ufrpe.sbpc.botpcd.service
 
-import com.whatsapp.api.domain.messages.Action
-import com.whatsapp.api.domain.messages.Body
-import com.whatsapp.api.domain.messages.InteractiveMessage
 import com.whatsapp.api.domain.messages.Message
-import com.whatsapp.api.domain.messages.Section
 import com.whatsapp.api.domain.messages.TextMessage
-import com.whatsapp.api.domain.messages.type.InteractiveMessageType
 import com.whatsapp.api.impl.WhatsappBusinessCloudApi
 import org.springframework.stereotype.Service
+import ufrpe.sbpc.botpcd.entity.MessageExchange
+import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 
 
 @Service
 class WhatsappService(
-    private val cloudApi: WhatsappBusinessCloudApi
+    private val cloudApi: WhatsappBusinessCloudApi,
+    private val messageExchangeRepository: MessageExchangeRepository
 ) {
     fun sendMessage(botNumber: String, destinyNumberID: String, msg: String) {
         val message = Message.MessageBuilder.builder()
             .setTo(destinyNumberID)
             .buildTextMessage(TextMessage().setBody(msg))
         cloudApi.sendMessage(botNumber, message)
+        messageExchangeRepository.save(MessageExchange(fromPhoneNumber = botNumber, toPhoneNumber = destinyNumberID, message = msg))
     }
 
     fun createOptions(options: List<String>, header: String = ""): String {

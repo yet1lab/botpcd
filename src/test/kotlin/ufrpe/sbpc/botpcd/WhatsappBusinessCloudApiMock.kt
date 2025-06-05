@@ -21,8 +21,8 @@ class WhatsappBusinessCloudApiMock(token: String?) : WhatsappBusinessCloudApi(to
         // Retorna uma resposta simulada
         messageExchangeRepository.save(
             MessageExchange(
-                fromNumber = phoneNumberId!!,
-                toNumber = message!!.to,
+                fromPhoneNumber = phoneNumberId!!,
+                toPhoneNumber = message!!.to,
                 message = message.textMessage.body
             )
         )

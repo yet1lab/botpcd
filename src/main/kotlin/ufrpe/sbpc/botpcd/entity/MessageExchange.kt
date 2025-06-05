@@ -13,8 +13,8 @@ class MessageExchange(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    var fromNumber: String,
-    var toNumber: String,
+    var fromPhoneNumber: String,
+    var toPhoneNumber: String,
     @Column(columnDefinition = "TEXT")
     var message: String
 ) {

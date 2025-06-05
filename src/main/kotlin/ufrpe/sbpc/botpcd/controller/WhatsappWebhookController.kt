@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import ufrpe.sbpc.botpcd.entity.MessageExchange
+import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.service.FirstContactService
 
 
 @RestController
-class WhatsappWebhookController(private val firstContactService: FirstContactService) {
+class WhatsappWebhookController(private val firstContactService: FirstContactService, private val messageExchangeRepository: MessageExchangeRepository) {
 	@Value("\${whatsapp.verify.token}")
 	lateinit var VERIFY_TOKEN: String
 	val logger: Logger = LoggerFactory.getLogger(WhatsappWebhookController::class.java)
@@ -31,7 +33,8 @@ class WhatsappWebhookController(private val firstContactService: FirstContactSer
 				if(change.value?.messages == null) {
 					return ResponseEntity.ok("We don't handle this type of message")
 				}
-				firstContactService.redirectFluxByUserType(change.value.contacts[0].waId, change)
+				val userPhoneNumber = change.value.contacts[0].waId
+				firstContactService.redirectFluxByUserType(userPhoneNumber, change)
 			}
 		}
 		// Opcional: validar assinatura com 'signature'

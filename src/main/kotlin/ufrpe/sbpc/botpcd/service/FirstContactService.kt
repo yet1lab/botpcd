@@ -25,16 +25,16 @@ class FirstContactService(
     val logger: Logger = LoggerFactory.getLogger(WhatsappWebhookController::class.java)
 
     fun redirectFluxByUserType(phoneNumber: String, change: Change) {
-        // to get a message from the change change.value.messages[0].text.body
-        val disabilityNumberOptions = Disability.entries.map { it.ordinal.toString() }.toMutableList().apply {  this.add("7") }
+        val disabilityNumberOptions = Disability.entries.map { (it.ordinal + 1).toString() }.toMutableList().apply {  this.add("7") }
         val botNumber = change.value.metadata.phoneNumberId
         val message = change.value.messages[0].text.body.trim()
-        val lastBotMessage = messageExchangeRepository.findFirstByFromNumberOrderByCreateAtDesc(botNumber)
+        messageExchangeRepository.save(MessageExchange(fromPhoneNumber = phoneNumber, toPhoneNumber = botNumber, message = message))
+        val lastBotMessage = messageExchangeRepository.lastExchangeMessage(fromPhoneNumber = botNumber, toPhoneNumber = phoneNumber)
         when {
             pwdRepository.findByPhoneNumber(phoneNumber) != null -> {
                 val pwd = pwdRepository.findByPhoneNumber(phoneNumber)!!
                 // Nome ainda não registrado
-                if((lastBotMessage?.message ?: "Qual o seu nome?") == "" && pwd.name == null) {
+                if((lastBotMessage?.message ?: "") == "Qual o seu nome?" && pwd.name == null) {
                     registerPWDService.registerName(pwd, message)
                     whatsappService.sendMessage(botNumber, phoneNumber, "Cadastro realizado.")
                 } else {

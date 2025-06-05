@@ -5,7 +5,7 @@ Funcionalidade: Cadastro do PCD
   Cenario: Usuário não cadastrado manda qualquer mensagem
     Dado usuário não cadastrado
     Quando usuário envia mensagem "Oi"
-    Entao usuário recebeu mensagem
+    Entao usuário receberá mensagem
       """
 Olá, qual sua deficiência?
 - Digite 1 para Deficiência visual
@@ -33,11 +33,11 @@ Olá, qual sua deficiência?
 
     Cenario: O usuário responde que não precisa de suporte
       Quando usuário envia mensagem "7"
-      Então bot envia mensagem "Agradecemos o contato! Este canal é exclusivo para atendimento de pessoas com deficiência ou mobilidade reduzida que participarão do evento. Desejamos a você uma excelente participação na 77ª Reunião Anual da SBPC."
+      Então usuário receberá mensagem "Agradecemos o contato! Este canal é exclusivo para atendimento de pessoas com deficiência ou mobilidade reduzida que participarão do evento. Desejamos a você uma excelente participação na 77ª Reunião Anual da SBPC."
 
     Cenario:
       Quando usuário envia mensagem "10"
-      Entao bot envia mensagem
+      Entao usuário receberá mensagem
       """
 Olá, qual sua deficiência?
 - Digite 1 para Deficiência visual
@@ -49,9 +49,20 @@ Olá, qual sua deficiência?
 - Digite 7 para Não preciso de suporte.
 """
     Esquema do Cenario: O usuário responde que tem deficiência
+      Dado usuário recebeu mensagem
+    """
+Olá, qual sua deficiência?
+- Digite 1 para Deficiência visual
+- Digite 2 para Deficiência auditiva/surdez
+- Digite 3 para Surdocegueira
+- Digite 4 para Transtorno do Espectro Autista/Neurodivergente
+- Digite 5 para Deficiência física
+- Digite 6 para Não tenho deficiência, mas tenho mobilidade reduzida
+- Digite 7 para Não preciso de suporte.
+"""
       Quando usuário envia mensagem "<numero_da_deficiencia>"
-      Então bot registra o usuário com deficiencia "<tipo_deficiencia>"
-      E usuário recebeu mensagem "Qual o seu nome?"
+      Então bot registrará o usuário com deficiencia "<tipo_deficiencia>"
+      E usuário receberá mensagem "Qual o seu nome?"
 
       Exemplos:
         | numero_da_deficiencia | tipo_deficiencia                                     |
@@ -61,8 +72,10 @@ Olá, qual sua deficiência?
         | 4                     | Transtorno do Espectro Autista/Neurodivergente       |
         | 5                     | Deficiência física                                   |
         | 6                     | Não tenho deficiência, mas tenho mobilidade reduzida |
-    Cenario: O usuário responde com o seu nome
+
+  Cenario: O usuário responde com o seu nome
     Dado usuário recebeu mensagem "Qual o seu nome?"
-    Quando usuário envia mensagem "João Victor"
-    Entao bot envia mensagem "Cadastro realizado"
-      E bot salva o nome do usuário "João Victor"
+    E usuário possui deficiência cadastrada
+  Quando usuário envia mensagem "João Victor"
+  Entao usuário receberá mensagem "Cadastro realizado."
+    E bot salvará o nome do usuário "João Victor"

@@ -23,7 +23,6 @@ class RegisterPWDService(
 	}
 	fun whatIsYourDisability(botPhoneNumber: String, pwdPhoneNumber: String) {
 		whatsappService.sendMessage(botPhoneNumber,pwdPhoneNumber, Disability.getOptions())
-		messageExchangeRepository.save(MessageExchange(fromNumber = botPhoneNumber, toNumber = pwdPhoneNumber, message = Disability.getOptions()))
 	}
 
 	fun whatsIsYourName(botPhoneNumber: String, pwdPhoneNumber: String) {
