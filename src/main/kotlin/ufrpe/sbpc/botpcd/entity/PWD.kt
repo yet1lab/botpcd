@@ -1,8 +1,14 @@
 package ufrpe.sbpc.botpcd.entity
 
+import jakarta.persistence.CascadeType
+import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.CollectionTable
+import jakarta.persistence.Column
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.repository.NoRepositoryBean
@@ -17,8 +23,9 @@ import org.springframework.data.repository.NoRepositoryBean
 class PWD(
     name: String? = null,
     phoneNumber: String,
-    phoneNumberId: String,
-    @NotEmpty(message = "The PWD needs to have a disability")
-    @Enumerated(value = EnumType.STRING)
-    var disability: MutableSet<Disability>
-): User(name = name, phoneNumber = phoneNumber, phoneNumberId = phoneNumberId)
+    @ElementCollection(targetClass = Disability::class)
+    @CollectionTable(name = "tb_pwd_disabilities", joinColumns = [JoinColumn(name = "pwd_id")])
+    @Column(name = "disability")
+    @Enumerated(EnumType.STRING)
+    var disabilities: MutableSet<Disability> = mutableSetOf()
+): User(name = name, phoneNumber = phoneNumber)

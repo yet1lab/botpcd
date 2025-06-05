@@ -10,5 +10,6 @@ import jakarta.persistence.Table
 @Table(name = "committee_member")
 class CommitteeMember(
     name: String,
-    phoneNumber: String
-): User(name = name, phoneNumber = phoneNumber)
+    phoneNumber: String,
+    status: UserStatus
+): Attendant(name = name, phoneNumber = phoneNumber, status = status)

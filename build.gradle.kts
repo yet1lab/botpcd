@@ -50,7 +50,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
+    testImplementation("io.cucumber:cucumber-spring:7.22.2")
     testImplementation(platform("org.junit:junit-bom:5.12.2"))
     testImplementation(platform("io.cucumber:cucumber-bom:7.22.2"))
     testImplementation(platform("org.assertj:assertj-bom:3.27.3"))
