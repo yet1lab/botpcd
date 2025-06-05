@@ -57,7 +57,6 @@ class FirstContactService(
                     whatsappService.sendMessage(botNumber, phoneNumber, "Digite um número válido.")
                 } else {
                     registerPWDService.registerDisability(botNumber,phoneNumber, disability)
-                    whatsappService.sendMessage(botNumber, phoneNumber, "Entendi que você ${disability.textOption}")
                     registerPWDService.whatsIsYourName(botNumber, phoneNumber)
                 }
             }
