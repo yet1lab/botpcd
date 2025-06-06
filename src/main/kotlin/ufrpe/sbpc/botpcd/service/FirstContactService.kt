@@ -5,7 +5,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import ufrpe.sbpc.botpcd.controller.WhatsappWebhookController
-import ufrpe.sbpc.botpcd.entity.Attendant 
+import ufrpe.sbpc.botpcd.entity.Attendant
 import ufrpe.sbpc.botpcd.entity.Disability
 import ufrpe.sbpc.botpcd.entity.MessageExchange
 import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
@@ -18,11 +18,11 @@ class FirstContactService(
     private val pwdRepository: PWDRepository,
     private val monitorRepository: MonitorRepository,
     private val committeeMemberRepository: CommitteeMemberRepository,
-    private val registerPWDService: RegisterPWDService, 
-    private val whatsappService: WhatsappService, 
-    private val attendanceService: AttendanceService, 
-    private val messageExchangeRepository: MessageExchangeRepository, 
-    private val attendantStatusService: AttendantStatusService 
+    private val registerPWDService: RegisterPWDService,
+    private val whatsappService: WhatsappService,
+    private val attendanceService: AttendanceService,
+    private val messageExchangeRepository: MessageExchangeRepository,
+    private val attendantStatusService: AttendantStatusService
 ) {
     val logger: Logger = LoggerFactory.getLogger(WhatsappWebhookController::class.java)
 
@@ -52,41 +52,37 @@ class FirstContactService(
             attendant != null && message.equals("BotPCD", ignoreCase = true) -> {
                 attendantStatusService.sendStatusChanger(attendant, botNumber)
             }
-            
+
             // Usuario ainda desconhecido
             pwdRepository.findByPhoneNumber(phoneNumber) != null -> {
-                val pwd = pwdRepository.findByPhoneNumber(phoneNumber)!! 
+                val pwd = pwdRepository.findByPhoneNumber(phoneNumber)!!
                 if(lastBotMessageText == "Qual o seu nome?" && pwd.name == null) {
                     registerPWDService.registerName(pwd, message)
                     whatsappService.sendMessage(botNumber, phoneNumber, "Cadastro realizado.")
                 } else {
+                    // Completar com o resto da menssagem
                     whatsappService.sendMessage(botNumber, phoneNumber, "Olá, ${pwd.name}.")
-                    pwd.disabilities.firstOrNull()?.let { disability -> // Usar firstOrNull para segurança
-                        attendanceService.sendServices(botNumber,phoneNumber, disability)
-                    } ?: whatsappService.sendMessage(botNumber, phoneNumber, "Não encontramos deficiências registradas para você.")
+                    attendanceService.sendServices(botNumber,phoneNumber, pwd.disabilities.first())
                 }
             }
-            
-            // PCD responde a pergunta de deficiência
-            lastBotMessageText == Disability.getOptions() && message in disabilityNumberOptions -> {
+            monitorRepository.findByPhoneNumber(phoneNumber) != null || committeeMemberRepository.findByPhoneNumber(phoneNumber) != null-> {
+
+            }
+            (lastBotMessage?.message ?: "") == Disability.getOptions() && message in disabilityNumberOptions -> {
                 val disabilityNumber = message.toInt()
                 val ordinalDisability = disabilityNumber - 1
-                
-                if(disabilityNumber == 7){ 
+                val disability = Disability.getByOrdinal(ordinalDisability)
+                if(disabilityNumber == 7){
                     whatsappService.sendMessage(botNumber, phoneNumber, "Agradecemos o contato! Este canal é exclusivo para atendimento de pessoas com deficiência ou mobilidade reduzida que participarão do evento. Desejamos a você uma excelente participação na 77ª Reunião Anual da SBPC.")
+                } else if(disability == null) {
+                    logger.warn("Foi passado um numero de deficiencia incorreto numero da disability $disabilityNumber")
+                    whatsappService.sendMessage(botNumber, phoneNumber, "Digite um número válido.")
                 } else {
-                    val disability = Disability.getByOrdinal(ordinalDisability)
-                    if(disability == null) {
-                        logger.warn("Foi passado um numero de deficiencia incorreto numero da disability $disabilityNumber")
-                        whatsappService.sendMessage(botNumber, phoneNumber, "Digite um número válido.")
-                    } else {
-                        registerPWDService.registerDisability(botNumber,phoneNumber, disability)
-                        whatsappService.sendMessage(botNumber, phoneNumber, "Entendi que você ${disability.textOption}")
-                        registerPWDService.whatsIsYourName(botNumber, phoneNumber)
-                    }
+                    registerPWDService.registerDisability(botNumber,phoneNumber, disability)
+                    registerPWDService.whatsIsYourName(botNumber, phoneNumber)
                 }
             }
-            
+
             // Atendente enviou outra mensagem sem ser "BotPCD" (talvez isso mude no futuro pq vai ter a conversa entre o usuário e o atendente)
             else -> {
                 if (attendant != null) {
