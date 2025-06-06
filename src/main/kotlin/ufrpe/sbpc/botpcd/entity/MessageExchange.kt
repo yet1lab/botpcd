@@ -19,5 +19,5 @@ class MessageExchange(
     var message: String
 ) {
     @CreationTimestamp
-    var createAt: LocalDateTime? = null
+    lateinit var createAt: LocalDateTime
 }

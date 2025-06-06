@@ -64,4 +64,20 @@ Funcionalidade: Acessar serviços de assistência
   Cenario: Avisar que o atendimento foi encerrado
     Dado atendente estava em atendimento com um pcd
     Quando atendente encerrou o atendimento
-    Entao pcd recebeu mensagem "Atendimento Encerrado"
+    Entao pcd receberá mensagem "Atendimento Encerrado"
+
+  Esquema do Cenário: Atendete quando entra no estado disponível é direcionado para o pcd
+    Dado pcd que solicitou <tipo_de_servico> estava na fila de espera
+    Quando atendente do <tipo_de_atendente> muda para o estado disponível
+    Entao atendente do <tipo_de_atendente> será direcionado para o pcd
+
+    Exemplos:
+      | tipo_de_servico       | tipo_de_atendente    |
+      | Libras                | MONITOR              |
+      | LibrasInterpreter     | COMMITTEE_MEMBER     |
+      | Mobility              | MONITOR              |
+      | AudioDescription      | COMMITTEE_MEMBER     |
+      | NeurodivergentSupport | MONITOR              |
+      | GuideInterpreter      | COMMITTEE_MEMBER     |
+      | HygieneAndNutrition   | COMMITTEE_MEMBER     |
+      | Car                   | COMMITTEE_MEMBER     |
