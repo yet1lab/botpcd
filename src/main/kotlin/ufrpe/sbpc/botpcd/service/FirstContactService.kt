@@ -7,7 +7,10 @@ import org.springframework.stereotype.Service
 import ufrpe.sbpc.botpcd.controller.WhatsappWebhookController
 import ufrpe.sbpc.botpcd.entity.Disability
 import ufrpe.sbpc.botpcd.entity.MessageExchange
+import ufrpe.sbpc.botpcd.entity.MonitorServiceType
+import ufrpe.sbpc.botpcd.entity.Provider
 import ufrpe.sbpc.botpcd.entity.ServiceType
+import ufrpe.sbpc.botpcd.entity.UserStatus
 import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.repository.MonitorRepository
@@ -50,12 +53,13 @@ class FirstContactService(
                         whatsappService.sendMessage(botNumber, phoneNumber, "Cadastro realizado.")
                     }
                     // escolhe um tipo de serviço e é redirecionado
-                    message in ServiceType.getServicesByDisability(disability).indices.map { (it + 1).toString() } -> {
-
-                    }
                     (lastBotMessage?.message
-                        ?: "") == attendanceService.createSendServicesMessage(disability) && message in ServiceType.getServicesByDisability(disability).indices-> {
-
+                        ?: "") == attendanceService.createSendServicesMessage(disability) -> {
+                         if(message in ServiceType.getServicesByDisability(disability).indices.map { (it + 1).toString() }) {
+                             attendanceService.startAttendance(disability, message, pwd, botNumber)
+                         } else {
+                             return
+                         }
                     }
                     // envia servicos disponiveis
                     else -> {
