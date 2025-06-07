@@ -60,7 +60,7 @@ class FirstContactService(
         when {
             attendant != null -> {
                 if (lastBotMessageText in statusQuestionMessages) {
-                    attendantStatusService.processStatusChangeResponse(attendant, message, botNumber)
+                    attendantStatusService.sendStatusChanger(attendant, lastBotMessageText)
                 } else if (botPcdRegex.matches(message)) {
                     attendantStatusService.processStatusChangeResponse(attendant, message, botNumber)
                 } else {
