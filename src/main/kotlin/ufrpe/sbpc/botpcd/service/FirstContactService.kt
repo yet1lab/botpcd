@@ -60,14 +60,19 @@ class FirstContactService(
         val botPcdRegex = Regex("^\\s*bot\\s*pcd\\s*$", RegexOption.IGNORE_CASE)
 
         when {
-            // Atendente respondende a pergunta de mudança de status
-            attendant != null && lastBotMessageText in statusQuestionMessages -> {
-                attendantStatusService.processStatusChangeResponse(attendant, message, botNumber)
-            }
+            attendant != null -> {
+                if (lastBotMessageText in statusQuestionMessages) {
+                    attendantStatusService.processStatusChangeResponse(attendant, message, botNumber)
+                }
+                else if (botPcdRegex.matches(message)) {
+                    attendantStatusService.processStatusChangeResponse(attendant, message, botNumber)
+                    }
+                else {
+                    attendanceRepository.findStartedAttendanceOfAttendance(attendant)?.let { attendance ->
+                        attendanceService.redirectMessageToPwd(botNumber, message, attendance.pwd, attendant)
+                    }
+                }
 
-            // Atendente escreve "BotPCD"
-            attendant != null && botPcdRegex.matches(message) -> {
-                attendantStatusService.sendStatusChanger(attendant, botNumber)
             }
 
             pwdRepository.findByPhoneNumber(phoneNumber) != null -> {
