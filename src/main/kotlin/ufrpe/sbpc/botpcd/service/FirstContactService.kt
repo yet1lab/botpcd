@@ -106,22 +106,7 @@ class FirstContactService(
                 }
             }
             (lastBotMessage?.message ?: "") == Disability.getOptions() && message in disabilityNumberOptions -> {
-                val disabilityNumber = message.toInt()
-                val ordinalDisability = disabilityNumber - 1
-                val disability = Disability.getByOrdinal(ordinalDisability)
-                if (disabilityNumber == 7) {
-                    whatsappService.sendMessage(
-                        botNumber,
-                        phoneNumber,
-                        "Agradecemos o contato! Este canal é exclusivo para atendimento de pessoas com deficiência ou mobilidade reduzida que participarão do evento. Desejamos a você uma excelente participação na 77ª Reunião Anual da SBPC."
-                    )
-                } else if (disability == null) {
-                    logger.warn("Foi passado um numero de deficiencia incorreto numero da disability $disabilityNumber")
-                    whatsappService.sendMessage(botNumber, phoneNumber, "Digite um número válido.")
-                } else {
-                    registerPWDService.registerDisability(botNumber, phoneNumber, disability)
-                    registerPWDService.whatsIsYourName(botNumber, phoneNumber)
-                }
+                registerPWDService.handleDisabilitySelected(botNumber, message, phoneNumber)
             }
             else -> {
                 // Usuario não cadastrado

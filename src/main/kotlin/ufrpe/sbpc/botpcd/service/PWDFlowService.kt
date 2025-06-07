@@ -1,0 +1,62 @@
+package ufrpe.sbpc.botpcd.service
+
+import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.stereotype.Service
+import ufrpe.sbpc.botpcd.entity.Disability
+import ufrpe.sbpc.botpcd.entity.MessageExchange
+import ufrpe.sbpc.botpcd.entity.PWD
+import ufrpe.sbpc.botpcd.entity.ServiceType
+import ufrpe.sbpc.botpcd.repository.AttendanceRepository
+
+@Service
+class PWDFlowService(
+    private val registerPWDService: RegisterPWDService,
+    private val whatsappService: WhatsappService,
+    private val attendanceService: AttendanceService,
+    private val attendanceRepository: AttendanceRepository
+
+    ) {
+    val logger = KotlinLogging.logger {}
+    private fun redirect(
+        pwd: PWD,
+        botNumber: String,
+        phoneNumber: String,
+        message: String,
+        lastBotMessage: MessageExchange?
+    ) {
+        val disability = pwd.disabilities.first()
+        val attendance = attendanceRepository.findStartedAttendanceOfPwd(pwd)
+        when {
+            isRegisteringName(lastBotMessage, pwd) -> {
+                registerPWDService.registerName(pwd, message)
+                whatsappService.sendMessage(botNumber, phoneNumber, "Cadastro realizado.")
+                attendanceService.sendServices(botNumber, pwd)
+            }
+            isChoosingService(lastBotMessage, disability) -> {
+                if (isValidService(message, disability)) {
+                    val service = ServiceType.getServicesByDisability(disability)[message.toInt() - 1]
+                    attendanceService.startAttendance(pwd = pwd, botNumber = botNumber, service = service)
+                } else {
+                    attendanceService.sendServices(botNumber, pwd)
+                }
+            }
+            attendance != null -> {
+                if (attendance.attendant == null) {
+                    logger.error{"Atendimento com id ${attendance.id} foi iniciado com atendente Nulo!"}
+                } else {
+                    attendanceService.redirectMessageToAttendance(
+                        botNumber,
+                        message,
+                        attendance.attendant!!,
+                        pwd
+                    )
+                }
+            }
+        }
+    }
+    private fun isRegisteringName(lastBotMessage: MessageExchange?, pwd: PWD) = (lastBotMessage?.message ?: "") == "Qual o seu nome?" && pwd.name == null
+    private fun isChoosingService(lastBotMessage: MessageExchange?, disability: Disability) = (lastBotMessage?.message
+        ?: "") == attendanceService.createSendServicesMessage(disability)
+    private fun isValidService(message: String, disability: Disability) = message in ServiceType.getServicesByDisability(disability).indices.map { (it + 1).toString() }
+
+}
