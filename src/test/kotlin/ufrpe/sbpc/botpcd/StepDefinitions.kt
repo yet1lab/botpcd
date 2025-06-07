@@ -7,6 +7,8 @@ import io.cucumber.java.pt.Entao
 import io.cucumber.java.pt.Quando
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -25,6 +27,7 @@ class StepDefinitions(
 ) {
     private val numberUserNotRegister: String = "558187654321"
     private val botNumber: String = "15556557522"
+    val logger: Logger = LoggerFactory.getLogger(StepDefinitions::class.java)
     @Dado("usuário recebeu mensagem {string}")
     fun `usuário recebeu mensagem`(message: String) {
         mockUserRecievedMessage(numberUserNotRegister, message)
@@ -43,6 +46,7 @@ class StepDefinitions(
     }
     @Dado("usuário possui deficiência cadastrada de {string}")
     fun `usuário que possui deficiencia cadastrada`(tipoDeDeficiencia: String) {
+        logger.warn("usuario que está registrado no sistema ${pwdRepository.findByPhoneNumber(numberUserNotRegister).toString()}")
         pwdRepository.save(PWD(
             phoneNumber = numberUserNotRegister,
             disabilities = mutableSetOf(Disability.getByShortText(tipoDeDeficiencia))
@@ -66,18 +70,24 @@ class StepDefinitions(
     }
     @Entao("usuário receberá mensagem {string}")
     fun `usuario receberá mensagem`(message: String) {
-        testarMensagemRecebidaDoUsuario(message, numberUserNotRegister)
+        testarUltimaMensagemRecebidaDoUsuario(message, numberUserNotRegister)
     }
     @Entao("usuário receberá mensagem")
     fun `usuario receberá mensagem docs string`(message: String) {
-        testarMensagemRecebidaDoUsuario(message, numberUserNotRegister)
+        testarUltimaMensagemRecebidaDoUsuario(message, numberUserNotRegister)
+    }
+    @Entao("usuário receberá mensagem {string} seguindo de {string}")
+    fun `usuário receberá mensagem seguida de outra mensagem` (penultimaMensagem: String, ultimaMensagem: String) {
+        testarUltimaMensagemRecebidaDoUsuario(mensagemEsperada = ultimaMensagem, userPhoneNumber = numberUserNotRegister)
+
     }
     fun mockUserRecievedMessage(userNumber: String, message: String) {
         messageExchangeRepository.save(MessageExchange(fromPhoneNumber = botNumber, toPhoneNumber =  numberUserNotRegister, message = message))
     }
-    fun testarMensagemRecebidaDoUsuario(mensagemEsperada: String, userPhoneNumber: String) {
+    fun testarUltimaMensagemRecebidaDoUsuario(mensagemEsperada: String, userPhoneNumber: String) {
         assertEquals(mensagemEsperada, messageExchangeRepository.lastExchangeMessage(toPhoneNumber = userPhoneNumber, fromPhoneNumber = botNumber)?.message)
     }
+
     private fun userSendMessage(mensagemEnviada: String, userPhoneNumber: String) {
         val payload = loadPayload("src/test/resources/ufrpe/sbpc/botpcd/mocks/usuario-manda-oi.json")
             .changeUserNumber(userPhoneNumber)

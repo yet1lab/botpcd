@@ -66,18 +66,18 @@ Olá, qual sua deficiência?
 
       Exemplos:
         | numero_da_deficiencia | tipo_deficiencia                                     |
-        | 1                     | Deficiência visual                                   |
+        | 1                     | cegueira                                             |
         | 2                     | Deficiência auditiva/surdez                          |
         | 3                     | Surdocegueira                                        |
         | 4                     | Transtorno do Espectro Autista/Neurodivergente       |
         | 5                     | Deficiência física                                   |
         | 6                     | Não tenho deficiência, mas tenho mobilidade reduzida |
 
-  Esquema do Cenario: O usuário responde com o seu nome
+    Esquema do Cenario: O usuário responde com o seu nome
     Dado usuário recebeu mensagem "Qual o seu nome?"
     E usuário possui deficiência cadastrada de "<tipo_de_deficiência>"
     Quando usuário envia mensagem "João Victor"
-    Entao usuário receberá mensagem "Cadastro realizado."
+    Entao usuário receberá mensagem "Cadastro realizado." seguindo das opcções de serviço <opccoes_de_servico>
       E bot salvará o nome do usuário "João Victor"
       E bot vai enviará "<opccoes_de_servico>" de acordo com o "<tipo_de_deficiência>" do pcd
 
