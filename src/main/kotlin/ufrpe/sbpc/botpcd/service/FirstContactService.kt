@@ -46,10 +46,12 @@ class FirstContactService(
                 message = message
             )
         )
-        val lastBotMessage = messageExchangeRepository.lastExchangeMessage(fromPhoneNumber = botNumber, toPhoneNumber = phoneNumber)
+        val lastBotMessage =
+            messageExchangeRepository.lastExchangeMessage(fromPhoneNumber = botNumber, toPhoneNumber = phoneNumber)
         val lastBotMessageText = lastBotMessage?.message ?: ""
 
-        val attendant: Attendant? = monitorRepository.findByPhoneNumber(phoneNumber) ?: committeeMemberRepository.findByPhoneNumber(phoneNumber)
+        val attendant: Attendant? =
+            monitorRepository.findByPhoneNumber(phoneNumber) ?: committeeMemberRepository.findByPhoneNumber(phoneNumber)
 
         val statusQuestionMessages = listOf(
             AttendantStatusService.StatusChangeMessages.UNAVAILABLE_ATTENDANT_TEXT,
@@ -62,12 +64,10 @@ class FirstContactService(
         when {
             attendant != null -> {
                 if (lastBotMessageText in statusQuestionMessages) {
-                    attendantStatusService.sendStatusChanger(attendant, lastBotMessageText)
-                }
-                else if (botPcdRegex.matches(message)) {
                     attendantStatusService.processStatusChangeResponse(attendant, message, botNumber)
-                    }
-                else {
+                } else if (botPcdRegex.matches(message)) {
+                    attendantStatusService.processStatusChangeResponse(attendant, message, botNumber)
+                } else {
                     attendanceRepository.findStartedAttendanceOfAttendance(attendant)?.let { attendance ->
                         attendanceService.redirectMessageToPwd(botNumber, message, attendance.pwd, attendant)
                     }
@@ -83,12 +83,12 @@ class FirstContactService(
                     (lastBotMessage?.message ?: "") == "Qual o seu nome?" && pwd.name == null -> {
                         registerPWDService.registerName(pwd, message)
                         whatsappService.sendMessage(botNumber, phoneNumber, "Cadastro realizado.")
-                        attendanceService.sendServices(botNumber, pwd, )
+                        attendanceService.sendServices(botNumber, pwd)
                     }
                     // escolhe um tipo de serviço e é redirecionado
                     (lastBotMessage?.message
                         ?: "") == attendanceService.createSendServicesMessage(disability) -> {
-                        if(message in ServiceType.getServicesByDisability(disability).indices.map { (it + 1).toString() }) {
+                        if (message in ServiceType.getServicesByDisability(disability).indices.map { (it + 1).toString() }) {
                             val service = ServiceType.getServicesByDisability(disability)[message.toInt() - 1]
                             attendanceService.startAttendance(pwd = pwd, botNumber = botNumber, service = service)
                         } else {
@@ -98,10 +98,15 @@ class FirstContactService(
                     // redireciona mensagenns para o atendente
                     attendanceRepository.findStartedAttendanceOfPwd(pwd) != null -> {
                         val attendance = attendanceRepository.findStartedAttendanceOfPwd(pwd)
-                        if(attendance?.attendant == null) {
+                        if (attendance?.attendant == null) {
                             logger.error("Atendimento com id ${attendance?.id} foi iniciado com atendente Nulo!")
                         } else {
-                            attendanceService.redirectMessageToAttendance(botNumber, message, attendance.attendant!!, pwd)
+                            attendanceService.redirectMessageToAttendance(
+                                botNumber,
+                                message,
+                                attendance.attendant!!,
+                                pwd
+                            )
                         }
                     }
                     (lastBotMessage?.message ?: "") == Disability.getOptions() && message in disabilityNumberOptions -> {
@@ -126,30 +131,31 @@ class FirstContactService(
                         // Usuario não cadastrado
                         registerPWDService.whatIsYourDisability(botNumber, phoneNumber)
                     }
-
+                }
             }
+
+        }
+    }
+
+    fun String.sanitizeInput(): String {
+        val dangerousKeywords = listOf(
+            "select", "drop", "insert", "delete", "update", "truncate", "exec",
+            "execute", "union", "alter", "create", "shutdown", "grant", "revoke", "--", "/*", "*/"
+        )
+
+        // Remove palavras-chave perigosas, ignorando maiúsculas/minúsculas
+        var sanitized = this
+        dangerousKeywords.forEach { keyword ->
+            val regex = Regex("\\b$keyword\\b", RegexOption.IGNORE_CASE)
+            sanitized = sanitized.replace(regex, "")
         }
 
+        // Remove ou substitui caracteres especiais perigosos
+        sanitized = sanitized.replace(Regex("[\"'`;\\\\/<>&]"), "") // remove aspas, ponto e vírgula, barra, etc.
+
+        // Remove múltiplos espaços seguidos e trim final
+        sanitized = sanitized.replace(Regex("\\s+"), " ").trim()
+
+        return sanitized
     }
 }
-
-fun String.sanitizeInput(): String {
-    val dangerousKeywords = listOf(
-        "select", "drop", "insert", "delete", "update", "truncate", "exec",
-        "execute", "union", "alter", "create", "shutdown", "grant", "revoke", "--", "/*", "*/"
-    )
-
-    // Remove palavras-chave perigosas, ignorando maiúsculas/minúsculas
-    var sanitized = this
-    dangerousKeywords.forEach { keyword ->
-        val regex = Regex("\\b$keyword\\b", RegexOption.IGNORE_CASE)
-        sanitized = sanitized.replace(regex, "")
-    }
-
-    // Remove ou substitui caracteres especiais perigosos
-    sanitized = sanitized.replace(Regex("[\"'`;\\\\/<>&]"), "") // remove aspas, ponto e vírgula, barra, etc.
-
-    // Remove múltiplos espaços seguidos e trim final
-    sanitized = sanitized.replace(Regex("\\s+"), " ").trim()
-
-    return sanitized }}
