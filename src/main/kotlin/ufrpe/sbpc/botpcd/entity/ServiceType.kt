@@ -4,12 +4,12 @@ package ufrpe.sbpc.botpcd.entity
  *
  */
 sealed class ServiceType(
-    val providerType: Provider,
+    val attendantType: Provider,
     val disability: Set<Disability>,
     val description: String
 ) {
     object Libras : ServiceType(
-        providerType = Provider.MONITOR,
+        attendantType = Provider.MONITOR,
         disability = mutableSetOf(Disability.DEAFNESS),
         description = "informações em Libras"
     ), MonitorServiceType {
@@ -17,12 +17,12 @@ sealed class ServiceType(
         override val monitorAssistanceType = MonitorAssistanceType.LIBRAS_MONITOR
     }
     object LibrasInterpreter : ServiceType(
-        providerType = Provider.COMMITTEE_MEMBER,
+        attendantType = Provider.COMMITTEE_MEMBER,
         disability = mutableSetOf(Disability.DEAFNESS),
         description = "atividade com interpretação em Libras"
     )
     object Mobility : ServiceType(
-        providerType = Provider.MONITOR,
+        attendantType = Provider.MONITOR,
         disability = mutableSetOf(Disability.MOBILITY_IMPAIRED, Disability.PHYSICAL_DISABILITY, Disability.BLINDED),
         description = "ajuda na mobilidade"
     ), MonitorServiceType {
@@ -30,13 +30,13 @@ sealed class ServiceType(
     }
 
     object AudioDescription : ServiceType(
-        providerType = Provider.COMMITTEE_MEMBER,
+        attendantType = Provider.COMMITTEE_MEMBER,
         disability = mutableSetOf(Disability.BLINDED),
         description = "programação com audiodescrição"
     )
 
     object NeurodivergentSupport : ServiceType(
-        providerType = Provider.MONITOR,
+        attendantType = Provider.MONITOR,
         disability = mutableSetOf(Disability.NEURODIVERGENT),
         description = "suporte para pessoas neurodivergentes"
     ), MonitorServiceType {
@@ -44,19 +44,19 @@ sealed class ServiceType(
     }
 
     object GuideInterpreter : ServiceType(
-        providerType = Provider.COMMITTEE_MEMBER,
+        attendantType = Provider.COMMITTEE_MEMBER,
         disability = mutableSetOf(Disability.DEAFBLINDNESS),
         description = "guia-intérprete"
     )
 
     object HygieneAndNutrition : ServiceType(
-        providerType = Provider.COMMITTEE_MEMBER,
+        attendantType = Provider.COMMITTEE_MEMBER,
         disability = mutableSetOf(Disability.MOBILITY_IMPAIRED, Disability.PHYSICAL_DISABILITY),
         description = "ajuda com alimentação e higiene"
     )
 
     object Car : ServiceType(
-        providerType = Provider.COMMITTEE_MEMBER,
+        attendantType = Provider.COMMITTEE_MEMBER,
         disability = mutableSetOf(Disability.PHYSICAL_DISABILITY, Disability.MOBILITY_IMPAIRED),
         description = "transporte para deslocamento no evento"
     )

@@ -18,7 +18,7 @@ import jakarta.validation.constraints.NotEmpty
  * @param phoneNumberId used by whatsapp to callback a message when you recive a message in webhook
  */
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Table(name = "tb_user")
 abstract class User(
     @Id @GeneratedValue

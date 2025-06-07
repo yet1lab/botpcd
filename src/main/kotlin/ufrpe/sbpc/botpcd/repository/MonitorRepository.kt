@@ -10,5 +10,5 @@ interface MonitorRepository : JpaRepository<Monitor, Long>{
     fun findByPhoneNumber(phoneNumber: String): Monitor?
     fun findByStatus(status: UserStatus): List<Monitor>
     @Query("SELECT m from Monitor m where m.status = :status and m.assistanceType = :assistanceType")
-    fun findAvailableMonitor(status: UserStatus, assistanceType: MonitorAssistanceType): Monitor?
+    fun findAvailableMonitor(status: UserStatus, assistanceType: MonitorAssistanceType): List<Monitor>
 }

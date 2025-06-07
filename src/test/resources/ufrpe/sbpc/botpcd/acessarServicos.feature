@@ -4,7 +4,7 @@ Funcionalidade: Acessar serviços de assistência
 
     Esquema do Cenário Listar serviços de acordo com meu tipo de deficiência
       Quando PCD com a deficiência de "<tipo_de_deficiência>" mandar qualquer mensagem
-      Entao O bot vai enviar uma lista de opções de acordo com a <opccoes_de_servico>
+      Entao bot vai enviará <opccoes_de_servico> de acordo com o <tipo_de_deficiência> do pcd
 
       Exemplos:
         | tipo_de_deficiência | opccoes_de_servico                                                                         |
