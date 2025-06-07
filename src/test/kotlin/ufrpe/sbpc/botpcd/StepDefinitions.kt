@@ -41,9 +41,12 @@ class StepDefinitions(
     fun `usuário não cadastrado`() {
         assertNull(pwdRepository.findByPhoneNumber(numberUserNotRegister))
     }
-    @Dado("usuário possui deficiência cadastrada")
-    fun `usuário que possui deficiencia cadastrada`() {
-        pwdRepository.save(PWD(phoneNumber = numberUserNotRegister, disabilities = mutableSetOf(Disability.BLINDED)))
+    @Dado("usuário possui deficiência cadastrada de {string}")
+    fun `usuário que possui deficiencia cadastrada`(tipoDeDeficiencia: String) {
+        pwdRepository.save(PWD(
+            phoneNumber = numberUserNotRegister,
+            disabilities = mutableSetOf(Disability.getByShortText(tipoDeDeficiencia))
+        ))
     }
     @Quando("usuário envia mensagem {string}")
     fun `usuario envia mensagem`(mensagemEnviada: String) {
@@ -57,7 +60,9 @@ class StepDefinitions(
     }
     @Entao("bot salvará o nome do usuário {string}")
     fun `bot salva o nome do usuário`(nome: String) {
-        assertEquals(pwdRepository.findByPhoneNumber(numberUserNotRegister)!!.name, nome)
+        val pwd = pwdRepository.findByPhoneNumber(numberUserNotRegister)
+        assertEquals(pwd!!.name, nome)
+        pwdRepository.delete(pwd)
     }
     @Entao("usuário receberá mensagem {string}")
     fun `usuario receberá mensagem`(message: String) {

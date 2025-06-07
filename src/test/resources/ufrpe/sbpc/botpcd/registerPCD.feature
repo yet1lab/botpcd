@@ -75,17 +75,17 @@ Olá, qual sua deficiência?
 
   Esquema do Cenario: O usuário responde com o seu nome
     Dado usuário recebeu mensagem "Qual o seu nome?"
-    E usuário possui deficiência cadastrada
+    E usuário possui deficiência cadastrada de "<tipo_de_deficiência>"
     Quando usuário envia mensagem "João Victor"
     Entao usuário receberá mensagem "Cadastro realizado."
       E bot salvará o nome do usuário "João Victor"
-      E bot vai enviará <opccoes_de_servico> de acordo com o <tipo_de_deficiência> do pcd
+      E bot vai enviará "<opccoes_de_servico>" de acordo com o "<tipo_de_deficiência>" do pcd
 
-      Exemplos:
-        | tipo_de_deficiência | opccoes_de_servico                                                                         |
-        | Surdez              | informações em Libras,atividade com interpretação em Libras                                |
-        | Mobilidade Reduzida | ajuda na mobilidade,transporte para deslocamento no evento                                 |
-        | Deficiência Física  | ajuda na mobilidade,ajuda com alimentação e higiene,transporte para deslocamento no evento |
-        | Cegueira            | ajuda na mobilidade,programação com audiodescrição                                         |
-        | Neurodivergente     | suporte para pessoas neurodivergentes                                                      |
-        | Surdocegueira       | guia-intérprete                                                                            |
+    Exemplos:
+      | tipo_de_deficiência | opccoes_de_servico                                                                         |
+      | surdez              | informações em Libras,atividade com interpretação em Libras                                |
+      | mobilidade reduzida | ajuda na mobilidade,transporte para deslocamento no evento                                 |
+      | deficiência física  | ajuda na mobilidade,ajuda com alimentação e higiene,transporte para deslocamento no evento |
+      | cegueira            | ajuda na mobilidade,programação com audiodescrição                                         |
+      | neurodivergente     | suporte para pessoas neurodivergentes                                                      |
+      | surdocegueira       | guia-intérprete                                                                            |

@@ -11,7 +11,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
     toolchain {
-         languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -34,13 +34,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-hateoas")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
-    implementation("org.springframework.boot:spring-boot-starter-web") {
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
-    }
-    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
-    implementation("org.springframework.boot:spring-boot-starter-log4j2") {
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
-    }
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")

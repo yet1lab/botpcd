@@ -48,7 +48,7 @@ class FirstContactService(
         )
         val lastBotMessage =
             messageExchangeRepository.lastExchangeMessage(fromPhoneNumber = botNumber, toPhoneNumber = phoneNumber)
-        val lastBotMessageText = lastBotMessage?.message?.sanitizeInput()
+        val lastBotMessageText = lastBotMessage?.message
         val attendant: Attendant? =
             monitorRepository.findByPhoneNumber(phoneNumber) ?: committeeMemberRepository.findByPhoneNumber(phoneNumber)
         val pwd = pwdRepository.findByPhoneNumber(phoneNumber)

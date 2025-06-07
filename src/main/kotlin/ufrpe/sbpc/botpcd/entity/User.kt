@@ -1,5 +1,6 @@
 package ufrpe.sbpc.botpcd.entity
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -7,7 +8,9 @@ import jakarta.persistence.Id
 import jakarta.persistence.Inheritance
 import jakarta.persistence.InheritanceType
 import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import jakarta.validation.constraints.NotEmpty
+import org.hibernate.validator.constraints.UniqueElements
 
 /**
 
@@ -25,5 +28,6 @@ abstract class User(
     var id: Long? = null,
     var name: String? = null,
     @NotEmpty(message = "The User needs to have a phone number")
+    @Column(unique = true)
     var phoneNumber: String
 )

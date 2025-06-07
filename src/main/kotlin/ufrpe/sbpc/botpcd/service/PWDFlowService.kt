@@ -1,6 +1,7 @@
 package ufrpe.sbpc.botpcd.service
 
-import io.github.oshai.kotlinlogging.KotlinLogging
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import ufrpe.sbpc.botpcd.entity.Disability
 import ufrpe.sbpc.botpcd.entity.MessageExchange
@@ -16,7 +17,7 @@ class PWDFlowService(
     private val attendanceRepository: AttendanceRepository
 
     ) {
-    val logger = KotlinLogging.logger {}
+    val logger: Logger? = LoggerFactory.getLogger(PWDFlowService::class.java)
     fun redirect(
         pwd: PWD,
         botNumber: String,
@@ -42,7 +43,7 @@ class PWDFlowService(
             }
             attendance != null -> {
                 if (attendance.attendant == null) {
-                    logger.error{"Atendimento com id ${attendance.id} foi iniciado com atendente Nulo!"}
+                    logger?.error("Atendimento com id ${attendance.id} foi iniciado com atendente Nulo!")
                 } else {
                     attendanceService.redirectMessageToAttendance(
                         botNumber,
