@@ -49,18 +49,14 @@ class FirstContactService(
         val lastBotMessage =
             messageExchangeRepository.lastExchangeMessage(fromPhoneNumber = botNumber, toPhoneNumber = phoneNumber)
         val lastBotMessageText = lastBotMessage?.message ?: ""
-
         val attendant: Attendant? =
             monitorRepository.findByPhoneNumber(phoneNumber) ?: committeeMemberRepository.findByPhoneNumber(phoneNumber)
-
         val statusQuestionMessages = listOf(
             AttendantStatusService.StatusChangeMessages.UNAVAILABLE_ATTENDANT_TEXT,
             AttendantStatusService.StatusChangeMessages.BUSY_ATTENDANT_TEXT,
             AttendantStatusService.StatusChangeMessages.AVAILABLE_ATTENDANT_TEXT
         )
-
         val botPcdRegex = Regex("^\\s*bot\\s*pcd\\s*$", RegexOption.IGNORE_CASE)
-
         when {
             attendant != null -> {
                 if (lastBotMessageText in statusQuestionMessages) {
@@ -72,9 +68,7 @@ class FirstContactService(
                         attendanceService.redirectMessageToPwd(botNumber, message, attendance.pwd, attendant)
                     }
                 }
-
             }
-
             pwdRepository.findByPhoneNumber(phoneNumber) != null -> {
                 val pwd = pwdRepository.findByPhoneNumber(phoneNumber)!!
                 val disability = pwd.disabilities.first()
@@ -109,31 +103,30 @@ class FirstContactService(
                             )
                         }
                     }
-                    (lastBotMessage?.message ?: "") == Disability.getOptions() && message in disabilityNumberOptions -> {
-                        val disabilityNumber = message.toInt()
-                        val ordinalDisability = disabilityNumber - 1
-                        val disability = Disability.getByOrdinal(ordinalDisability)
-                        if (disabilityNumber == 7) {
-                            whatsappService.sendMessage(
-                                botNumber,
-                                phoneNumber,
-                                "Agradecemos o contato! Este canal é exclusivo para atendimento de pessoas com deficiência ou mobilidade reduzida que participarão do evento. Desejamos a você uma excelente participação na 77ª Reunião Anual da SBPC."
-                            )
-                        } else if (disability == null) {
-                            logger.warn("Foi passado um numero de deficiencia incorreto numero da disability $disabilityNumber")
-                            whatsappService.sendMessage(botNumber, phoneNumber, "Digite um número válido.")
-                        } else {
-                            registerPWDService.registerDisability(botNumber, phoneNumber, disability)
-                            registerPWDService.whatsIsYourName(botNumber, phoneNumber)
-                        }
-                    }
-                    else -> {
-                        // Usuario não cadastrado
-                        registerPWDService.whatIsYourDisability(botNumber, phoneNumber)
-                    }
                 }
             }
-
+            (lastBotMessage?.message ?: "") == Disability.getOptions() && message in disabilityNumberOptions -> {
+                val disabilityNumber = message.toInt()
+                val ordinalDisability = disabilityNumber - 1
+                val disability = Disability.getByOrdinal(ordinalDisability)
+                if (disabilityNumber == 7) {
+                    whatsappService.sendMessage(
+                        botNumber,
+                        phoneNumber,
+                        "Agradecemos o contato! Este canal é exclusivo para atendimento de pessoas com deficiência ou mobilidade reduzida que participarão do evento. Desejamos a você uma excelente participação na 77ª Reunião Anual da SBPC."
+                    )
+                } else if (disability == null) {
+                    logger.warn("Foi passado um numero de deficiencia incorreto numero da disability $disabilityNumber")
+                    whatsappService.sendMessage(botNumber, phoneNumber, "Digite um número válido.")
+                } else {
+                    registerPWDService.registerDisability(botNumber, phoneNumber, disability)
+                    registerPWDService.whatsIsYourName(botNumber, phoneNumber)
+                }
+            }
+            else -> {
+                // Usuario não cadastrado
+                registerPWDService.whatIsYourDisability(botNumber, phoneNumber)
+            }
         }
     }
 
