@@ -73,9 +73,19 @@ Olá, qual sua deficiência?
         | 5                     | Deficiência física                                   |
         | 6                     | Não tenho deficiência, mas tenho mobilidade reduzida |
 
-  Cenario: O usuário responde com o seu nome
+  Esquema do Cenario: O usuário responde com o seu nome
     Dado usuário recebeu mensagem "Qual o seu nome?"
     E usuário possui deficiência cadastrada
-  Quando usuário envia mensagem "João Victor"
-  Entao usuário receberá mensagem "Cadastro realizado."
-    E bot salvará o nome do usuário "João Victor"
+    Quando usuário envia mensagem "João Victor"
+    Entao usuário receberá mensagem "Cadastro realizado."
+      E bot salvará o nome do usuário "João Victor"
+      E bot vai enviará <opccoes_de_servico> de acordo com o <tipo_de_deficiência> do pcd
+
+      Exemplos:
+        | tipo_de_deficiência | opccoes_de_servico                                                                         |
+        | Surdez              | informações em Libras,atividade com interpretação em Libras                                |
+        | Mobilidade Reduzida | ajuda na mobilidade,transporte para deslocamento no evento                                 |
+        | Deficiência Física  | ajuda na mobilidade,ajuda com alimentação e higiene,transporte para deslocamento no evento |
+        | Cegueira            | ajuda na mobilidade,programação com audiodescrição                                         |
+        | Neurodivergente     | suporte para pessoas neurodivergentes                                                      |
+        | Surdocegueira       | guia-intérprete                                                                            |

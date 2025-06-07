@@ -100,6 +100,6 @@ class AttendantStatusService(
 
     fun findAvailableMonitorsByType(assistanceType: MonitorAssistanceType): List<Monitor> {
         val availableMonitors = findAvailableMonitors()
-        return availableMonitors.filter { it.assistanceTypes == assistanceType }
+        return availableMonitors.filter { it.assistanceType == assistanceType }
     }
 }
