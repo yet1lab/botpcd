@@ -1,10 +1,13 @@
 package ufrpe.sbpc.botpcd.repository
 
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import ufrpe.sbpc.botpcd.entity.Attendance
 import ufrpe.sbpc.botpcd.entity.Attendant
 import ufrpe.sbpc.botpcd.entity.PWD
+import java.time.LocalDateTime
 
 interface AttendanceRepository : JpaRepository<Attendance, Long> {
     @Query("SELECT att from Attendance att where att.pwd = :pwd AND att.acceptDateTime is null order by att.requestDateTime desc")
@@ -13,4 +16,12 @@ interface AttendanceRepository : JpaRepository<Attendance, Long> {
     fun  findStartedAttendanceOfPwd(pwd: PWD): Attendance?
     @Query("SELECT att from Attendance att where att.attendant = :attendant AND att.acceptDateTime is not null and att.endDateTime is null order by att.requestDateTime desc")
     fun findStartedAttendanceOfAttendance(attendant: Attendant): Attendance?
+
+    @Modifying 
+    @Query("UPDATE Attendance a SET a.attendant = :attendant, a.acceptDateTime = :acceptDateTime WHERE a.pwd = :pwd AND a.acceptDateTime IS NULL")
+    fun acceptPendingAttendanceForPwd(
+        @Param("pwd") pwd: PWD,
+        @Param("attendant") attendant: Attendant,
+        @Param("acceptDateTime") acceptDateTime: LocalDateTime
+    ): Int 
 }

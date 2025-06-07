@@ -57,6 +57,7 @@ class FirstContactService(
             AttendantStatusService.StatusChangeMessages.AVAILABLE_ATTENDANT_TEXT
         )
 
+        val botPcdRegex = Regex("^\\s*bot\\s*pcd\\s*$", RegexOption.IGNORE_CASE)
 
         when {
             // Atendente respondende a pergunta de mudança de status
@@ -65,7 +66,7 @@ class FirstContactService(
             }
 
             // Atendente escreve "BotPCD"
-            attendant != null && message.equals("BotPCD", ignoreCase = true) -> {
+            attendant != null && botPcdRegex.matches(message) -> {
                 attendantStatusService.sendStatusChanger(attendant, botNumber)
             }
 
@@ -147,5 +148,4 @@ fun String.sanitizeInput(): String {
     // Remove múltiplos espaços seguidos e trim final
     sanitized = sanitized.replace(Regex("\\s+"), " ").trim()
 
-    return sanitized
-}
+    return sanitized }}

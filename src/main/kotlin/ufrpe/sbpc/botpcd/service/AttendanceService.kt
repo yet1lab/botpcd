@@ -44,7 +44,7 @@ class AttendanceService(
     }
 
     @Transactional
-    fun beginAttendance(attendance: Attendance) {
+    fun makeAttendantBusy(attendance: Attendance) {
         when (attendance.attendantType) {
             Provider.MONITOR -> {
                 val monitor = attendance.attendant as? Monitor
