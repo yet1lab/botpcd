@@ -36,7 +36,7 @@ Funcionalidade: Acessar serviços de assistência
     Dado bot enviou a mensagem "<opção de serviço>"
       E não tem atendente disponível
     Quando PCD envia mensagem "<servico_desejado>"
-    Entao bot envia mensagem "No momento não há atendentes disponíveis. Por favor, aguarde na fila de espera e retornaremos assim que possível."
+    Entao bot enviará mensagem "No momento não há atendentes disponíveis. Por favor, aguarde na fila de espera e retornaremos assim que possível."
     Exemplos:
       | servico_desejado       |                    |
       | Informações em Libras  | monitor            |
