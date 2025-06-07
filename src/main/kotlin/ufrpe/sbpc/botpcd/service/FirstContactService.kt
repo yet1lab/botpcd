@@ -60,9 +60,9 @@ class FirstContactService(
         when {
             attendant != null -> {
                 if (lastBotMessageText in statusQuestionMessages) {
-                    attendantStatusService.sendStatusChanger(attendant, lastBotMessageText)
-                } else if (botPcdRegex.matches(message)) {
                     attendantStatusService.processStatusChangeResponse(attendant, message, botNumber)
+                } else if (botPcdRegex.matches(message)) {
+                    attendantStatusService.sendStatusChanger(attendant, botNumber)
                 } else {
                     attendanceRepository.findStartedAttendanceOfAttendance(attendant)?.let { attendance ->
                         attendanceService.redirectMessageToPwd(botNumber, message, attendance.pwd, attendant)
