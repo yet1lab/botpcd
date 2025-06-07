@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 class AttendanceService(
     private val attendanceRepository: AttendanceRepository,
     private val whatsappService: WhatsappService,
-    private val attendantStatusService: AttendantStatusService
+    private val attendantStatusService: AttendantStatusService,
     private val monitorRepository: MonitorRepository,
     private val committeeMemberRepository: CommitteeMemberRepository,
     private val messageExchangeRepository: MessageExchangeRepository

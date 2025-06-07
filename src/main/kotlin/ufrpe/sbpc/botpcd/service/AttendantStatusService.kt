@@ -66,11 +66,12 @@ class AttendantStatusService(
                 when (userResponse) {
                     "1" -> {
                         updateAttendantStatus(attendant, UserStatus.AVAILABLE)
-                        // no futuro talvez a gente coloque a logica de encerrar o atendimento aqui
+                        // terminar o atendimento
                         confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Disponível."
                     }
                     "2" -> {
                         updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
+                        // terminar o atendimento
                         confirmationMessage = "Seu status foi atualizado para Indisponível."
                     }
                     else -> {
