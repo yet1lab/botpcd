@@ -70,7 +70,6 @@ class FirstContactService(
                 attendantStatusService.sendStatusChanger(attendant, botNumber)
             }
 
-            // Usuario ainda desconhecido
             pwdRepository.findByPhoneNumber(phoneNumber) != null -> {
                 val pwd = pwdRepository.findByPhoneNumber(phoneNumber)!!
                 val disability = pwd.disabilities.first()

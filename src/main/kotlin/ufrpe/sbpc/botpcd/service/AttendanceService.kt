@@ -43,19 +43,15 @@ class AttendanceService(
         )
     }
 
-    @Transactional
-    fun makeAttendantBusy(attendance: Attendance) {
-        when (attendance.attendantType) {
-            Provider.MONITOR -> {
-                val monitor = attendance.attendant as? Monitor
-                monitor?.let { attendantStatusService.setMonitorStatus(it, UserStatus.BUSY) }
+    fun makeAttendantBusy(attendant: Attendant) {
+        when (attendant) {
+            is Monitor -> {
+                attendantStatusService.setMonitorStatus(attendant, UserStatus.BUSY)
             }
-            Provider.COMMITTEE_MEMBER -> {
-                val committeeMember = attendance.attendant as? CommitteeMember
-                committeeMember?.let { attendantStatusService.setCommitteeMemberStatus(it, UserStatus.BUSY) }
+            is CommitteeMember -> {
+                attendantStatusService.setCommitteeMemberStatus(attendant, UserStatus.BUSY)
             }
         }
-        attendanceRepository.save(attendance)
     }
 
     fun requestAttendance(pwd: PWD, service: ServiceType) {
@@ -94,10 +90,8 @@ class AttendanceService(
                             pwd.phoneNumber,
                             "O monitor ${monitor.name} irá realizar seu atendimento."
                         )
-                        attendanceRepository.save(attendanceRepository.findRequestAttendanceOfPwd(pwd)?.apply {
-                            acceptDateTime = LocalDateTime.now()
-                            attendant = monitor
-                        } as Attendance)
+                        attendanceRepository.acceptPendingAttendanceForPwd(pwd, monitor, LocalDateTime.now())
+                        makeAttendantBusy(monitor)
                     } else {
                         logger.warn("Monitor ${monitor.name} com número ${monitor.phoneNumber} não enviou mensagem nas ultimas 24")
                     }
@@ -124,10 +118,8 @@ class AttendanceService(
                             pwd.phoneNumber,
                             "O membro da comissão ${member.name} irá realizar seu atendimento."
                         )
-                        attendanceRepository.save(attendanceRepository.findRequestAttendanceOfPwd(pwd)?.apply {
-                            acceptDateTime = LocalDateTime.now()
-                            attendant = member
-                        } as Attendance)
+                        attendanceRepository.acceptPendingAttendanceForPwd(pwd, member, LocalDateTime.now())
+                        makeAttendantBusy(member)
                     } else {
                         logger.warn("Membro da comissão ${member.name} com número ${member.phoneNumber} não enviou mensagem nas ultimas 24")
                     }
