@@ -30,7 +30,8 @@ class FirstContactService(
     private val attendantStatusService: AttendantStatusService,
     private val attendanceRepository: AttendanceRepository,
     private val monitorRepository: MonitorRepository,
-    private val committeeMemberRepository: CommitteeMemberRepository
+    private val committeeMemberRepository: CommitteeMemberRepository,
+    private val pwdFlowService: PWDFlowService
 ) {
     val logger: Logger = LoggerFactory.getLogger(WhatsappWebhookController::class.java)
 
@@ -57,54 +58,11 @@ class FirstContactService(
             AttendantStatusService.StatusChangeMessages.AVAILABLE_ATTENDANT_TEXT
         )
         val botPcdRegex = Regex("^\\s*bot\\s*pcd\\s*$", RegexOption.IGNORE_CASE)
+        val pwd = pwdRepository.findByPhoneNumber(phoneNumber)
         when {
             attendant != null -> {
-                if (lastBotMessageText in statusQuestionMessages) {
-                    attendantStatusService.processStatusChangeResponse(attendant, message, botNumber)
-                } else if (botPcdRegex.matches(message)) {
-                    attendantStatusService.sendStatusChanger(attendant, botNumber)
-                } else {
-                    attendanceRepository.findStartedAttendanceOfAttendance(attendant)?.let { attendance ->
-                        attendanceService.redirectMessageToPwd(botNumber, message, attendance.pwd, attendant)
-                    }
-                }
             }
-            pwdRepository.findByPhoneNumber(phoneNumber) != null -> {
-                val pwd = pwdRepository.findByPhoneNumber(phoneNumber)!!
-                val disability = pwd.disabilities.first()
-                when {
-                    // registra o nome
-                    (lastBotMessage?.message ?: "") == "Qual o seu nome?" && pwd.name == null -> {
-                        registerPWDService.registerName(pwd, message)
-                        whatsappService.sendMessage(botNumber, phoneNumber, "Cadastro realizado.")
-                        attendanceService.sendServices(botNumber, pwd)
-                    }
-                    // escolhe um tipo de serviço e é redirecionado
-                    (lastBotMessage?.message
-                        ?: "") == attendanceService.createSendServicesMessage(disability) -> {
-                        if (message in ServiceType.getServicesByDisability(disability).indices.map { (it + 1).toString() }) {
-                            val service = ServiceType.getServicesByDisability(disability)[message.toInt() - 1]
-                            attendanceService.startAttendance(pwd = pwd, botNumber = botNumber, service = service)
-                        } else {
-                            attendanceService.sendServices(botNumber, pwd)
-                        }
-                    }
-                    // redireciona mensagenns para o atendente
-                    attendanceRepository.findStartedAttendanceOfPwd(pwd) != null -> {
-                        val attendance = attendanceRepository.findStartedAttendanceOfPwd(pwd)
-                        if (attendance?.attendant == null) {
-                            logger.error("Atendimento com id ${attendance?.id} foi iniciado com atendente Nulo!")
-                        } else {
-                            attendanceService.redirectMessageToAttendance(
-                                botNumber,
-                                message,
-                                attendance.attendant!!,
-                                pwd
-                            )
-                        }
-                    }
-                }
-            }
+             pwd != null -> pwdFlowService.redirectMessageToPwd(pwd = pwd)
             (lastBotMessage?.message ?: "") == Disability.getOptions() && message in disabilityNumberOptions -> {
                 registerPWDService.handleDisabilitySelected(botNumber, message, phoneNumber)
             }
