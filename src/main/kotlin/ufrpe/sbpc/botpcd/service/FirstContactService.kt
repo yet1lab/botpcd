@@ -31,13 +31,12 @@ class FirstContactService(
     private val attendanceRepository: AttendanceRepository,
     private val monitorRepository: MonitorRepository,
     private val committeeMemberRepository: CommitteeMemberRepository,
-    private val pwdFlowService: PWDFlowService
+    private val pwdFlowService: PWDFlowService,
+    private val attendantFlowService: AttendantFlowService
 ) {
     val logger: Logger = LoggerFactory.getLogger(WhatsappWebhookController::class.java)
 
     fun redirectFluxByUserType(phoneNumber: String, change: Change) {
-        val disabilityNumberOptions =
-            Disability.entries.map { (it.ordinal + 1).toString() }.toMutableList().apply { this.add("7") }
         val botNumber = change.value.metadata.phoneNumberId
         val message = change.value.messages[0].text.body.trim().sanitizeInput()
         messageExchangeRepository.save(
@@ -49,21 +48,14 @@ class FirstContactService(
         )
         val lastBotMessage =
             messageExchangeRepository.lastExchangeMessage(fromPhoneNumber = botNumber, toPhoneNumber = phoneNumber)
-        val lastBotMessageText = lastBotMessage?.message ?: ""
+        val lastBotMessageText = lastBotMessage?.message?.sanitizeInput()
         val attendant: Attendant? =
             monitorRepository.findByPhoneNumber(phoneNumber) ?: committeeMemberRepository.findByPhoneNumber(phoneNumber)
-        val statusQuestionMessages = listOf(
-            AttendantStatusService.StatusChangeMessages.UNAVAILABLE_ATTENDANT_TEXT,
-            AttendantStatusService.StatusChangeMessages.BUSY_ATTENDANT_TEXT,
-            AttendantStatusService.StatusChangeMessages.AVAILABLE_ATTENDANT_TEXT
-        )
-        val botPcdRegex = Regex("^\\s*bot\\s*pcd\\s*$", RegexOption.IGNORE_CASE)
         val pwd = pwdRepository.findByPhoneNumber(phoneNumber)
         when {
-            attendant != null -> {
-            }
-             pwd != null -> pwdFlowService.redirectMessageToPwd(pwd = pwd)
-            (lastBotMessage?.message ?: "") == Disability.getOptions() && message in disabilityNumberOptions -> {
+            attendant != null -> attendantFlowService.redirect(botNumber, lastBotMessageText, attendant, message)
+             pwd != null -> pwdFlowService.redirect(pwd = pwd, botNumber = botNumber, phoneNumber = phoneNumber, message = message, lastBotMessage = lastBotMessage)
+             registerPWDService.shouldRegisterNewUser(lastBotMessageText, message)-> {
                 registerPWDService.handleDisabilitySelected(botNumber, message, phoneNumber)
             }
             else -> {

@@ -17,7 +17,7 @@ class PWDFlowService(
 
     ) {
     val logger = KotlinLogging.logger {}
-    private fun redirect(
+    fun redirect(
         pwd: PWD,
         botNumber: String,
         phoneNumber: String,

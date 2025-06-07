@@ -17,6 +17,7 @@ class RegisterPWDService(
 	private val messageExchangeRepository: MessageExchangeRepository
 ) {
 	private val logger = KotlinLogging.logger {}
+	fun shouldRegisterNewUser(lastBotMessageText: String?, message: String) = (lastBotMessageText ?: "") == Disability.getOptions() && message in Disability.entries.map { (it.ordinal + 1).toString() }.toMutableList().apply { this.add("7") }
 	fun handleDisabilitySelected(botNumber: String, message: String, phoneNumber: String) {
 		val disabilityNumber = message.toInt()
 		val ordinalDisability = disabilityNumber - 1
