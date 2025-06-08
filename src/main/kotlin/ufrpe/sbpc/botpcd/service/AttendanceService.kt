@@ -38,7 +38,7 @@ class AttendanceService(
         val serviceList = ServiceType.getServicesByDisability(disability)
         return whatsappService.createOptions(
             serviceList.map { it -> it.description },
-            header = "Olá ${pwd.name}. Percebi que você tem ${if (disability.ordinal + 1 != 6) disability.textOption else "mobilidade reduzida"}. Os serviços disponíveis para você são:"
+            header = "Olá ${pwd.name}. Percebi que você tem ${disability.shortText}. Os serviços disponíveis para você são:"
         )
     }
 
