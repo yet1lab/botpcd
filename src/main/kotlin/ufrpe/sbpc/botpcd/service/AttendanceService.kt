@@ -3,7 +3,6 @@ package ufrpe.sbpc.botpcd.service
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import ufrpe.sbpc.botpcd.entity.*
 import ufrpe.sbpc.botpcd.entity.Attendance
 import ufrpe.sbpc.botpcd.entity.Attendant
@@ -38,7 +37,7 @@ class AttendanceService(
         val serviceList = ServiceType.getServicesByDisability(disability)
         return whatsappService.createOptions(
             serviceList.map { it -> it.description },
-            header = "Olá ${pwd.name}. Percebi que você tem ${disability.shortText}. Os serviços disponíveis para você são:"
+            header = "Olá ${pwd.name}. Percebi que você tem ${disability.adjective}. Os serviços disponíveis para você são:"
         )
     }
 

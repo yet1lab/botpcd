@@ -15,10 +15,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import ufrpe.sbpc.botpcd.entity.Disability
 import ufrpe.sbpc.botpcd.entity.MessageExchange
 import ufrpe.sbpc.botpcd.entity.PWD
-import ufrpe.sbpc.botpcd.entity.ServiceType
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.repository.PWDRepository
 import java.io.File
+import kotlin.test.assertTrue
 
 
 class StepDefinitions(
@@ -60,7 +60,7 @@ class StepDefinitions(
         pwdRepository.save(
             PWD(
                 phoneNumber = numberUserNotRegister,
-                disabilities = mutableSetOf(Disability.getByShortText(tipoDeDeficiencia))
+                disabilities = mutableSetOf(Disability.getByAdjective(tipoDeDeficiencia))
             )
         )
     }
@@ -70,10 +70,10 @@ class StepDefinitions(
         userSendMessage(mensagemEnviada, numberUserNotRegister)
     }
 
-    @Entao("bot registrará o usuário com deficiencia {string}")
-    fun `bot registra deficiencia do usuário`(deficiencia: String) {
+    @Entao("bot registrará que usuário tem ou possui {string}")
+    fun `bot registra deficiencia do usuário`(deficienciaAdjtivo: String) {
         val pwd = pwdRepository.findByPhoneNumberWithDisabilities(numberUserNotRegister)!!
-        assertEquals(pwd.disabilities.first().shortText, deficiencia)
+        assertEquals(pwd.disabilities.first().adjective, deficienciaAdjtivo)
         pwdRepository.delete(pwd)
     }
 
@@ -117,14 +117,14 @@ class StepDefinitions(
         // Verificar se a mensagem contém todas as opções de serviço esperadas
         val opcoesEsperadas = opcoesDeServico.split(",")
         for (opcao in opcoesEsperadas) {
-            assertEquals(
-                true, ultimaMensagem.contains(opcao.trim()),
+            assertTrue (
+                ultimaMensagem.contains(opcao.trim()),
                 "A opção '${opcao.trim()}' não foi encontrada na mensagem do bot"
             )
         }
         // Verificar se a mensagem menciona o tipo de deficiência
-        assertEquals(
-            true, ultimaMensagem.contains(tipoDeDeficiencia, ignoreCase = true),
+        assertTrue (
+            ultimaMensagem.contains(tipoDeDeficiencia, ignoreCase = true),
             "O tipo de deficiência '$tipoDeDeficiencia' não foi mencionado na mensagem"
         )
     }

@@ -1,12 +1,12 @@
 package ufrpe.sbpc.botpcd.entity
 
 
-enum class Disability(val textOption: String, val shortText: String) {
-	BLINDED("Deficiência visual", "cegueira"),
-	DEAFNESS("Deficiência auditiva/surdez", "surdez"),
-	DEAFBLINDNESS("Surdocegueira", "surdocegueira"),
+enum class Disability(val textOption: String, val adjective: String) {
+	BLINDED("Deficiência visual", "uma pessoa cega"),
+	DEAFNESS("Deficiência auditiva/surdez", "um pessoa surda"),
+	DEAFBLINDNESS("Surdocegueira", "uma pessoa surdocega"),
 	NEURODIVERGENT("Transtorno do Espectro Autista/Neurodivergente", "neurodivergente"),
-	PHYSICAL_DISABILITY("Deficiência física", "deficiência física"),
+	PHYSICAL_DISABILITY("Deficiência física", "deficiente físico"),
 	MOBILITY_IMPAIRED("Não tenho deficiência, mas tenho mobilidade reduzida", "mobilidade reduzida");
 
 	companion object {
@@ -17,8 +17,8 @@ enum class Disability(val textOption: String, val shortText: String) {
 			}
 			return disability
 		}
-		fun getByShortText(shortText: String): Disability {
-			val disability = Disability.entries.find { it.shortText.equals(shortText, ignoreCase = true) }
+		fun getByAdjective(shortText: String): Disability {
+			val disability = Disability.entries.find { it.adjective.equals(shortText, ignoreCase = true) }
 			if (disability == null) {
 				throw IllegalArgumentException("Invalid disability type: $shortText")
 			}
