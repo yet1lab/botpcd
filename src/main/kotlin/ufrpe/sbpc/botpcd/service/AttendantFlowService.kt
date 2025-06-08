@@ -18,7 +18,7 @@ class AttendantFlowService(
         } else if (botPcdRegex.matches(message)) {
             attendantStatusService.sendStatusChanger(attendant, botNumber)
         } else {
-            attendanceRepository.findStartedAttendanceOfAttendance(attendant)?.let { attendance ->
+            attendanceRepository.findStartedAttendanceOfAttendant(attendant)?.let { attendance ->
                 attendanceService.redirectMessageToPwd(botNumber, message, attendance.pwd, attendant)
             }
         }

@@ -35,9 +35,10 @@ class AttendanceService(
 
     fun createSendServicesMessage(disability: Disability, pwd: PWD): String {
         val serviceList = ServiceType.getServicesByDisability(disability)
+        val adjective = disability.adjective
         return whatsappService.createOptions(
             serviceList.map { it -> it.description },
-            header = "Olá ${pwd.name}. Percebi que você tem ${disability.adjective}. Os serviços disponíveis para você são:"
+            header = "Olá ${pwd.name}. Percebi que você ${if (disability == Disability.MOBILITY_IMPAIRED) "tem $adjective" else "é $adjective"}. Os serviços disponíveis para você são:"
         )
     }
 
