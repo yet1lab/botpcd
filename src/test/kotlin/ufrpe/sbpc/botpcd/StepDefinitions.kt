@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import ufrpe.sbpc.botpcd.entity.Disability
 import ufrpe.sbpc.botpcd.entity.MessageExchange
 import ufrpe.sbpc.botpcd.entity.PWD
+import ufrpe.sbpc.botpcd.entity.ServiceType
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.repository.PWDRepository
 import java.io.File
@@ -28,64 +29,130 @@ class StepDefinitions(
     private val numberUserNotRegister: String = "558187654321"
     private val botNumber: String = "15556557522"
     val logger: Logger = LoggerFactory.getLogger(StepDefinitions::class.java)
+
     @Dado("usuário recebeu mensagem {string}")
     fun `usuário recebeu mensagem`(message: String) {
         mockUserRecievedMessage(numberUserNotRegister, message)
     }
+
     @Dado("usuário recebeu mensagem")
     fun `usuário recebeu mensagem docs string`(message: String) {
         mockUserRecievedMessage(numberUserNotRegister, message)
     }
+
     @Dado("pcd está cadastrado completo")
     fun pcdEstaCadastrado() {
         // Implementar lógica para garantir que o PCD está cadastrado no sistema
     }
+
     @Dado("usuário não cadastrado")
     fun `usuário não cadastrado`() {
         assertNull(pwdRepository.findByPhoneNumber(numberUserNotRegister))
     }
+
     @Dado("usuário possui deficiência cadastrada de {string}")
     fun `usuário que possui deficiencia cadastrada`(tipoDeDeficiencia: String) {
-        logger.warn("usuario que está registrado no sistema ${pwdRepository.findByPhoneNumber(numberUserNotRegister).toString()}")
-        pwdRepository.save(PWD(
-            phoneNumber = numberUserNotRegister,
-            disabilities = mutableSetOf(Disability.getByShortText(tipoDeDeficiencia))
-        ))
+        logger.warn(
+            "usuario que está registrado no sistema ${
+                pwdRepository.findByPhoneNumber(numberUserNotRegister).toString()
+            }"
+        )
+        pwdRepository.save(
+            PWD(
+                phoneNumber = numberUserNotRegister,
+                disabilities = mutableSetOf(Disability.getByShortText(tipoDeDeficiencia))
+            )
+        )
     }
+
     @Quando("usuário envia mensagem {string}")
     fun `usuario envia mensagem`(mensagemEnviada: String) {
         userSendMessage(mensagemEnviada, numberUserNotRegister)
     }
+
     @Entao("bot registrará o usuário com deficiencia {string}")
     fun `bot registra deficiencia do usuário`(deficiencia: String) {
         val pwd = pwdRepository.findByPhoneNumberWithDisabilities(numberUserNotRegister)!!
         assertEquals(pwd.disabilities.first().textOption, deficiencia)
         pwdRepository.delete(pwd)
     }
+
     @Entao("bot salvará o nome do usuário {string}")
     fun `bot salva o nome do usuário`(nome: String) {
         val pwd = pwdRepository.findByPhoneNumber(numberUserNotRegister)
         assertEquals(pwd!!.name, nome)
         pwdRepository.delete(pwd)
     }
+
     @Entao("usuário receberá mensagem {string}")
     fun `usuario receberá mensagem`(message: String) {
         testarUltimaMensagemRecebidaDoUsuario(message, numberUserNotRegister)
     }
+
     @Entao("usuário receberá mensagem")
     fun `usuario receberá mensagem docs string`(message: String) {
         testarUltimaMensagemRecebidaDoUsuario(message, numberUserNotRegister)
     }
-    @Entao("usuário receberá mensagem {string} seguindo de {string}")
-    fun `usuário receberá mensagem seguida de outra mensagem` (penultimaMensagem: String, ultimaMensagem: String) {
-        testarUltimaMensagemRecebidaDoUsuario(mensagemEsperada = ultimaMensagem, userPhoneNumber = numberUserNotRegister)
 
+    @Entao("A penúltima mensagem recebida pelo usuário será {string}")
+    fun `a penultima mensagem recebida pelo usuário será`(penultimaMensagem: String) {
+        testarPenultimaMensagemRecebidaDoUsuario(
+            mensagemEsperada = penultimaMensagem,
+            userPhoneNumber = numberUserNotRegister
+        )
     }
+
+    @Entao("bot enviará opcções de serviço {string} de acordo com a deficiência {string} do pcd")
+    fun `bot enviará opcçoes de seviço de acordo com a deficiência do pcd`(
+        opcoesDeServico: String,
+        tipoDeDeficiencia: String
+    ) {
+        // Obter a última mensagem enviada pelo bot ao usuário
+        val ultimaMensagem = messageExchangeRepository.lastExchangeMessage(
+            toPhoneNumber = numberUserNotRegister,
+            fromPhoneNumber = botNumber
+        )?.message ?: ""
+        logger.warn("Verificando se a mensagem contém as opções: $opcoesDeServico")
+        logger.warn("Mensagem recebida: $ultimaMensagem")
+        // Verificar se a mensagem contém todas as opções de serviço esperadas
+        val opcoesEsperadas = opcoesDeServico.split(",")
+        for (opcao in opcoesEsperadas) {
+            assertEquals(
+                true, ultimaMensagem.contains(opcao.trim()),
+                "A opção '${opcao.trim()}' não foi encontrada na mensagem do bot"
+            )
+        }
+        // Verificar se a mensagem menciona o tipo de deficiência
+        assertEquals(
+            true, ultimaMensagem.contains(tipoDeDeficiencia, ignoreCase = true),
+            "O tipo de deficiência '$tipoDeDeficiencia' não foi mencionado na mensagem"
+        )
+    }
+
     fun mockUserRecievedMessage(userNumber: String, message: String) {
-        messageExchangeRepository.save(MessageExchange(fromPhoneNumber = botNumber, toPhoneNumber =  numberUserNotRegister, message = message))
+        messageExchangeRepository.save(
+            MessageExchange(
+                fromPhoneNumber = botNumber,
+                toPhoneNumber = userNumber,
+                message = message
+            )
+        )
     }
+
     fun testarUltimaMensagemRecebidaDoUsuario(mensagemEsperada: String, userPhoneNumber: String) {
-        assertEquals(mensagemEsperada, messageExchangeRepository.lastExchangeMessage(toPhoneNumber = userPhoneNumber, fromPhoneNumber = botNumber)?.message)
+        assertEquals(
+            mensagemEsperada,
+            messageExchangeRepository.lastExchangeMessage(
+                toPhoneNumber = userPhoneNumber,
+                fromPhoneNumber = botNumber
+            )?.message
+        )
+    }
+
+    fun testarPenultimaMensagemRecebidaDoUsuario(mensagemEsperada: String, userPhoneNumber: String) {
+        val messageList =
+            messageExchangeRepository.listExchangeMessage(toPhoneNumber = userPhoneNumber, fromPhoneNumber = botNumber)
+        assertEquals(mensagemEsperada, messageList[messageList.lastIndex - 1].message)
     }
 
     private fun userSendMessage(mensagemEnviada: String, userPhoneNumber: String) {
@@ -114,21 +181,27 @@ class StepDefinitions(
 fun loadPayload(filePath: String): String {
     return File(filePath).readText(Charsets.UTF_8)
 }
+
 fun String.changeUserNumber(newNumber: String): String {
     return this.replace(Regex("(?<=\"wa_id\": \")\\d+(?=\")"), newNumber)
 }
+
 fun String.changeUserMessage(newMessage: String): String {
     return this.replace(Regex("(?<=\\\"body\\\": \\\").*?(?=\\\")"), newMessage)
 }
+
 fun String.changeBotNumber(newNumber: String): String {
     return this.replace(Regex("(?<=\\\"phone_number_id\\\": \\\").*?(?=\\\")"), newNumber)
 }
+
 fun String.getChange(): Value {
     return WebHook.constructEvent(this).entry[0].changes[0].value
 }
+
 fun String.getBotNumber(): String {
     return this.getChange().metadata.displayPhoneNumber
 }
+
 fun String.getMessageBody(): String {
     return this.getChange().messages[0].text.body
 }

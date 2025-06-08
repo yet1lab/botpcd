@@ -31,15 +31,14 @@ class AttendanceService(
 ) {
     val logger: Logger = LoggerFactory.getLogger(AttendanceService::class.java)
     fun sendServices(botNumber: String, pwd: PWD) {
-        whatsappService.sendMessage(botNumber, pwd.phoneNumber, "Olá, ${pwd.name}.")
-        whatsappService.sendMessage(botNumber, pwd.phoneNumber, createSendServicesMessage(pwd.disabilities.first()))
+        whatsappService.sendMessage(botNumber, pwd.phoneNumber, createSendServicesMessage(pwd.disabilities.first(), pwd))
     }
 
-    fun createSendServicesMessage(disability: Disability): String {
+    fun createSendServicesMessage(disability: Disability, pwd: PWD): String {
         val serviceList = ServiceType.getServicesByDisability(disability)
         return whatsappService.createOptions(
             serviceList.map { it -> it.description },
-            header = "Percebi que você tem ${if (disability.ordinal + 1 != 6) disability.textOption else "mobilidade reduzida"}. Os serviços disponíveis para você são:"
+            header = "Olá ${pwd.name}. Percebi que você tem ${if (disability.ordinal + 1 != 6) disability.textOption else "mobilidade reduzida"}. Os serviços disponíveis para você são:"
         )
     }
 

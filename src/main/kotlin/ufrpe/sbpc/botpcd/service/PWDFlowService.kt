@@ -33,7 +33,7 @@ class PWDFlowService(
                 whatsappService.sendMessage(botNumber, phoneNumber, "Cadastro realizado.")
                 attendanceService.sendServices(botNumber, pwd)
             }
-            isChoosingService(lastBotMessage, disability) -> {
+            isChoosingService(lastBotMessage, pwd) -> {
                 if (isValidService(message, disability)) {
                     val service = ServiceType.getServicesByDisability(disability)[message.toInt() - 1]
                     attendanceService.startAttendance(pwd = pwd, botNumber = botNumber, service = service)
@@ -56,8 +56,8 @@ class PWDFlowService(
         }
     }
     private fun isRegisteringName(lastBotMessage: MessageExchange?, pwd: PWD) = (lastBotMessage?.message ?: "") == "Qual o seu nome?" && pwd.name == null
-    private fun isChoosingService(lastBotMessage: MessageExchange?, disability: Disability) = (lastBotMessage?.message
-        ?: "") == attendanceService.createSendServicesMessage(disability)
+    private fun isChoosingService(lastBotMessage: MessageExchange?, pwd: PWD) = (lastBotMessage?.message
+        ?: "") == attendanceService.createSendServicesMessage(pwd.disabilities.first(), pwd)
     private fun isValidService(message: String, disability: Disability) = message in ServiceType.getServicesByDisability(disability).indices.map { (it + 1).toString() }
 
 }

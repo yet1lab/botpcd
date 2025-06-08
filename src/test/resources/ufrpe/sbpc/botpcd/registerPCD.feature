@@ -77,12 +77,12 @@ Olá, qual sua deficiência?
     Dado usuário recebeu mensagem "Qual o seu nome?"
     E usuário possui deficiência cadastrada de "<tipo_de_deficiência>"
     Quando usuário envia mensagem "João Victor"
-    Entao usuário receberá mensagem "Cadastro realizado." seguindo das opcções de serviço <opccoes_de_servico>
+    Entao A penúltima mensagem recebida pelo usuário será "Cadastro realizado."
+      E bot enviará opcções de serviço "<opcções_de_serviço>" de acordo com a deficiência "<tipo_de_deficiência>" do pcd
       E bot salvará o nome do usuário "João Victor"
-      E bot vai enviará "<opccoes_de_servico>" de acordo com o "<tipo_de_deficiência>" do pcd
 
     Exemplos:
-      | tipo_de_deficiência | opccoes_de_servico                                                                         |
+      | tipo_de_deficiência | opcções_de_serviço                                                                                           |
       | surdez              | informações em Libras,atividade com interpretação em Libras                                |
       | mobilidade reduzida | ajuda na mobilidade,transporte para deslocamento no evento                                 |
       | deficiência física  | ajuda na mobilidade,ajuda com alimentação e higiene,transporte para deslocamento no evento |
