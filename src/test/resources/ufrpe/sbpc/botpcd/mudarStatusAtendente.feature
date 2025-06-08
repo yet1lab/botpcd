@@ -9,7 +9,7 @@ Funcionalidade: Mudar status do Atendente(Monitor ou membro da comissão)
   Esquema do Cenário: Solicitar mudança de status
     Dado <tipo_de_atendente> estava com status <status_atual>
     Quando <tipo_de_atendente> envia mensagem "bot pcd"
-    Então bot enviará mensagem “Olá, <tipo_de_atendente>! No momento, seu status está como <status_atual>. Para mudar para algum desses status <novo_status>, basta clicar no botão correspondente abaixo.
+    Então usuário receberá mensagem "Olá, <tipo_de_atendente>! No momento, seu status está como <status_atual>. Para mudar para algum desses status <novo_status>, basta clicar no botão correspondente abaixo"
 
     Exemplos:
       | tipo_de_atendente  | status_atual | novo_status             |
@@ -24,7 +24,7 @@ Funcionalidade: Mudar status do Atendente(Monitor ou membro da comissão)
     Dado que o <tipo_de_atendente> está no <antigo_status> recebeu uma solicitação para mudar para o status <novo_status>
     Quando <tipo_de_atendente> envia mensagem "<numero_novo_status>"
     Então o status do <tipo_de_atendente> deve ser atualizado para <novo_status>
-    E o bot deve enviar a mensagem “Mudança realizada com sucesso agora seu novo status é <novo_status>”.
+    E usuário receberá mensagem "Mudança realizada com sucesso agora seu novo status é <novo_status>"
 
     Exemplos:
       | tipo_de_atendente  | antigo_status | novo_status  | numero_novo_status |
