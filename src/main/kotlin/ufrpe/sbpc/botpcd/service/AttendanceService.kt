@@ -17,16 +17,18 @@ import ufrpe.sbpc.botpcd.repository.AttendanceRepository
 import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.repository.MonitorRepository
+import ufrpe.sbpc.botpcd.service.QueryService
 import java.time.LocalDateTime
 
 @Service
 class AttendanceService(
+		private val queryService: QueryService
     private val attendanceRepository: AttendanceRepository,
     private val whatsappService: WhatsappService,
     private val attendantStatusService: AttendantStatusService,
     private val monitorRepository: MonitorRepository,
     private val committeeMemberRepository: CommitteeMemberRepository,
-    private val messageExchangeRepository: MessageExchangeRepository
+    private val messageExchangeRepository: MessageExchangeRepository,
 ) {
     val logger: Logger = LoggerFactory.getLogger(AttendanceService::class.java)
     fun sendServices(botNumber: String, pwd: PWD) {

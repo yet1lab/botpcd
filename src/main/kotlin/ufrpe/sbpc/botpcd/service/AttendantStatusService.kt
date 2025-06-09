@@ -12,13 +12,6 @@ class AttendantStatusService(
     private val committeeMemberRepository: CommitteeMemberRepository,
     private val whatsappService: WhatsappService
 ) {
-
-    object StatusChangeMessages {
-        const val UNAVAILABLE_ATTENDANT_TEXT = "Olá, você está Indisponível no momento. Digite 1 se Deseja ficar Disponível para receber atendimentos?\n1 - Ficar Disponível"
-        const val BUSY_ATTENDANT_TEXT = "Olá, você está em atendimento. Deseja encerrá-lo e continuar Disponível ou deseja ficar Indisponível?\n1 - Encerrar Atendimento\n2 - Ficar Indisponível"
-        const val AVAILABLE_ATTENDANT_TEXT = "Olá, você está Disponível no momento. Deseja ficar Indisponível para não receber atendimentos?\n1 - Ficar Indisponível"
-    }
-
     @Transactional
     fun setMonitorStatus(monitor: Monitor, status: UserStatus) {
         monitor.status = status
@@ -41,9 +34,20 @@ class AttendantStatusService(
     fun sendStatusChanger(attendant: Attendant, botPhoneNumber: String) {
         val userPhoneNumber = attendant.phoneNumber
         val messageToSend = when (attendant.status) {
-            UserStatus.UNAVAILABLE -> StatusChangeMessages.UNAVAILABLE_ATTENDANT_TEXT
-            UserStatus.BUSY -> StatusChangeMessages.BUSY_ATTENDANT_TEXT
-            UserStatus.AVAILABLE -> StatusChangeMessages.AVAILABLE_ATTENDANT_TEXT
+            UserStatus.AVAILABLE ->  whatsappService.createOptions(
+							[ "Continuar disponivel", "Ficar Indisponivel" ],
+							"*BotPCD:*\n Você está *Disponível* no momento"
+						)
+						UserStatus.UNAVAILABLE -> whatsappService.createOptions(
+							[ "Continuar Indisponivel", "Ficar Disponivel" ],
+							"*BotPCD:*\n Você está *Indisponível* no momento"
+						)
+            UserStatus.BUSY ->  whatsappService.createOptions(
+							[ "Continuar atendimento", 
+								"Encerrar atendimento e Ficar Disponivel",
+								"Encerrar atendimento e Ficar Indisponivel" ],
+							"*BotPCD:* você está *em atendimento*"
+						)
         }
         whatsappService.sendMessage(botPhoneNumber, userPhoneNumber, messageToSend)
     }
