@@ -1,17 +1,30 @@
 package ufrpe.sbpc.botpcd.service
+
 import java.time.LocalDateTime
+import ufrpe.sbpc.botpcd.model.PWD
+import ufrpe.sbpc.botpcd.model.Attendance
+import ufrpe.sbpc.botpcd.model.ServiceType
+import org.springframework.stereotype.Service
+import ufrpe.sbpc.botpcd.repository.AttendanceRepository
 
 @Service
-class QueueService(){
-	fun pop(service: ServiceType){
-		// get first attendance of list    TODO: switch pwd uses to new pop function
-		val firstAtt = AttendanceRepository.findRequestAttendanceOfService(service) 
-		// "remove" from list
-		AttendanceRepository.acceptPendingAttendanceForPwd(firstAtt.pwd, firstAtt.Attendant, LocalDateTime.now())
+class QueueService(private val attendanceRepository: AttendanceRepository){
+	fun add(service: ServiceType, pwd: PWD) {
+		attendanceRepository.save(
+			Attendance(serviceType = service, pwd = pwd, attendantType = service.attendantType)
+		)
 	}
 
-	fun push(service: ServiceType, pwd: PWD) {
-    attendanceRepository.save(Attendance(serviceType = service, pwd = pwd, attendantType = service.attendantType))
-  }
-}
+	fun len(service: ServiceType): Long {
+		return attendanceRepository.countRequestAttendanceOfService(service)
+	}
+
+	fun pop(service: ServiceType): Attendance? {
+		val firstAtt = attendanceRepository.findRequestAttendanceOfService(service)
+
+		firstAtt?.let {
+			attendanceRepository.acceptPendingAttendanceForPwd(it.pwd, it.attendant, LocalDateTime.now())
+		}
+		return firstAtt
+	}
 }
