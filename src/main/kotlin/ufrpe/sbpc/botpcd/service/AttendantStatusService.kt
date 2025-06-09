@@ -36,17 +36,17 @@ class AttendantStatusService(
         val messageToSend = when (attendant.status) {
             UserStatus.AVAILABLE ->  whatsappService.createOptions(
 							[ "Continuar Disponível", "Ficar Indisponível" ],
-							"*BotPCD:* Você está *Disponível* no momento"
+							"Você está *Disponível* no momento", "BotPCD"
 						)
 						UserStatus.UNAVAILABLE -> whatsappService.createOptions(
 							[ "Continuar Indisponível", "Ficar Disponível" ],
-							"*BotPCD:* Você está *Indisponível* no momento"
+							"Você está *Indisponível* no momento", "BotPCD"
 						)
             UserStatus.BUSY ->  whatsappService.createOptions(
 							[ "Continuar atendimento", 
 								"Encerrar atendimento e Ficar Disponível",
 								"Encerrar atendimento e Ficar Indisponível" ],
-							"*BotPCD:* Você está *em atendimento*"
+							"Você está *em atendimento*", "BotPCD"
 						)
         }
         whatsappService.sendMessage(botPhoneNumber, userPhoneNumber, messageToSend)
@@ -61,51 +61,51 @@ class AttendantStatusService(
             UserStatus.AVAILABLE -> {
 								when (userResponse) {
 									"1" -> {
-										confirmationMessage = "*BotPCD:* Você continua Disponível."
+										confirmationMessage = "Você continua Disponível."
 									}
 									"2" -> {
 										updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
-										confirmationMessage = "*BotPCD:* Seu status foi atualizado para Indisponível."
+										confirmationMessage = "Seu status foi atualizado para Indisponível."
 									}
 									else -> {
-                    confirmationMessage = "*BotPCD:* Opção inválida. Seu status permanece Disponível."
+                    confirmationMessage = "Opção inválida. Seu status permanece Disponível."
 									}
             }
             UserStatus.UNAVAILABLE -> {
 								when (userResponse) {  
 									"1" -> {
-                    confirmationMessage = "*BotPCD:* Você continua Indisponível"
+                    confirmationMessage = "Você continua Indisponível"
 									}
 									"2" -> {
 										updateAttendantStatus(attendant, UserStatus.AVAILABLE)
-                    confirmationMessage = "*BotPCD:* Seu status foi atualizado para Disponível."
+                    confirmationMessage = "Seu status foi atualizado para Disponível."
 									}
 									else -> {
-                    confirmationMessage = "*BotPCD:* Opção inválida. Seu status permanece Indisponível."
+                    confirmationMessage = "Opção inválida. Seu status permanece Indisponível."
                 }
             }
             UserStatus.BUSY -> {
                 when (userResponse) {
                     "1" -> {
-                        confirmationMessage = "*BotPCD:* Você continua em atendimento."
+                        confirmationMessage = "Você continua em atendimento."
                     }
                     "2" -> {
                         updateAttendantStatus(attendant, UserStatus.AVAILABLE)
                         // terminar o atendimento
-                        confirmationMessage = "*BotPCD:* Atendimento encerrado. Seu status foi atualizado para Disponível."
+                        confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Disponível."
                     }
                     "3" -> {
                         updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
                         // terminar o atendimento
-                        confirmationMessage = "*BotPCD:* Seu status foi atualizado para Indisponível."
+                        confirmationMessage = "Seu status foi atualizado para Indisponível."
                     }
                     else -> {
-                        confirmationMessage = "*BotPCD:* Opção inválida. Seu status permanece Ocupado."
+                        confirmationMessage = "Opção inválida. Seu status permanece Ocupado."
                     }
                 }
             }
         }
-        confirmationMessage?.let { whatsappService.sendMessage(botPhoneNumber, userPhoneNumber, it) }
+        confirmationMessage?.let { whatsappService.sendMessage(botPhoneNumber, userPhoneNumber, it, "BotPCD") }
     }
 
     fun findAvailableMonitors(): List<Monitor> {
