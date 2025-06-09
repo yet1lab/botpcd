@@ -53,6 +53,9 @@ class PWDFlowService(
                     )
                 }
             }
+            else -> {
+                attendanceService.sendServices(botNumber = botNumber, pwd = pwd)
+            }
         }
     }
     private fun isRegisteringName(lastBotMessage: MessageExchange?, pwd: PWD) = (lastBotMessage?.message ?: "") == "Qual o seu nome?" && pwd.name == null

@@ -16,7 +16,6 @@ interface AttendanceRepository : JpaRepository<Attendance, Long> {
     fun  findStartedAttendanceOfPwd(pwd: PWD): Attendance?
     @Query("SELECT att from Attendance att where att.attendant = :attendant AND att.acceptDateTime is not null and att.endDateTime is null order by att.requestDateTime desc")
     fun findStartedAttendanceOfAttendant(attendant: Attendant): Attendance?
-
     @Modifying 
     @Query("UPDATE Attendance a SET a.attendant = :attendant, a.acceptDateTime = :acceptDateTime WHERE a.pwd = :pwd AND a.acceptDateTime IS NULL")
     fun acceptPendingAttendanceForPwd(
