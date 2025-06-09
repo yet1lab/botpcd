@@ -35,18 +35,18 @@ class AttendantStatusService(
         val userPhoneNumber = attendant.phoneNumber
         val messageToSend = when (attendant.status) {
             UserStatus.AVAILABLE ->  whatsappService.createOptions(
-							[ "Continuar disponivel", "Ficar Indisponivel" ],
-							"*BotPCD:*\n Você está *Disponível* no momento"
+							[ "Continuar Disponível", "Ficar Indisponível" ],
+							"*BotPCD:* Você está *Disponível* no momento"
 						)
 						UserStatus.UNAVAILABLE -> whatsappService.createOptions(
-							[ "Continuar Indisponivel", "Ficar Disponivel" ],
-							"*BotPCD:*\n Você está *Indisponível* no momento"
+							[ "Continuar Indisponível", "Ficar Disponível" ],
+							"*BotPCD:* Você está *Indisponível* no momento"
 						)
             UserStatus.BUSY ->  whatsappService.createOptions(
 							[ "Continuar atendimento", 
-								"Encerrar atendimento e Ficar Disponivel",
-								"Encerrar atendimento e Ficar Indisponivel" ],
-							"*BotPCD:* você está *em atendimento*"
+								"Encerrar atendimento e Ficar Disponível",
+								"Encerrar atendimento e Ficar Indisponível" ],
+							"*BotPCD:* Você está *em atendimento*"
 						)
         }
         whatsappService.sendMessage(botPhoneNumber, userPhoneNumber, messageToSend)
@@ -58,37 +58,50 @@ class AttendantStatusService(
         var confirmationMessage: String? = null
 
         when (attendant.status) {
+            UserStatus.AVAILABLE -> {
+								when (userResponse) {
+									"1" -> {
+										confirmationMessage = "*BotPCD:* Você continua Disponível."
+									}
+									"2" -> {
+										updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
+										confirmationMessage = "*BotPCD:* Seu status foi atualizado para Indisponível."
+									}
+									else -> {
+                    confirmationMessage = "*BotPCD:* Opção inválida. Seu status permanece Disponível."
+									}
+            }
             UserStatus.UNAVAILABLE -> {
-                if (userResponse == "1") {
-                    updateAttendantStatus(attendant, UserStatus.AVAILABLE)
-                    confirmationMessage = "Seu status foi atualizado para Disponível."
-                } else {
-                    confirmationMessage = "Opção inválida. Seu status permanece Indisponível."
+								when (userResponse) {  
+									"1" -> {
+                    confirmationMessage = "*BotPCD:* Você continua Indisponível"
+									}
+									"2" -> {
+										updateAttendantStatus(attendant, UserStatus.AVAILABLE)
+                    confirmationMessage = "*BotPCD:* Seu status foi atualizado para Disponível."
+									}
+									else -> {
+                    confirmationMessage = "*BotPCD:* Opção inválida. Seu status permanece Indisponível."
                 }
             }
             UserStatus.BUSY -> {
                 when (userResponse) {
                     "1" -> {
-                        updateAttendantStatus(attendant, UserStatus.AVAILABLE)
-                        // terminar o atendimento
-                        confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Disponível."
+                        confirmationMessage = "*BotPCD:* Você continua em atendimento."
                     }
                     "2" -> {
+                        updateAttendantStatus(attendant, UserStatus.AVAILABLE)
+                        // terminar o atendimento
+                        confirmationMessage = "*BotPCD:* Atendimento encerrado. Seu status foi atualizado para Disponível."
+                    }
+                    "3" -> {
                         updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
                         // terminar o atendimento
-                        confirmationMessage = "Seu status foi atualizado para Indisponível."
+                        confirmationMessage = "*BotPCD:* Seu status foi atualizado para Indisponível."
                     }
                     else -> {
-                        confirmationMessage = "Opção inválida. Seu status permanece Ocupado."
+                        confirmationMessage = "*BotPCD:* Opção inválida. Seu status permanece Ocupado."
                     }
-                }
-            }
-            UserStatus.AVAILABLE -> {
-                if (userResponse == "1") {
-                    updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
-                    confirmationMessage = "Seu status foi atualizado para Indisponível."
-                } else {
-                    confirmationMessage = "Opção inválida. Seu status permanece Disponível."
                 }
             }
         }
