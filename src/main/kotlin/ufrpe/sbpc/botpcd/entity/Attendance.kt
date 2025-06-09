@@ -33,7 +33,7 @@ class Attendance(
     var attendantType: Provider,
 
     // Campos opcionais que serão atualizados durante o ciclo de vida do atendimento
-    var acceptDateTime: LocalDateTime? = null,
+    var startDateTime: LocalDateTime? = null,
 
     var monitorArrivalDateTime: LocalDateTime? = null,
 
