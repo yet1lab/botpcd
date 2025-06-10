@@ -17,12 +17,12 @@ import ufrpe.sbpc.botpcd.repository.AttendanceRepository
 import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.repository.MonitorRepository
-import ufrpe.sbpc.botpcd.service.QueryService
+import ufrpe.sbpc.botpcd.service.QueueService
 import java.time.LocalDateTime
 
 @Service
 class AttendanceService(
-		private val queryService: QueryService
+		private val queryService: QueueService,
     private val attendanceRepository: AttendanceRepository,
     private val whatsappService: WhatsappService,
     private val attendantStatusService: AttendantStatusService,
@@ -38,10 +38,11 @@ class AttendanceService(
     fun createSendServicesMessage(disability: Disability, pwd: PWD): String {
         val serviceList = ServiceType.getServicesByDisability(disability)
         val adjective = disability.adjective
+
         return whatsappService.createOptions(
-            serviceList.map { it -> it.description },
-            header = "Olá ${pwd.name}. Percebi que você ${if (disability == Disability.MOBILITY_IMPAIRED) "tem $adjective" else "é $adjective"}. Os serviços disponíveis para você são:"
-        )
+            serviceList.map { it -> it.description }.toTypedArray(),
+            header = "Olá ${pwd.name}. Percebi que você ${if (disability == Disability.MOBILITY_IMPAIRED) "tem $adjective" else "é $adjective"}. Os serviços disponíveis para você são\n"
+					)
     }
 
     fun makeAttendantBusy(attendant: Attendant) {
@@ -120,7 +121,7 @@ class AttendanceService(
                             "O membro da comissão ${member.name} irá realizar seu atendimento."
                         )
                         attendanceRepository.acceptPendingAttendanceForPwd(pwd, member, LocalDateTime.now())
-                        makeAttendantBusy(member)
+												makeAttendantBusy(member)
                     } else {
                         logger.warn("Membro da comissão ${member.name} com número ${member.phoneNumber} não enviou mensagem nas ultimas 24")
                     }

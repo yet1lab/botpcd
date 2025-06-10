@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import ufrpe.sbpc.botpcd.entity.Attendance
+import ufrpe.sbpc.botpcd.entity.ServiceType
 import ufrpe.sbpc.botpcd.entity.Attendant
 import ufrpe.sbpc.botpcd.entity.PWD
 import java.time.LocalDateTime
@@ -29,7 +30,7 @@ interface AttendanceRepository : JpaRepository<Attendance, Long> {
   @Query("UPDATE Attendance a SET a.attendant = :attendant, a.startDateTime = :acceptDateTime WHERE a.pwd = :pwd AND a.startDateTime IS NULL")
 	fun acceptPendingAttendanceForPwd(
 		@Param("pwd") pwd: PWD,
-		@Param("attendant") attendant: Attendant,
+		@Param("attendant") attendant: Attendant?,
 		@Param("acceptDateTime") startDateTime: LocalDateTime
 	): Int 
 }

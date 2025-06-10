@@ -1,0 +1,35 @@
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:74:36 Unexpected tokens (use ';' to separate expressions on the same line)
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:87:29 Unexpected tokens (use ';' to separate expressions on the same line)
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:115:5 Expecting '->'
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:115:40 Expecting an expression
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:115:40 Expecting '->'
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:122:6 Expecting '->'
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:123:2 Expecting '}'
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:123:2 Missing '}
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:38:8 Unsupported [Collection literals outside of annotations]
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:42:8 Unsupported [Collection literals outside of annotations]
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:46:8 Unsupported [Collection literals outside of annotations]
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:111:5 Comparison of incompatible enums 'UserStatus' and '() -> List<Monitor>' is always unsuccessful
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:111:9 Anonymous functions with names are prohibited
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:115:9 Unresolved reference: findAvailableCommitteeMembers
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:115:42 No value passed for parameter 'size'
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:116:16 Type mismatch: inferred type is List<CommitteeMember> but Unit was expected
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:119:5 Comparison of incompatible enums 'UserStatus' and '(MonitorAssistanceType) -> List<Monitor>' is always unsuccessful
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:119:9 Anonymous functions with names are prohibited
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:120:33 Unresolved reference: findAvailableMonitors
+e: file:///data/data/com.termux/files/home/desk/botpcd/botpcd/src/main/kotlin/ufrpe/sbpc/botpcd/service/AttendantStatusService.kt:121:43 Unresolved reference: it
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 5s

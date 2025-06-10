@@ -1,9 +1,9 @@
 package ufrpe.sbpc.botpcd.service
 
 import java.time.LocalDateTime
-import ufrpe.sbpc.botpcd.model.PWD
-import ufrpe.sbpc.botpcd.model.Attendance
-import ufrpe.sbpc.botpcd.model.ServiceType
+import ufrpe.sbpc.botpcd.entity.PWD
+import ufrpe.sbpc.botpcd.entity.Attendance
+import ufrpe.sbpc.botpcd.entity.ServiceType
 import org.springframework.stereotype.Service
 import ufrpe.sbpc.botpcd.repository.AttendanceRepository
 

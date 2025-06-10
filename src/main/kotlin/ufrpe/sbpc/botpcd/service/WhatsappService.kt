@@ -14,7 +14,7 @@ class WhatsappService(
     private val messageExchangeRepository: MessageExchangeRepository
 ) {
     fun sendMessage(botNumber: String, destinyNumberID: String, msg: String, author: String = "") {
-				if (author != ""){ msg = "*${author}:*\n ${msg}"; }  
+				if (author != ""){ val msg = "*${author}:*\n ${msg}"; }  
 
 				val message = Message.MessageBuilder.builder()
             .setTo(destinyNumberID)
@@ -24,7 +24,7 @@ class WhatsappService(
         messageExchangeRepository.save(MessageExchange(fromPhoneNumber = botNumber, toPhoneNumber = destinyNumberID, message = msg))
     }
 
-    fun createOptions(options: List<String>, header: String = "", author: String = ""): String {
+    fun createOptions(options: Array<String>, header: String = "", author: String = ""): String {
         var msg = ""
 
 				for (i in options.indices) {

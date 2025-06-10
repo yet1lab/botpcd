@@ -97,7 +97,7 @@ class AttendantStatusService(
                     "3" -> {
                         updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
                         // terminar o atendimento
-                        confirmationMessage = "Seu status foi atualizado para Indisponível."
+                        confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Indisponível."
                     }
                     else -> {
                         confirmationMessage = "Opção inválida. Seu status permanece Ocupado."
