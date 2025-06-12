@@ -1,5 +1,7 @@
 package ufrpe.sbpc.botpcd.service
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import ufrpe.sbpc.botpcd.entity.*
 import ufrpe.sbpc.botpcd.repository.MonitorRepository
@@ -13,6 +15,8 @@ class AttendantStatusService(
     private val attendanceRepository: AttendanceRepository,
     private val committeeMemberRepository: CommitteeMemberRepository
 ) {
+	val logger: Logger = LoggerFactory.getLogger(AttendantStatusService::class.java)
+
     @Transactional
     fun setMonitorStatus(monitor: Monitor, status: UserStatus) {
         monitor.status = status
@@ -92,23 +96,27 @@ class AttendantStatusService(
 
 					UserStatus.BUSY -> {
 							val attendance = attendanceRepository.findStartedAttendanceOfAttendant(attendant)
-							when (userResponse) {
+							if(attendance != null) {
+								when (userResponse) {
 									"1" -> {
-											updateAttendantStatus(attendant, UserStatus.AVAILABLE)
-											whatsappService.sendMensage(botPhoneNumber, attendance.pwd.phoneNumber, "Atendimento encerrado", "BotPCD")
-											confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Disponível."
+										updateAttendantStatus(attendant, UserStatus.AVAILABLE)
+										whatsappService.sendMessage(botPhoneNumber, attendance.pwd.phoneNumber, "Atendimento encerrado", "BotPCD")
+										confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Disponível."
 									}
 									"2" -> {
-											updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
-											whatsappService.sendMensage(botPhoneNumber, attendance.pwd.phoneNumber, "Atendimento encerrado", "BotPCD")
-											confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Indisponível."
+										updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
+										whatsappService.sendMessage(botPhoneNumber, attendance.pwd.phoneNumber, "Atendimento encerrado", "BotPCD")
+										confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Indisponível."
 									}
 									"cancelar" -> {
-											confirmationMessage = "Você continua em atendimento."
+										confirmationMessage = "Você continua em atendimento."
 									}
 									else -> {
-											confirmationMessage = "Opção inválida. Seu status permanece Ocupado."
+										confirmationMessage = "Opção inválida. Seu status permanece Ocupado."
 									}
+								}
+							} else {
+								logger.warn("Atendente está ocupardo  ${attendant.name} sem atendimento")
 							}
 					}
 			}

@@ -21,7 +21,7 @@ Funcionalidade: Mudar status do Atendente(Monitor ou membro da comissão)
       | membro da comissão | ocupado      | disponível,indisponível |
 
   Esquema do Cenário: Confirmar mudança de status
-    Dado que o <tipo_de_atendente> está no <antigo_status> recebeu uma solicitação para mudar para o status <novo_status>
+    Dado <tipo_de_atendente> está no <antigo_status> recebeu uma solicitação de mudança de status
     Quando <tipo_de_atendente> envia mensagem "<numero_novo_status>"
     Então o status do <tipo_de_atendente> deve ser atualizado para <novo_status>
     E usuário receberá mensagem "Mudança realizada com sucesso agora seu novo status é <novo_status>"
