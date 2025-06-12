@@ -26,7 +26,7 @@ class WhatsappService(
 		
 		fun createOptionsWithCancel(options: List<String>, header: String = "", author: String = ""): String {
 			var msg = this.createOptions(options, header, author)
-			return "${msg}\n- Escreva \"cancelar\" sair do menu"
+			return "${msg}- Escreva \"cancelar\" para sair do menu"
 		}
 
     fun createOptions(options: List<String>, header: String = "", author: String = ""): String {
