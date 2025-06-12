@@ -11,10 +11,10 @@ import ufrpe.sbpc.botpcd.entity.PWD
 import java.time.LocalDateTime
 
 interface AttendanceRepository : JpaRepository<Attendance, Long> {
-	@Query("SELECT COUNT(att) FROM Attendance att WHERE att.serviceType = :serviceType AND att.acceptDateTime IS NULL")
+	@Query("SELECT COUNT(att) FROM Attendance att WHERE att.serviceType = :serviceType AND att.startDateTime IS NULL")
 	fun countRequestAttendanceOfService(serviceType: ServiceType): Long
 
-  @Query("SELECT att from Attendance att where att.serviceType = :serviceType AND att.acceptDateTime is null order by att requestDateTime asc")
+  @Query("SELECT att from Attendance att where att.serviceType = :serviceType AND att.startDateTime is null order by att.requestDateTime asc")
   fun findRequestAttendanceOfService(serviceType: ServiceType) : Attendance?
 	
 	@Query("SELECT att from Attendance att where att.pwd = :pwd AND att.startDateTime is null order by att.requestDateTime asc")
