@@ -77,11 +77,6 @@ class AttendanceService(
                     (service as MonitorServiceType).monitorAssistanceType
                 )
                 for (monitor in monitors) {
-                    if (LocalDateTime.now().minusHours(24) < (messageExchangeRepository.lastExchangeMessage(
-                            fromPhoneNumber = monitor.phoneNumber,
-                            toPhoneNumber = botNumber
-                        )?.createAt ?: LocalDateTime.now().minusHours(25))
-                    ) {
                         whatsappService.sendMessage(
                             botNumber,
                             monitor.phoneNumber,
@@ -94,9 +89,6 @@ class AttendanceService(
                         )
                         attendanceRepository.acceptPendingAttendanceForPwd(pwd, monitor, LocalDateTime.now())
                         makeAttendantBusy(monitor)
-                    } else {
-                        logger.warn("Monitor ${monitor.name} com número ${monitor.phoneNumber} não enviou mensagem nas ultimas 24")
-                    }
                 }
                 // fila de espera
                 sendWaitListMessage(botNumber, pwd)
@@ -104,13 +96,7 @@ class AttendanceService(
             Provider.COMMITTEE_MEMBER -> {
                 val committeeMembers = committeeMemberRepository.findAvailableCommitteeMember(UserStatus.AVAILABLE)
                 for (member in committeeMembers) {
-                    val lastMessageTime = messageExchangeRepository.lastExchangeMessage(
-                        fromPhoneNumber = member.phoneNumber,
-                        toPhoneNumber = botNumber
-                    )?.createAt ?: LocalDateTime.now().minusHours(25)
-
-                    if (LocalDateTime.now().minusHours(24) < lastMessageTime) {
-                        whatsappService.sendMessage(
+                     whatsappService.sendMessage(
                             botNumber,
                             member.phoneNumber,
                             "Você irá começar o atendimento de ${pwd.name}."
@@ -122,9 +108,6 @@ class AttendanceService(
                         )
                         attendanceRepository.acceptPendingAttendanceForPwd(pwd, member, LocalDateTime.now())
 												makeAttendantBusy(member)
-                    } else {
-                        logger.warn("Membro da comissão ${member.name} com número ${member.phoneNumber} não enviou mensagem nas ultimas 24")
-                    }
                 }
                 sendWaitListMessage(botNumber, pwd)
             }
