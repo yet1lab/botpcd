@@ -3,14 +3,15 @@ package ufrpe.sbpc.botpcd.service
 import org.springframework.stereotype.Service
 import ufrpe.sbpc.botpcd.entity.*
 import ufrpe.sbpc.botpcd.repository.MonitorRepository
+import ufrpe.sbpc.botpcd.repository.AttendanceRepository
 import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
 import org.springframework.transaction.annotation.Transactional
-
 @Service
 class AttendantStatusService(
+    private val whatsappService: WhatsappService,
     private val monitorRepository: MonitorRepository,
-    private val committeeMemberRepository: CommitteeMemberRepository,
-    private val whatsappService: WhatsappService
+    private val attendanceRepository: AttendanceRepository,
+    private val committeeMemberRepository: CommitteeMemberRepository
 ) {
     @Transactional
     fun setMonitorStatus(monitor: Monitor, status: UserStatus) {
@@ -34,15 +35,15 @@ class AttendantStatusService(
     fun sendStatusChanger(attendant: Attendant, botPhoneNumber: String) {
         val userPhoneNumber = attendant.phoneNumber
         val messageToSend = when (attendant.status) {
-            UserStatus.AVAILABLE ->  whatsappService.createOptions(
+            UserStatus.AVAILABLE ->  whatsappService.createOptionsWithCancel(
 							listOf("Continuar Disponível", "Ficar Indisponível"),
 							"Você está *Disponível* no momento", "BotPCD"
 						)
-						UserStatus.UNAVAILABLE -> whatsappService.createOptions(
+						UserStatus.UNAVAILABLE -> whatsappService.createOptionsWithCancel(
 							listOf("Continuar Indisponível", "Ficar Disponível"),
 							"Você está *Indisponível* no momento", "BotPCD"
 						)
-            UserStatus.BUSY ->  whatsappService.createOptions(
+            UserStatus.BUSY ->  whatsappService.createOptionsWithCancel(
 							listOf(
 								"Continuar atendimento", 
 								"Encerrar atendimento e Ficar Disponível",
@@ -55,18 +56,18 @@ class AttendantStatusService(
 
 	@Transactional
 	fun processStatusChangeResponse(attendant: Attendant, userResponse: String, botPhoneNumber: String) {
-		val userPhoneNumber = attendant.phoneNumber
 		var confirmationMessage: String? = null
+		val userPhoneNumber = attendant.phoneNumber
 
 		when (attendant.status) {
 					UserStatus.AVAILABLE -> {
 							when (userResponse) {
 									"1" -> {
-											confirmationMessage = "Você continua Disponível."
-									}
-									"2" -> {
 											updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
 											confirmationMessage = "Seu status foi atualizado para Indisponível."
+									}
+									"cancelar" -> {
+											confirmationMessage = "Você continua Disponível."
 									}
 									else -> {
 											confirmationMessage = "Opção inválida. Seu status permanece Disponível."
@@ -77,11 +78,11 @@ class AttendantStatusService(
 					UserStatus.UNAVAILABLE -> {
 							when (userResponse) {
 									"1" -> {
-											confirmationMessage = "Você continua Indisponível."
-									}
-									"2" -> {
 											updateAttendantStatus(attendant, UserStatus.AVAILABLE)
 											confirmationMessage = "Seu status foi atualizado para Disponível."
+									}
+									"cancelar" -> {
+											confirmationMessage = "Você continua Indisponível."
 									}
 									else -> {
 											confirmationMessage = "Opção inválida. Seu status permanece Indisponível."
@@ -90,19 +91,20 @@ class AttendantStatusService(
 					}
 
 					UserStatus.BUSY -> {
+							val attendance = attendanceRepository.findStartedAttendanceOfAttendant(attendant)
 							when (userResponse) {
 									"1" -> {
-											confirmationMessage = "Você continua em atendimento."
-									}
-									"2" -> {
 											updateAttendantStatus(attendant, UserStatus.AVAILABLE)
-											// terminar o atendimento
+											whatsappService.sendMensage(botPhoneNumber, attendance.pwd.phoneNumber, "Atendimento encerrado", "BotPCD")
 											confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Disponível."
 									}
-									"3" -> {
+									"2" -> {
 											updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
-											// terminar o atendimento
+											whatsappService.sendMensage(botPhoneNumber, attendance.pwd.phoneNumber, "Atendimento encerrado", "BotPCD")
 											confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Indisponível."
+									}
+									"cancelar" -> {
+											confirmationMessage = "Você continua em atendimento."
 									}
 									else -> {
 											confirmationMessage = "Opção inválida. Seu status permanece Ocupado."
