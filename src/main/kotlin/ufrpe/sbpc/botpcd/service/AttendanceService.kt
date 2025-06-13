@@ -18,6 +18,7 @@ import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.repository.MonitorRepository
 import ufrpe.sbpc.botpcd.service.QueueService
+import ufrpe.sbpc.botpcd.util.createOptions
 import java.time.LocalDateTime
 
 @Service
@@ -39,7 +40,7 @@ class AttendanceService(
         val serviceList = ServiceType.getServicesByDisability(disability)
         val adjective = disability.adjective
 
-        return whatsappService.createOptions(
+        return createOptions(
             serviceList.map { it -> it.description },
             header = "Olá ${pwd.name}. Percebi que você ${if (disability == Disability.MOBILITY_IMPAIRED) "tem $adjective" else "é $adjective"}. Os serviços disponíveis para você são\n"
 					)
@@ -70,6 +71,11 @@ class AttendanceService(
     }
 
     fun directToAvailableAttendant(botNumber: String, pwd: PWD, service: ServiceType) {
+        val attendance = attendanceRepository.findRequestAttendanceOfPwd(pwd)
+        if(attendance == null) {
+            logger.warn("Um atendimento que não foi requsitado está tentando ser começado.")
+            return
+        }
         when (service.attendantType) {
             Provider.MONITOR -> {
                 val monitors = monitorRepository.findAvailableMonitor(
@@ -92,8 +98,13 @@ class AttendanceService(
                             pwd.phoneNumber,
                             "O monitor ${monitor.name} irá realizar seu atendimento."
                         )
-                        attendanceRepository.acceptPendingAttendanceForPwd(pwd, monitor, LocalDateTime.now())
+                        attendance.apply {
+                            attendant = monitor
+                            startDateTime = LocalDateTime.now()
+                        }
+                        attendanceRepository.save(attendance)
                         makeAttendantBusy(monitor)
+                        return
                     } else {
                         logger.warn("Monitor ${monitor.name} com número ${monitor.phoneNumber} não enviou mensagem nas ultimas 24")
                     }
@@ -120,8 +131,13 @@ class AttendanceService(
                             pwd.phoneNumber,
                             "O membro da comissão ${member.name} irá realizar seu atendimento."
                         )
-                        attendanceRepository.acceptPendingAttendanceForPwd(pwd, member, LocalDateTime.now())
+                        attendance.apply {
+                            attendant = member
+                            startDateTime = LocalDateTime.now()
+                        }
+                        attendanceRepository.save(attendance)
 												makeAttendantBusy(member)
+                        return
                     } else {
                         logger.warn("Membro da comissão ${member.name} com número ${member.phoneNumber} não enviou mensagem nas ultimas 24")
                     }

@@ -23,23 +23,7 @@ class WhatsappService(
 				
         messageExchangeRepository.save(MessageExchange(fromPhoneNumber = botNumber, toPhoneNumber = destinyNumberID, message = msg))
     }
-		
-		fun createOptionsWithCancel(options: List<String>, header: String = "", author: String = ""): String {
-			var msg = this.createOptions(options, header, author)
-			return "${msg}- Escreva \"cancelar\" para sair do menu"
-		}
 
-    fun createOptions(options: List<String>, header: String = "", author: String = ""): String {
-        var msg = ""
-
-				for (i in options.indices) {
-            msg += "- Digite ${i + 1} para ${options[i]}\n"
-        }
-				if (header != ""){ msg = "${header}\n${msg}"; }
-				if (author != ""){ msg = "*${author}:*\n${msg}"; }
-
-				return msg
-    }
 }
  
 

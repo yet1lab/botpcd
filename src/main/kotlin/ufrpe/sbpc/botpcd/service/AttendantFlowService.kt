@@ -13,10 +13,10 @@ class AttendantFlowService(
 ) {
     val botPcdRegex = Regex("^\\s*bot\\s*pcd\\s*$", RegexOption.IGNORE_CASE)
     fun redirect(botNumber: String, lastBotMessageText: String?, attendant: Attendant, message: String) {
-        if (lastBotMessageText in UserStatus.entries.map { it.statusChangeMessage }) {
-            attendantStatusService.processStatusChangeResponse(attendant, message, botNumber)
-        } else if (botPcdRegex.matches(message)) {
+        if (botPcdRegex.matches(message)) {
             attendantStatusService.sendStatusChanger(attendant, botNumber)
+        } else if (lastBotMessageText in attendantStatusService.changeStatusTextOptionsFor.values) {
+            attendantStatusService.processStatusChangeResponse(attendant, message, botNumber)
         } else {
             attendanceRepository.findStartedAttendanceOfAttendant(attendant)?.let { attendance ->
                 attendanceService.redirectMessageToPwd(botNumber, message, attendance.pwd, attendant)
