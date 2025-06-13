@@ -9,6 +9,7 @@ import ufrpe.sbpc.botpcd.repository.AttendanceRepository
 import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
 import org.springframework.transaction.annotation.Transactional
 import ufrpe.sbpc.botpcd.util.createOptions
+import java.time.LocalDateTime
 
 @Service
 class AttendantStatusService(
@@ -76,7 +77,7 @@ class AttendantStatusService(
 
         when (attendant.status) {
             UserStatus.AVAILABLE -> {
-                when (userResponse) {
+                when (userResponse.lowercase()) {
                     "1" -> {
                         updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
                         confirmationMessage = "Seu status foi atualizado para Indisponível."
@@ -93,7 +94,7 @@ class AttendantStatusService(
             }
 
             UserStatus.UNAVAILABLE -> {
-                when (userResponse) {
+                when (userResponse.lowercase()) {
                     "1" -> {
                         updateAttendantStatus(attendant, UserStatus.AVAILABLE)
                         confirmationMessage = "Seu status foi atualizado para Disponível."
@@ -112,7 +113,7 @@ class AttendantStatusService(
             UserStatus.BUSY -> {
                 val attendance = attendanceRepository.findStartedAttendanceOfAttendant(attendant)
                 if (attendance != null) {
-                    when (userResponse) {
+                    when (userResponse.lowercase()) {
                         "1" -> {
                             updateAttendantStatus(attendant, UserStatus.AVAILABLE)
                             whatsappService.sendMessage(
@@ -122,8 +123,8 @@ class AttendantStatusService(
                                 "BotPCD"
                             )
                             confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Disponível."
+                            finishAttendance(attendance)
                         }
-
                         "2" -> {
                             updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
                             whatsappService.sendMessage(
@@ -133,6 +134,7 @@ class AttendantStatusService(
                                 "BotPCD"
                             )
                             confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Indisponível."
+                            finishAttendance(attendance)
                         }
 
                         "cancelar" -> {
@@ -144,7 +146,7 @@ class AttendantStatusService(
                         }
                     }
                 } else {
-                    logger.warn("Atendente está ocupardo  ${attendant.name} sem atendimento")
+                    logger.warn("Atendente está ocupado  ${attendant.name} sem atendimento")
                 }
             }
         }
@@ -165,5 +167,11 @@ class AttendantStatusService(
     fun findAvailableMonitorsByType(assistanceType: MonitorAssistanceType): List<Monitor> {
         val availableMonitors = findAvailableMonitors()
         return availableMonitors.filter { it.assistanceType == assistanceType }
+    }
+    fun finishAttendance(attendance: Attendance) {
+        attendance.apply {
+            endDateTime = LocalDateTime.now()
+        }
+        attendanceRepository.save(attendance)
     }
 }
