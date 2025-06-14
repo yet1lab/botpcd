@@ -34,7 +34,10 @@ class PWDFlowService(
                 attendanceService.sendServices(botNumber, pwd)
             }
             isChoosingService(lastBotMessage, pwd) -> {
-                if (isValidService(message, disability)) {
+                val requestAttendancePWD = attendanceRepository.findRequestAttendanceOfPwd(pwd)
+                if(requestAttendancePWD != null) {
+                    attendanceService.directToAvailableAttendant(botNumber, pwd, requestAttendancePWD.serviceType)
+                } else if (isValidService(message, disability)) {
                     val service = ServiceType.getServicesByDisability(disability)[message.toInt() - 1]
                     attendanceService.startAttendance(pwd = pwd, botNumber = botNumber, service = service)
                 } else {

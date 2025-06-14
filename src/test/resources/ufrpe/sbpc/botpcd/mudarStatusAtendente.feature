@@ -44,3 +44,4 @@ Funcionalidade: Mudar status do Atendente (Monitor ou Membro da Comissão)
       | Membro da Comissão | UNAVAILABLE   | "1"              | AVAILABLE            | *BotPCD:*\n Seu status foi atualizado para Disponível.                          |
       | Membro da Comissão | BUSY          | "1"              | AVAILABLE            | *BotPCD:*\n Atendimento encerrado. Seu status foi atualizado para Disponível.   |
       | Membro da Comissão | BUSY          | "2"              | UNAVAILABLE          | *BotPCD:*\n Atendimento encerrado. Seu status foi atualizado para Indisponível. |
+      | Membro da Comissão | BUSY          | "cancelar"       | BUSY                 | *BotPCD:*\n Você continua em atendimento.                                       |

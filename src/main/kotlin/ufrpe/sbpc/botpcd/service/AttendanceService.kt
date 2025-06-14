@@ -31,7 +31,16 @@ class AttendanceService(
     private val committeeMemberRepository: CommitteeMemberRepository,
     private val messageExchangeRepository: MessageExchangeRepository,
 ) {
+    val awaitServiceMessage = "No momento não há atendentes disponíveis. Por favor, aguarde na fila de espera e retornaremos assim que possível."
+    fun sendWaitListMessage(botNumber: String, pwd: PWD) {
+        whatsappService.sendMessage(
+            botNumber,
+            pwd.phoneNumber,
+            awaitServiceMessage
+        )
+    }
     val logger: Logger = LoggerFactory.getLogger(AttendanceService::class.java)
+
     fun sendServices(botNumber: String, pwd: PWD) {
         whatsappService.sendMessage(botNumber, pwd.phoneNumber, createSendServicesMessage(pwd.disabilities.first(), pwd))
     }
@@ -166,14 +175,6 @@ fun redirectMessageToPwd(botNumber: String, message: String, pwd: PWD, attendant
                 *${attendant.name}*:
 $message
             """.trimIndent()
-    )
-}
-
-fun sendWaitListMessage(botNumber: String, pwd: PWD) {
-    whatsappService.sendMessage(
-        botNumber,
-        pwd.phoneNumber,
-        "No momento não há atendentes disponíveis. Por favor, aguarde na fila de espera e retornaremos assim que possível."
     )
 }
 }
