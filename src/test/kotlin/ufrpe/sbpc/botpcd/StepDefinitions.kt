@@ -27,7 +27,7 @@ import ufrpe.sbpc.botpcd.repository.MonitorRepository
 import ufrpe.sbpc.botpcd.repository.PWDRepository
 import ufrpe.sbpc.botpcd.service.AttendantStatusService
 import java.io.File
-import java.math.BigInteger
+// import java.math.BigInteger // Não é mais necessário para os steps de atendente
 import kotlin.test.assertTrue
 
 
@@ -42,31 +42,32 @@ class StepDefinitions(
 ) {
     private var currentBotNumber: String = "15556557522"
     private val numberUserNotRegister: String = "558187654321"
+    private val currentTestAttendantPhoneNumber: String = "5581999999901" // Número fixo para o atendente em teste
     val logger: Logger = LoggerFactory.getLogger(StepDefinitions::class.java)
 
-    @Dado("^usuário recebeu mensagem \"([^\"]*)\"$")
+    @Dado("usuário recebeu mensagem {string}")
     fun `usuário recebeu mensagem`(message: String) {
         mockUserRecievedMessage(numberUserNotRegister, message)
     }
 
-    @Dado("^usuário recebeu mensagem$")
+    @Dado("usuário recebeu mensagem") // Para DocString
     fun `usuário recebeu mensagem docs string`(message: String) {
         mockUserRecievedMessage(numberUserNotRegister, message)
     }
 
-    @Dado("^pcd está cadastrado completo$")
+    @Dado("pcd está cadastrado completo")
     fun pcdEstaCadastrado() {
         // Implementar lógica para garantir que o PCD está cadastrado no sistema
         // Ex: pwdRepository.save(PWD(name = "PCD Teste Completo", phoneNumber = numberUserNotRegister, disabilities = mutableSetOf(Disability.DEAFNESS)))
     }
 
-    @Dado("^usuário não cadastrado$")
+    @Dado("usuário não cadastrado")
     fun `usuário não cadastrado`() {
         pwdRepository.findByPhoneNumber(numberUserNotRegister)?.let { pwdRepository.delete(it) }
         assertNull(pwdRepository.findByPhoneNumber(numberUserNotRegister))
     }
 
-    @Dado("^usuário possui deficiência cadastrada de \"([^\"]*)\"$")
+    @Dado("usuário possui deficiência cadastrada de {string}")
     fun `usuário que possui deficiencia cadastrada`(tipoDeDeficiencia: String) {
         pwdRepository.findByPhoneNumber(numberUserNotRegister)?.let { pwdRepository.delete(it) }
         pwdRepository.save(
@@ -77,36 +78,36 @@ class StepDefinitions(
         )
     }
 
-    @Quando("^usuário envia mensagem \"([^\"]*)\"$")
+    @Quando("usuário envia mensagem {string}")
     fun `usuario envia mensagem`(mensagemEnviada: String) {
         userSendMessage(mensagemEnviada, numberUserNotRegister)
     }
 
-    @Entao("^bot registrará que usuário tem ou possui \"([^\"]*)\"$")
+    @Entao("bot registrará que usuário tem ou possui {string}")
     fun `bot registra deficiencia do usuário`(deficienciaAdjtivo: String) {
         val pwd = pwdRepository.findByPhoneNumberWithDisabilities(numberUserNotRegister)!!
         assertEquals(pwd.disabilities.first().adjective, deficienciaAdjtivo)
         pwdRepository.delete(pwd)
     }
 
-    @Entao("^bot salvará o nome do usuário \"([^\"]*)\"$")
+    @Entao("bot salvará o nome do usuário {string}")
     fun `bot salva o nome do usuário`(nome: String) {
         val pwd = pwdRepository.findByPhoneNumber(numberUserNotRegister)
         assertEquals(pwd!!.name, nome)
         pwdRepository.delete(pwd)
     }
 
-    @Entao("^usuário receberá mensagem \"([^\"]*)\"$")
+    @Entao("usuário receberá mensagem {string}")
     fun `usuario receberá mensagem`(message: String) {
         testarUltimaMensagemRecebidaDoUsuario(message, numberUserNotRegister)
     }
 
-    @Entao("^usuário receberá mensagem$")
+    @Entao("usuário receberá mensagem") // Para DocString
     fun `usuario receberá mensagem docs string`(message: String) {
         testarUltimaMensagemRecebidaDoUsuario(message, numberUserNotRegister)
     }
 
-    @Entao("^A penúltima mensagem recebida pelo usuário será \"([^\"]*)\"$")
+    @Entao("A penúltima mensagem recebida pelo usuário será {string}")
     fun `a penultima mensagem recebida pelo usuário será`(penultimaMensagem: String) {
         testarPenultimaMensagemRecebidaDoUsuario(
             mensagemEsperada = penultimaMensagem,
@@ -114,7 +115,7 @@ class StepDefinitions(
         )
     }
 
-    @Entao("^bot enviará opcções de serviço \"([^\"]*)\" de acordo com a deficiência \"([^\"]*)\" do pcd$")
+    @Entao("bot enviará opcções de serviço {string} de acordo com a deficiência {string} do pcd")
     fun `bot enviará opcçoes de seviço de acordo com a deficiência do pcd`(
         opcoesDeServico: String,
         tipoDeDeficiencia: String
@@ -161,59 +162,43 @@ class StepDefinitions(
         }
     }
 
-    @Dado("^que sou um \"(.*)\" com número \"(.*)\" e status inicial \"(.*)\"$")
-    fun `que sou um tipo_de_atendente com número e status inicial`(
+
+    @Dado("que sou um {string} com status inicial {string}")
+    fun `que sou um tipo_de_atendente com status inicial`(
         tipoAtendente: String,
-        numeroAtendente: String, // Mantido como Int conforme original desta função
         statusInicialStr: String
     ) {
-        val status = UserStatus.valueOf(statusInicialStr)
-        val phoneNumber = numeroAtendente.toString()
-        createAttendant(phoneNumber, tipoAtendente, status)
+        val status = UserStatus.valueOf(statusInicialStr.uppercase())
+        createAttendant(currentTestAttendantPhoneNumber, tipoAtendente, status)
     }
 
-    @Dado("que sou um {string} com número {biginteger} e status inicial {string}")
-    fun `tipo_de_atendente com número e status inicial`(
+    @Quando("o {string} envia a mensagem {string}")
+    fun `o tipo_de_atendente envia a mensagem`(
         tipoAtendente: String,
-        numeroAtendente: BigInteger, // Mantido como Int conforme original desta função
-        statusInicialStr: String
-    ) {
-        val status = UserStatus.valueOf(statusInicialStr)
-        val phoneNumber = numeroAtendente.toString()
-        createAttendant(phoneNumber, tipoAtendente, status)
-    }
-
-
-    @Quando("^o \"([^\"]*)\" com número \"(\\d+)\" envia a mensagem \"([^\"]*)\"$")
-    fun `o tipo_de_atendente com número envia a mensagem`(
-        tipoAtendente: String,
-        numeroAtendente: String,
         mensagemEnviada: String
     ) {
-        val phoneNumber = numeroAtendente
-        checkIfHasCorrectAttendantType(phoneNumber, tipoAtendente)
-        userSendMessage(mensagemEnviada, phoneNumber)
+        checkIfHasCorrectAttendantType(currentTestAttendantPhoneNumber, tipoAtendente)
+        userSendMessage(mensagemEnviada, currentTestAttendantPhoneNumber)
     }
 
-    @Entao("^o \"([^\"]*)\" com número \"(\\d+)\" receberá a mensagem$")
-    fun `o tipo_de_atendente com número receberá a mensagem`(
+    @Entao("o {string} receberá a mensagem") // Para DocString
+    fun `o tipo_de_atendente receberá a mensagem`(
         tipoAtendente: String,
-        numeroAtendente: String,
         mensagemEsperadaDocString: String
     ) {
-        val phoneNumber = numeroAtendente
-        checkIfHasCorrectAttendantType(phoneNumber, tipoAtendente)
-        testarUltimaMensagemRecebidaDoUsuario(mensagemEsperadaDocString, phoneNumber)
+        checkIfHasCorrectAttendantType(currentTestAttendantPhoneNumber, tipoAtendente)
+        testarUltimaMensagemRecebidaDoUsuario(mensagemEsperadaDocString, currentTestAttendantPhoneNumber)
     }
 
     private fun checkIfHasCorrectAttendantType(phoneNumber: String, tipoAtendente: String) {
         val attendant = attendantRepository.findByPhoneNumber(phoneNumber)
-        when (tipoAtendente) { // tipoAtendente já vem sem aspas
+        assertTrue(attendant != null, "Atendente com número $phoneNumber não encontrado para o tipo $tipoAtendente.")
+        when (tipoAtendente) {
             "Monitor" -> {
-                assertTrue(attendant is Monitor)
+                assertTrue(attendant is Monitor, "Atendente $phoneNumber não é um Monitor.")
             }
             "Membro da Comissão" -> {
-                assertTrue(attendant is CommitteeMember)
+                assertTrue(attendant is CommitteeMember, "Atendente $phoneNumber não é um Membro da Comissão.")
             }
             else -> {
                 throw Exception("Foi passado um tipo inválido nos testes: $tipoAtendente")
@@ -221,32 +206,27 @@ class StepDefinitions(
         }
     }
 
-    @Dado("^o \"([^\"]*)\" com número \"(\\d+)\" recebeu a mensagem de opções para status \"([^\"]*)\"$")
-    fun `o tipo_de_atendente com número recebeu a mensagem de opções para status`(
+    @Dado("o {string} recebeu a mensagem de opções para status {string}")
+    fun `o tipo_de_atendente recebeu a mensagem de opções para status`(
         @Suppress("UNUSED_PARAMETER") tipoAtendente: String,
-        numeroAtendente: String,
         statusAntigoStr: String
     ) {
-        val phoneNumber = numeroAtendente.toString()
-        val statusAntigo = UserStatus.valueOf(statusAntigoStr)
-
+        val statusAntigo = UserStatus.valueOf(statusAntigoStr.uppercase())
         val expectedMessageContent = attendantStatusService.changeStatusTextOptionsFor[statusAntigo.name]
             ?: throw IllegalArgumentException("Mensagem de opção não encontrada para status $statusAntigoStr no AttendantStatusService.changeStatusTextOptionsFor. Chaves disponíveis: ${attendantStatusService.changeStatusTextOptionsFor.keys}")
 
-        mockUserRecievedMessage(phoneNumber, expectedMessageContent)
+        mockUserRecievedMessage(currentTestAttendantPhoneNumber, expectedMessageContent)
     }
 
-    @Entao("^o status do \"([^\"]*)\" com número \"(\\d+)\" deve ser \"([^\"]*)\"$")
-    fun `o status do tipo_de_atendente com número deve ser`(
+    @Entao("o status do {string} deve ser {string}")
+    fun `o status do tipo_de_atendente deve ser`(
         tipoAtendente: String,
-        numeroAtendente: String,
         statusNovoEsperadoStr: String
     ) {
-        val phoneNumber = numeroAtendente.toString()
-        val statusNovoEsperado = UserStatus.valueOf(statusNovoEsperadoStr)
-        checkIfHasCorrectAttendantType(phoneNumber, tipoAtendente)
-        val attendant = attendantRepository.findByPhoneNumber(phoneNumber)
-        assertTrue(attendant != null, "Atendente com número $phoneNumber não encontrado no banco de dados.")
+        val statusNovoEsperado = UserStatus.valueOf(statusNovoEsperadoStr.uppercase())
+        checkIfHasCorrectAttendantType(currentTestAttendantPhoneNumber, tipoAtendente)
+        val attendant = attendantRepository.findByPhoneNumber(currentTestAttendantPhoneNumber)
+        assertTrue(attendant != null, "Atendente com número $currentTestAttendantPhoneNumber não encontrado no banco de dados.")
         assertEquals(statusNovoEsperado, attendant!!.status, "Status do atendente não foi atualizado corretamente para $statusNovoEsperado. Estava ${attendant.status}.")
     }
 
@@ -278,7 +258,7 @@ class StepDefinitions(
     private fun userSendMessage(mensagemEnviada: String, userPhoneNumber: String) {
         val payload = loadPayload("src/test/resources/ufrpe/sbpc/botpcd/mocks/usuario-manda-oi.json")
             .changeUserNumber(userPhoneNumber)
-            .changeUserMessage(mensagemEnviada) // mensagemEnviada já está correta
+            .changeUserMessage(mensagemEnviada)
             .changeBotNumber(currentBotNumber)
         mockMvc.perform(
             post("/webhooks")
@@ -287,12 +267,12 @@ class StepDefinitions(
         ).andExpect(status().isOk)
     }
 
-    @Quando("^O PCD com a deficiência de \"([^\"]*)\" envia mensagem \"([^\"]*)\"$")
+    @Quando("O PCD com a deficiência de {string} envia mensagem {string}")
     fun pcdComDeficienciaMandaMensagem(deficiencia: String, mensagem: String) {
         logger.warn("Step 'O PCD com a deficiência de \"$deficiencia\" envia mensagem \"$mensagem\"' não implementado completamente.")
     }
 
-    @Entao("^O bot vai enviar uma lista de opções de acordo com a \"([^\"]*)\"$")
+    @Entao("O bot vai enviar uma lista de opções de acordo com a {string}")
     fun botEnviaListaOpcoes(opcoes: String) {
         logger.warn("Step 'O bot vai enviar uma lista de opções de acordo com a \"$opcoes\"' não implementado completamente.")
     }
