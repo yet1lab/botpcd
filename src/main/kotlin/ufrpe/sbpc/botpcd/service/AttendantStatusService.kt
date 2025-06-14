@@ -1,65 +1,177 @@
 package ufrpe.sbpc.botpcd.service
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import ufrpe.sbpc.botpcd.entity.*
 import ufrpe.sbpc.botpcd.repository.MonitorRepository
+import ufrpe.sbpc.botpcd.repository.AttendanceRepository
 import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
 import org.springframework.transaction.annotation.Transactional
+import ufrpe.sbpc.botpcd.util.createOptions
+import java.time.LocalDateTime
 
 @Service
 class AttendantStatusService(
+    private val whatsappService: WhatsappService,
     private val monitorRepository: MonitorRepository,
+    private val attendanceRepository: AttendanceRepository,
     private val committeeMemberRepository: CommitteeMemberRepository
 ) {
-    
+    val logger: Logger = LoggerFactory.getLogger(AttendantStatusService::class.java)
+
     @Transactional
     fun setMonitorStatus(monitor: Monitor, status: UserStatus) {
         monitor.status = status
         monitorRepository.save(monitor)
     }
-    
+
     @Transactional
     fun setCommitteeMemberStatus(member: CommitteeMember, status: UserStatus) {
         member.status = status
         committeeMemberRepository.save(member)
     }
 
-    fun sendStatusChanger(attendant: Attendant) {
-        if (attendant.status == UserStatus.UNAVAILABLE) {
-            /*1 - Ficar Disponível*/
-            /*
-            "Olá, você está Indisponível no momento. Deseja ficar Disponível para receber atendimentos?"
-            */
-        }
-        if (attendant.status == UserStatus.BUSY) {
-            /*
-            1 - Encerrar Atendimento (vai internamente mudar o status dele pra disponível)
-
-            2 - Ficar Indisponível (ele para de ser chamado para atendimentos)
-            */
-            /*
-            "Olá, você está em atendimento. Deseja encerrá-lo e continuar Disnpoível ou deseja ficar Indisponível?"
-             */
-        }
-        if (attendant.status == UserStatus.AVAILABLE) {
-            /*1 - Ficar Indisponível*/
-            /*
-            "Olá, você está Disponível no momento. Deseja ficar Indisponível para não receber atendimentos?"
-            */
+    private fun updateAttendantStatus(attendant: Attendant, newStatus: UserStatus) {
+        when (attendant) {
+            is Monitor -> setMonitorStatus(attendant, newStatus)
+            is CommitteeMember -> setCommitteeMemberStatus(attendant, newStatus)
         }
     }
-    
+    fun createOptionsWithCancel(options: List<String>, header: String = "", author: String = ""): String {
+        var msg = createOptions(options, header, author)
+        return "${msg}- Escreva \"cancelar\" para sair do menu"
+    }
+    val changeStatusTextOptionsFor = mapOf(
+        "AVAILABLE" to createOptionsWithCancel(
+            listOf("Ficar Indisponível"),
+            "Você está *Disponível* no momento", "BotPCD"
+        ),
+        "UNAVAILABLE" to createOptionsWithCancel(
+            listOf("Ficar Disponível"),
+            "Você está *Indisponível* no momento", "BotPCD"
+        ),
+        "BUSY" to createOptionsWithCancel(
+            listOf(
+                "Encerrar atendimento e Ficar Disponível",
+                "Encerrar atendimento e Ficar Indisponível"
+            ),
+            "Você está *em atendimento*", "BotPCD"
+        )
+    )
+
+    fun sendStatusChanger(attendant: Attendant, botPhoneNumber: String) {
+        val userPhoneNumber = attendant.phoneNumber
+        val messageToSend = when (attendant.status) {
+            UserStatus.AVAILABLE -> changeStatusTextOptionsFor[UserStatus.AVAILABLE.toString()]
+            UserStatus.UNAVAILABLE -> changeStatusTextOptionsFor[UserStatus.UNAVAILABLE.toString()]
+            UserStatus.BUSY -> changeStatusTextOptionsFor[UserStatus.BUSY.toString()]
+        }
+        whatsappService.sendMessage(botPhoneNumber, userPhoneNumber, messageToSend ?: "")
+    }
+
+    @Transactional
+    fun processStatusChangeResponse(attendant: Attendant, userResponse: String, botPhoneNumber: String) {
+        var confirmationMessage: String? = null
+        val userPhoneNumber = attendant.phoneNumber
+
+        when (attendant.status) {
+            UserStatus.AVAILABLE -> {
+                when (userResponse.lowercase()) {
+                    "1" -> {
+                        updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
+                        confirmationMessage = "Seu status foi atualizado para Indisponível."
+                    }
+
+                    "cancelar" -> {
+                        confirmationMessage = "Você continua Disponível."
+                    }
+
+                    else -> {
+                        confirmationMessage = "Opção inválida. Seu status permanece Disponível."
+                    }
+                }
+            }
+
+            UserStatus.UNAVAILABLE -> {
+                when (userResponse.lowercase()) {
+                    "1" -> {
+                        updateAttendantStatus(attendant, UserStatus.AVAILABLE)
+                        confirmationMessage = "Seu status foi atualizado para Disponível."
+                    }
+
+                    "cancelar" -> {
+                        confirmationMessage = "Você continua Indisponível."
+                    }
+
+                    else -> {
+                        confirmationMessage = "Opção inválida. Seu status permanece Indisponível."
+                    }
+                }
+            }
+
+            UserStatus.BUSY -> {
+                val attendance = attendanceRepository.findStartedAttendanceOfAttendant(attendant)
+                if (attendance != null) {
+                    when (userResponse.lowercase()) {
+                        "1" -> {
+                            updateAttendantStatus(attendant, UserStatus.AVAILABLE)
+                            whatsappService.sendMessage(
+                                botPhoneNumber,
+                                attendance.pwd.phoneNumber,
+                                "Atendimento encerrado",
+                                "BotPCD"
+                            )
+                            confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Disponível."
+                            finishAttendance(attendance)
+                        }
+                        "2" -> {
+                            updateAttendantStatus(attendant, UserStatus.UNAVAILABLE)
+                            whatsappService.sendMessage(
+                                botPhoneNumber,
+                                attendance.pwd.phoneNumber,
+                                "Atendimento encerrado",
+                                "BotPCD"
+                            )
+                            confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Indisponível."
+                            finishAttendance(attendance)
+                        }
+
+                        "cancelar" -> {
+                            confirmationMessage = "Você continua em atendimento."
+                        }
+
+                        else -> {
+                            confirmationMessage = "Opção inválida. Seu status permanece Ocupado."
+                        }
+                    }
+                } else {
+                    logger.warn("Atendente está ocupado  ${attendant.name} sem atendimento")
+                }
+            }
+        }
+
+        confirmationMessage?.let {
+            whatsappService.sendMessage(botPhoneNumber, userPhoneNumber, it, "BotPCD")
+        }
+    }
+
     fun findAvailableMonitors(): List<Monitor> {
         return monitorRepository.findByStatus(UserStatus.AVAILABLE)
     }
-    
+
     fun findAvailableCommitteeMembers(): List<CommitteeMember> {
         return committeeMemberRepository.findByStatus(UserStatus.AVAILABLE)
     }
-    
-    // Método para filtrar por tipo de assistência também
+
     fun findAvailableMonitorsByType(assistanceType: MonitorAssistanceType): List<Monitor> {
         val availableMonitors = findAvailableMonitors()
-        return availableMonitors.filter { it.assistanceTypes == assistanceType }
+        return availableMonitors.filter { it.assistanceType == assistanceType }
+    }
+    fun finishAttendance(attendance: Attendance) {
+        attendance.apply {
+            endDateTime = LocalDateTime.now()
+        }
+        attendanceRepository.save(attendance)
     }
 }

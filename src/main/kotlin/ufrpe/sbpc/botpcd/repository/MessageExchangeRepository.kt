@@ -9,4 +9,8 @@ interface MessageExchangeRepository: JpaRepository<MessageExchange, Long> {
         "SELECT m FROM MessageExchange m WHERE m.toPhoneNumber = :toPhoneNumber AND m.fromPhoneNumber = :fromPhoneNumber ORDER BY m.createAt DESC LIMIT 1"
     )
     fun lastExchangeMessage(toPhoneNumber: String, fromPhoneNumber: String): MessageExchange?
+    @Query(
+        "SELECT m FROM MessageExchange m WHERE m.toPhoneNumber = :toPhoneNumber AND m.fromPhoneNumber = :fromPhoneNumber ORDER BY m.createAt ASC"
+    )
+    fun listExchangeMessage(toPhoneNumber: String, fromPhoneNumber: String): List<MessageExchange>
 }

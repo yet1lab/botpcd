@@ -2,6 +2,7 @@ package ufrpe.sbpc.botpcd.entity
 
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
+import org.hibernate.annotations.CreationTimestamp
 import java.time.LocalDateTime
 
 /**
@@ -18,9 +19,6 @@ class Attendance(
     @Convert(converter = ServiceTypeConverter::class)
     var serviceType: ServiceType,
 
-    @NotNull(message = "The request date and time is required")
-    var requestDateTime: LocalDateTime,
-
     @ManyToOne
     @JoinColumn(name = "pwd_id")
     @NotNull(message = "The PWD is required")
@@ -28,15 +26,14 @@ class Attendance(
 
     @ManyToOne
     @JoinColumn(name = "attendant_id")
-    @NotNull(message = "The attendant ID is required")
-    var attendant: Attendant,
+    var attendant: Attendant? = null,
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "The attendant type is required")
     var attendantType: Provider,
 
     // Campos opcionais que serão atualizados durante o ciclo de vida do atendimento
-    var acceptDateTime: LocalDateTime? = null,
+    var startDateTime: LocalDateTime? = null,
 
     var monitorArrivalDateTime: LocalDateTime? = null,
 
@@ -44,4 +41,7 @@ class Attendance(
     var serviceLocation: LocationEmbeddable? = null,
 
     var endDateTime: LocalDateTime? = null
-)
+) {
+    @CreationTimestamp
+    lateinit var requestDateTime: LocalDateTime
+}

@@ -13,21 +13,17 @@ class WhatsappService(
     private val cloudApi: WhatsappBusinessCloudApi,
     private val messageExchangeRepository: MessageExchangeRepository
 ) {
-    fun sendMessage(botNumber: String, destinyNumberID: String, msg: String) {
-        val message = Message.MessageBuilder.builder()
+    fun sendMessage(botNumber: String, destinyNumberID: String, msg: String, author: String = "") {
+				val msg = if (author != "") "*${author}:*\n ${msg}" else msg
+
+				val message = Message.MessageBuilder.builder()
             .setTo(destinyNumberID)
             .buildTextMessage(TextMessage().setBody(msg))
         cloudApi.sendMessage(botNumber, message)
+				
         messageExchangeRepository.save(MessageExchange(fromPhoneNumber = botNumber, toPhoneNumber = destinyNumberID, message = msg))
     }
 
-    fun createOptions(options: List<String>, header: String = ""): String {
-        var mensage = "${header}\n"
-        for (i in options.indices) {
-            mensage += "- Digite ${i + 1} para ${options[i]}\n"
-        }
-        return mensage
-    }
 }
  
 

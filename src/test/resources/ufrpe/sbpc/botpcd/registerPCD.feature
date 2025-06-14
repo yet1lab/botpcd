@@ -61,21 +61,31 @@ Olá, qual sua deficiência?
 - Digite 7 para Não preciso de suporte.
 """
       Quando usuário envia mensagem "<numero_da_deficiencia>"
-      Então bot registrará o usuário com deficiencia "<tipo_deficiencia>"
+      Então bot registrará que usuário tem ou possui "<adjetivo_da_deficiencia>"
       E usuário receberá mensagem "Qual o seu nome?"
 
       Exemplos:
-        | numero_da_deficiencia | tipo_deficiencia                                     |
-        | 1                     | Deficiência visual                                   |
-        | 2                     | Deficiência auditiva/surdez                          |
-        | 3                     | Surdocegueira                                        |
-        | 4                     | Transtorno do Espectro Autista/Neurodivergente       |
-        | 5                     | Deficiência física                                   |
-        | 6                     | Não tenho deficiência, mas tenho mobilidade reduzida |
+        | numero_da_deficiencia | adjetivo_da_deficiencia |
+        | 1                     | uma pessoa cega         |
+        | 2                     | um pessoa surda         |
+        | 3                     | uma pessoa surdocega    |
+        | 4                     | neurodivergente         |
+        | 5                     | deficiente físico       |
+        | 6                     | mobilidade reduzida     |
 
-  Cenario: O usuário responde com o seu nome
+    Esquema do Cenario: O usuário responde com o seu nome
     Dado usuário recebeu mensagem "Qual o seu nome?"
-    E usuário possui deficiência cadastrada
-  Quando usuário envia mensagem "João Victor"
-  Entao usuário receberá mensagem "Cadastro realizado."
-    E bot salvará o nome do usuário "João Victor"
+    E usuário possui deficiência cadastrada de "<adjetivo_da_deficiencia>"
+    Quando usuário envia mensagem "João Victor"
+    Entao A penúltima mensagem recebida pelo usuário será "Cadastro realizado."
+      E bot enviará opcções de serviço "<opcções_de_serviço>" de acordo com a deficiência "<adjetivo_da_deficiencia>" do pcd
+      E bot salvará o nome do usuário "João Victor"
+
+    Exemplos:
+      | adjetivo_da_deficiencia | opcções_de_serviço                                                                         |
+      | um pessoa surda         | informações em Libras,atividade com interpretação em Libras                                |
+      | mobilidade reduzida     | ajuda na mobilidade,transporte para deslocamento no evento                                 |
+      | deficiente físico       | ajuda na mobilidade,ajuda com alimentação e higiene,transporte para deslocamento no evento |
+      | uma pessoa cega         | ajuda na mobilidade,programação com audiodescrição                                         |
+      | neurodivergente         | suporte para pessoas neurodivergentes                                                      |
+      | uma pessoa surdocega    | guia-intérprete                                                                            |

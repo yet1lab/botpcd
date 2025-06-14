@@ -1,23 +1,26 @@
 package ufrpe.sbpc.botpcd.entity
 
 
-/**
- * Represents the type of assistance a monitor can provide.
- */
-enum class Disability(val textOption: String) {
-	BLINDED("Deficiência visual"),
-	DEAFNESS("Deficiência auditiva/surdez"),
-	DEAFBLINDNESS("Surdocegueira"),
-	NEURODIVERGENT("Transtorno do Espectro Autista/Neurodivergente"),
-	PHYSICAL_DISABILITY("Deficiência física"),
-	MOBILITY_IMPAIRED("Não tenho deficiência, mas tenho mobilidade reduzida");
-
+enum class Disability(val textOption: String, val adjective: String) {
+	BLINDED("Deficiência visual", "uma pessoa cega"),
+	DEAFNESS("Deficiência auditiva/surdez", "um pessoa surda"),
+	DEAFBLINDNESS("Surdocegueira", "uma pessoa surdocega"),
+	NEURODIVERGENT("Transtorno do Espectro Autista/Neurodivergente", "neurodivergente"),
+	PHYSICAL_DISABILITY("Deficiência física", "deficiente físico"),
+	MOBILITY_IMPAIRED("Não tenho deficiência, mas tenho mobilidade reduzida", "mobilidade reduzida");
 
 	companion object {
-		fun getByText(text: String): Disability {
+		fun getByTextOption(text: String): Disability {
 			val disability = Disability.entries.find { it.textOption.equals(text, ignoreCase = true) }
-			if(disability == null) {
+			if (disability == null) {
 				throw IllegalArgumentException("Invalid disability type: $text")
+			}
+			return disability
+		}
+		fun getByAdjective(shortText: String): Disability {
+			val disability = Disability.entries.find { it.adjective.equals(shortText, ignoreCase = true) }
+			if (disability == null) {
+				throw IllegalArgumentException("Invalid disability type: $shortText")
 			}
 			return disability
 		}
