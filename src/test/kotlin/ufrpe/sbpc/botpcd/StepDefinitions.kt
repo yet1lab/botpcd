@@ -27,6 +27,7 @@ import ufrpe.sbpc.botpcd.repository.MonitorRepository
 import ufrpe.sbpc.botpcd.repository.PWDRepository
 import ufrpe.sbpc.botpcd.service.AttendantStatusService
 import java.io.File
+import java.math.BigInteger
 import kotlin.test.assertTrue
 
 
@@ -165,21 +166,21 @@ class StepDefinitions(
     @Dado("que sou um {string} com número {int} e status inicial {string}")
     fun `que sou um tipo_de_atendente com número e status inicial`(
         tipoAtendente: String,
-        numeroAtendente: String,
+        numeroAtendente:Integer,
         statusInicialStr: String
     ) {
         val status = UserStatus.valueOf(statusInicialStr.replace("\"", ""))
-        val phoneNumber = numeroAtendente.replace("\"", "")
+        val phoneNumber = numeroAtendente.toString()
         createAttendant(phoneNumber, tipoAtendente, status)
     }
 
     @Quando("o {string} com número {int} envia a mensagem {string}")
     fun `o tipo_de_atendente com número envia a mensagem`(
         tipoAtendente: String, // Não usado na lógica, mas presente no Gherkin
-        numeroAtendente: String,
+        numeroAtendente:BigInteger,
         mensagemEnviada: String
     ) {
-        val phoneNumber = numeroAtendente.replace("\"", "")
+        val phoneNumber = numeroAtendente.toString()
         val message = mensagemEnviada.replace("\"", "")
         checkIfHasCorrectAttendantType(phoneNumber, tipoAtendente)
         userSendMessage(message, phoneNumber)
@@ -188,10 +189,10 @@ class StepDefinitions(
     @Entao("o {string} com número {int} receberá a mensagem")
     fun `o tipo_de_atendente com número receberá a mensagem`(
         tipoAtendente: String, // Não usado na lógica, mas presente no Gherkin
-        numeroAtendente: String,
+        numeroAtendente:BigInteger,
         mensagemEsperadaDocString: String
     ) {
-        val phoneNumber = numeroAtendente.replace("\"", "")
+        val phoneNumber = numeroAtendente.toString()
         checkIfHasCorrectAttendantType(phoneNumber, tipoAtendente)
         // DocString já vem formatada, não precisa de replace de aspas aqui.
         testarUltimaMensagemRecebidaDoUsuario(mensagemEsperadaDocString, phoneNumber)
@@ -199,7 +200,7 @@ class StepDefinitions(
 
     private fun checkIfHasCorrectAttendantType(phoneNumber: String, tipoAtendente: String) {
         val attendant = attendantRepository.findByPhoneNumber(phoneNumber)
-        when (tipoAtendente) {
+        when (tipoAtendente.replace("\"", "")) { // Ainda precisa do replace para o tipoAtendente String
             "Monitor" -> {
                 assertTrue(attendant is Monitor)
             }
@@ -209,19 +210,19 @@ class StepDefinitions(
             }
 
             else -> {
-                throw Exception("Foi passado um tipo inválido nos testes")
+                throw Exception("Foi passado um tipo inválido nos testes: $tipoAtendente")
             }
         }
     }
 
 
-    @Dado("o {string} com número {string} recebeu a mensagem de opções para status {string}")
+    @Dado("o {string} com número {int} recebeu a mensagem de opções para status {string}")
     fun `o tipo_de_atendente com número recebeu a mensagem de opções para status`(
         @Suppress("UNUSED_PARAMETER") tipoAtendente: String, // Não usado na lógica, mas presente no Gherkin
-        numeroAtendente: String,
+        numeroAtendente:BigInteger,
         statusAntigoStr: String
     ) {
-        val phoneNumber = numeroAtendente.replace("\"", "")
+        val phoneNumber = numeroAtendente.toString()
         val statusAntigo = UserStatus.valueOf(statusAntigoStr.replace("\"", ""))
 
         // Obtém a mensagem formatada diretamente do AttendantStatusService
@@ -234,13 +235,13 @@ class StepDefinitions(
         mockUserRecievedMessage(phoneNumber, expectedMessageContent)
     }
 
-    @Entao("o status do {string} com número {string} deve ser {string}")
+    @Entao("o status do {string} com número {int} deve ser {string}")
     fun `o status do tipo_de_atendente com número deve ser`(
         tipoAtendente: String, // Não usado na lógica, mas presente no Gherkin
-        numeroAtendente: String,
+        numeroAtendente: BigInteger,
         statusNovoEsperadoStr: String
     ) {
-        val phoneNumber = numeroAtendente.replace("\"", "")
+        val phoneNumber = numeroAtendente.toString()
         val statusNovoEsperado = UserStatus.valueOf(statusNovoEsperadoStr.replace("\"", ""))
         checkIfHasCorrectAttendantType(phoneNumber, tipoAtendente)
         val attendant = attendantRepository.findByPhoneNumber(phoneNumber)
