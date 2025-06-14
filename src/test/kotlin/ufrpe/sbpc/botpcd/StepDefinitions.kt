@@ -52,6 +52,9 @@ class StepDefinitions(
     private val numberUserNotRegister: String = "558187654321"
     private val currentTestAttendantPhoneNumber: String = "5581999999901" // Número fixo para o atendente em teste
     private val pwdInAttendancePhoneNumberForAttendantChangeStatus = "558179654321"
+    private val pwdAcessarServicesPhoneNumber = "551965741234"
+    private val possibleItialsMessages = mutableListOf("Oi", "Olá", "Bom dia", "Boa noite", "Boa Tarde", "teste")
+
     val logger: Logger = LoggerFactory.getLogger(StepDefinitions::class.java)
 
     @Dado("usuário recebeu mensagem {string}")
@@ -92,6 +95,25 @@ class StepDefinitions(
         userSendMessage(mensagemEnviada, numberUserNotRegister)
     }
 
+    @Quando("PCD {string} mandar qualquer mensagem")
+    fun `PCD mandar qualquer mensagem`(adjetivoPCD: String) {
+        val message = possibleItialsMessages.random()
+        val pwd = createIfNotExistsPWDWithDisability(adjetivoPCD, pwdAcessarServicesPhoneNumber)
+        userSendMessage(message, pwd.phoneNumber)
+    }
+
+    fun createIfNotExistsPWDWithDisability(adjetivoPCD: String, pwdPhoneNumber: String): PWD {
+        var pwd = pwdRepository.findByPhoneNumber(pwdPhoneNumber)
+        val disability = Disability.getByAdjective(adjetivoPCD)
+        if(pwd == null) {
+            return pwdRepository.save(PWD(name=adjetivoPCD, phoneNumber = pwdPhoneNumber, disabilities = mutableSetOf(disability)))
+        }
+        if(pwd.disabilities.first() != disability) {
+            pwd.disabilities = mutableSetOf(disability)
+            pwdRepository.save(pwd)
+        }
+        return pwd
+    }
     @Entao("bot registrará que usuário tem ou possui {string}")
     fun `bot registra deficiencia do usuário`(deficienciaAdjtivo: String) {
         val pwd = pwdRepository.findByPhoneNumberWithDisabilities(numberUserNotRegister)!!
@@ -124,10 +146,10 @@ class StepDefinitions(
         )
     }
 
-    @Entao("bot enviará opcções de serviço {string} de acordo com a deficiência {string} do pcd")
+    @Entao("{string} PCD receberá mensagem de opcções de serviço {string}")
     fun `bot enviará opcçoes de seviço de acordo com a deficiência do pcd`(
-        opcoesDeServico: String,
-        tipoDeDeficiencia: String
+        tipoDeDeficiencia: String,
+        opcoesDeServico: String
     ) {
         val ultimaMensagem = messageExchangeRepository.lastExchangeMessage(
             toPhoneNumber = numberUserNotRegister,

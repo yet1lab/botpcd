@@ -3,8 +3,8 @@ Funcionalidade: Acessar serviços de assistência
   Como um PCD, quero poder acessar os serviços que estão disponíveis para o meu tipo de deficiência, para que eu consiga aproveitar o evento da SBPC.
 
   Esquema do Cenário Listar serviços de acordo com meu tipo de deficiência
-    Quando PCD com a deficiência de "<adjetivo_da_deficiencia>" mandar qualquer mensagem
-    Entao PCD receberá mensagem de opcções de serviço "<opcções_de_serviço>" de acordo com a deficiência "<adjetivo_da_deficiencia>"
+    Quando PCD "<adjetivo_da_deficiencia>" mandar qualquer mensagem
+    Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem de opcções de serviço "<opcções_de_serviço>"
 
     Exemplos:
       | adjetivo_da_deficiencia | opcções_de_serviço                                                                         |
@@ -16,10 +16,10 @@ Funcionalidade: Acessar serviços de assistência
       | uma pessoa surdocega    | guia-intérprete                                                                            |
 
   Esquema do Cenário Direcionar para o atendente(monitor ou membro da comissão)
-    Dado bot enviou a mensagem de opção de serviço
-    E existe atendente disponível para o "<servico_desejado>"
-    Quando PCD envia a mensagem "<servico_desejado>"
-    Entao bot vai direcionar para o <tipo_de_atendente> disponível no momento
+    Dado "<adjetivo_da_deficiencia>" recebeu mensagem de opcções de serviço
+    E atendente que se chama "<nome_do_atendente>" está disponível para o "<servico_desejado>"
+    Quando "<adjetivo_da_deficiencia>" PCD envia a mensagem "<servico_desejado>"
+    Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem O monitor "<nome_do_atendente>" irá realizar seu atendimento
 
     Exemplos:
       | servico_desejado       | tipo_de_atendente  |
@@ -33,7 +33,7 @@ Funcionalidade: Acessar serviços de assistência
       | Guia-intérprete        | membro da comissão |
 
     Regra: PCD precisa receber mensagem informando que ele está na fila de espera
-      Cenário de Fundo: PCD recebeu a mensagem "<opção de serviço>"
+      Cenário de Fundo: Dado que PCD recebeu a mensagem "<opção de serviço>"
         E não tem atendente disponível
 
       Esquema do Cenário: PCD entra na fila de espera

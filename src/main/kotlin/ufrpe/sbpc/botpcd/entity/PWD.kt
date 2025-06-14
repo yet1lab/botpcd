@@ -27,5 +27,5 @@ class PWD(
     @CollectionTable(name = "tb_pwd_disabilities", joinColumns = [JoinColumn(name = "pwd_id")])
     @Column(name = "disability")
     @Enumerated(EnumType.STRING)
-    var disabilities: MutableSet<Disability> = mutableSetOf()
+    var disabilities: Set<Disability> = setOf()
 ): User(name = name, phoneNumber = phoneNumber)
