@@ -161,8 +161,19 @@ class StepDefinitions(
         }
     }
 
-    @Dado("^que sou um ([^\"]*) com número (\\d+) e status inicial ([^\"]*)$")
+    @Dado("^que sou um \"(.*)\" com número \"(.*)\" e status inicial \"(.*)\"$")
     fun `que sou um tipo_de_atendente com número e status inicial`(
+        tipoAtendente: String,
+        numeroAtendente: String, // Mantido como Int conforme original desta função
+        statusInicialStr: String
+    ) {
+        val status = UserStatus.valueOf(statusInicialStr)
+        val phoneNumber = numeroAtendente.toString()
+        createAttendant(phoneNumber, tipoAtendente, status)
+    }
+
+    @Dado("que sou um {string} com número {biginteger} e status inicial {string}")
+    fun `tipo_de_atendente com número e status inicial`(
         tipoAtendente: String,
         numeroAtendente: BigInteger, // Mantido como Int conforme original desta função
         statusInicialStr: String
@@ -172,24 +183,25 @@ class StepDefinitions(
         createAttendant(phoneNumber, tipoAtendente, status)
     }
 
-    @Quando("^o \"([^\"]*)\" com número (\\d+) envia a mensagem \"([^\"]*)\"$")
+
+    @Quando("^o \"([^\"]*)\" com número \"(\\d+)\" envia a mensagem \"([^\"]*)\"$")
     fun `o tipo_de_atendente com número envia a mensagem`(
         tipoAtendente: String,
-        numeroAtendente: BigInteger,
+        numeroAtendente: String,
         mensagemEnviada: String
     ) {
-        val phoneNumber = numeroAtendente.toString()
+        val phoneNumber = numeroAtendente
         checkIfHasCorrectAttendantType(phoneNumber, tipoAtendente)
         userSendMessage(mensagemEnviada, phoneNumber)
     }
 
-    @Entao("^o \"([^\"]*)\" com número (\\d+) receberá a mensagem$")
+    @Entao("^o \"([^\"]*)\" com número \"(\\d+)\" receberá a mensagem$")
     fun `o tipo_de_atendente com número receberá a mensagem`(
         tipoAtendente: String,
-        numeroAtendente: BigInteger,
+        numeroAtendente: String,
         mensagemEsperadaDocString: String
     ) {
-        val phoneNumber = numeroAtendente.toString()
+        val phoneNumber = numeroAtendente
         checkIfHasCorrectAttendantType(phoneNumber, tipoAtendente)
         testarUltimaMensagemRecebidaDoUsuario(mensagemEsperadaDocString, phoneNumber)
     }
@@ -209,10 +221,10 @@ class StepDefinitions(
         }
     }
 
-    @Dado("^o \"([^\"]*)\" com número (\\d+) recebeu a mensagem de opções para status \"([^\"]*)\"$")
+    @Dado("^o \"([^\"]*)\" com número \"(\\d+)\" recebeu a mensagem de opções para status \"([^\"]*)\"$")
     fun `o tipo_de_atendente com número recebeu a mensagem de opções para status`(
         @Suppress("UNUSED_PARAMETER") tipoAtendente: String,
-        numeroAtendente: BigInteger,
+        numeroAtendente: String,
         statusAntigoStr: String
     ) {
         val phoneNumber = numeroAtendente.toString()
@@ -224,10 +236,10 @@ class StepDefinitions(
         mockUserRecievedMessage(phoneNumber, expectedMessageContent)
     }
 
-    @Entao("^o status do \"([^\"]*)\" com número (\\d+) deve ser \"([^\"]*)\"$")
+    @Entao("^o status do \"([^\"]*)\" com número \"(\\d+)\" deve ser \"([^\"]*)\"$")
     fun `o status do tipo_de_atendente com número deve ser`(
         tipoAtendente: String,
-        numeroAtendente: BigInteger,
+        numeroAtendente: String,
         statusNovoEsperadoStr: String
     ) {
         val phoneNumber = numeroAtendente.toString()
