@@ -179,29 +179,11 @@ class StepDefinitions(
         val attendant = createAttendant(currentTestAttendantPhoneNumber, tipoAtendente, status)
         if (status == UserStatus.BUSY) {
             // Limpar PWD existente com este número para evitar conflitos
-            pwdRepository.findByPhoneNumber(pwdInAttendancePhoneNumberForAttendantChangeStatus)?.let { pwdToDelete ->
-                // Antes de deletar o PWD, deletar TODOS os atendimentos associados para evitar erro de FK
-                // Deletar todos os atendimentos iniciados associados a este PWD
-                while (true) {
-                    val startedAttendance = attendanceRepository.findStartedAttendanceOfPwd(pwdToDelete) ?: break
-                    attendanceRepository.delete(startedAttendance)
-                    // Forçar o flush pode ser necessário em alguns cenários para garantir que a deleção
-                    // seja enviada ao banco de dados imediatamente, antes da próxima iteração ou da deleção do PWD.
-                    attendanceRepository.flush()
-                }
-
-                // Após garantir que todos os atendimentos foram deletados e as deleções efetivadas,
-                // deletar o PWD.
-                pwdRepository.delete(pwdToDelete)
-                pwdRepository.flush() // Garante que a deleção do PWD seja efetivada antes de criar um novo.
-            }
-
-            val pwd = PWD(
+            val pwd = pwdRepository.findByPhoneNumber(pwdInAttendancePhoneNumberForAttendantChangeStatus) ?: pwdRepository.save(PWD(
                 name = "PCD em Atendimento Teste",
                 phoneNumber = pwdInAttendancePhoneNumberForAttendantChangeStatus,
                 disabilities = mutableSetOf(Disability.MOBILITY_IMPAIRED) // Deficiência padrão para o teste
-            )
-            pwdRepository.save(pwd)
+            ))
 
             // Determinar o tipo de serviço e provedor com base no tipo de atendente
             val serviceType: ServiceType
