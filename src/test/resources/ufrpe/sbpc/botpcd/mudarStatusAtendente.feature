@@ -4,7 +4,7 @@ Funcionalidade: Mudar status do Atendente (Monitor ou Membro da Comissão)
   para que minha disponibilidade seja sempre atualizada.
 
   Esquema do Cenário: Atendente solicita mudança de status
-    Dado que sou um "<tipo_de_atendente>" com número <numero_atendente> e status inicial "<status_atual>"
+    Dado que sou um <tipo_de_atendente> com número <numero_atendente> e status inicial <status_atual>
     Quando o "<tipo_de_atendente>" com número <numero_atendente> envia a mensagem "bot pcd"
     Então o "<tipo_de_atendente>" com número <numero_atendente> receberá a mensagem
       """
