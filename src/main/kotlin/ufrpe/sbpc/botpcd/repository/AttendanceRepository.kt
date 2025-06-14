@@ -32,5 +32,9 @@ interface AttendanceRepository : JpaRepository<Attendance, Long> {
 		@Param("pwd") pwd: PWD,
 		@Param("attendant") attendant: Attendant?,
 		@Param("acceptDateTime") startDateTime: LocalDateTime
-	): Int 
+	): Int
+
+	@Modifying(flushAutomatically = true, clearAutomatically = true) // Modificação aqui
+	@Query("DELETE FROM Attendance a WHERE a.pwd = :pwd")
+	fun deleteAllByPwd(@Param("pwd") pwd: PWD)
 }

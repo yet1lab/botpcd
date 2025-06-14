@@ -27,21 +27,20 @@ Funcionalidade: Mudar status do Atendente (Monitor ou Membro da Comissão)
     Então o status do "<tipo_de_atendente>" deve ser "<status_novo_esperado>"
     E o "<tipo_de_atendente>" receberá a mensagem
       """
-      *BotPCD:*
-      <mensagem_confirmacao>
+      <mensagem_confirmacao_completa>
       """
 
     Exemplos:
-      | tipo_de_atendente  | status_antigo | resposta_usuario | status_novo_esperado | mensagem_confirmacao                                                |
-      | Monitor            | AVAILABLE     | "1"              | UNAVAILABLE          | Seu status foi atualizado para Indisponível.                        |
-      | Monitor            | AVAILABLE     | "cancelar"       | AVAILABLE            | Você continua Disponível.                                           |
-      | Monitor            | AVAILABLE     | "X"              | AVAILABLE            | Opção inválida. Seu status permanece Disponível.                    |
-      | Monitor            | UNAVAILABLE   | "1"              | AVAILABLE            | Seu status foi atualizado para Disponível.                          |
-      | Monitor            | UNAVAILABLE   | "cancelar"       | UNAVAILABLE          | Você continua Indisponível.                                         |
-      | Monitor            | BUSY          | "1"              | AVAILABLE            | Atendimento encerrado. Seu status foi atualizado para Disponível.   |
-      | Monitor            | BUSY          | "2"              | UNAVAILABLE          | Atendimento encerrado. Seu status foi atualizado para Indisponível. |
-      | Monitor            | BUSY          | "cancelar"       | BUSY                 | Você continua em atendimento.                                       |
-      | Membro da Comissão | AVAILABLE     | "1"              | UNAVAILABLE          | Seu status foi atualizado para Indisponível.                        |
-      | Membro da Comissão | UNAVAILABLE   | "1"              | AVAILABLE            | Seu status foi atualizado para Disponível.                          |
-      | Membro da Comissão | BUSY          | "1"              | AVAILABLE            | Atendimento encerrado. Seu status foi atualizado para Disponível.   |
-      | Membro da Comissão | BUSY          | "2"              | UNAVAILABLE          | Atendimento encerrado. Seu status foi atualizado para Indisponível. |
+      | tipo_de_atendente  | status_antigo | resposta_usuario | status_novo_esperado | mensagem_confirmacao_completa                                                   |
+      | Monitor            | AVAILABLE     | "1"              | UNAVAILABLE          | *BotPCD:*\n Seu status foi atualizado para Indisponível.                        |
+      | Monitor            | AVAILABLE     | "cancelar"       | AVAILABLE            | *BotPCD:*\n Você continua Disponível.                                           |
+      | Monitor            | AVAILABLE     | "X"              | AVAILABLE            | *BotPCD:*\n Opção inválida. Seu status permanece Disponível.                    |
+      | Monitor            | UNAVAILABLE   | "1"              | AVAILABLE            | *BotPCD:*\n Seu status foi atualizado para Disponível.                          |
+      | Monitor            | UNAVAILABLE   | "cancelar"       | UNAVAILABLE          | *BotPCD:*\n Você continua Indisponível.                                         |
+      | Monitor            | BUSY          | "1"              | AVAILABLE            | *BotPCD:*\n Atendimento encerrado. Seu status foi atualizado para Disponível.   |
+      | Monitor            | BUSY          | "2"              | UNAVAILABLE          | *BotPCD:*\n Atendimento encerrado. Seu status foi atualizado para Indisponível. |
+      | Monitor            | BUSY          | "cancelar"       | BUSY                 | *BotPCD:*\n Você continua *em atendimento*                                      |
+      | Membro da Comissão | AVAILABLE     | "1"              | UNAVAILABLE          | *BotPCD:*\n Seu status foi atualizado para Indisponível.                        |
+      | Membro da Comissão | UNAVAILABLE   | "1"              | AVAILABLE            | *BotPCD:*\n Seu status foi atualizado para Disponível.                          |
+      | Membro da Comissão | BUSY          | "1"              | AVAILABLE            | *BotPCD:*\n Atendimento encerrado. Seu status foi atualizado para Disponível.   |
+      | Membro da Comissão | BUSY          | "2"              | UNAVAILABLE          | *BotPCD:*\n Atendimento encerrado. Seu status foi atualizado para Indisponível. |

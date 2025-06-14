@@ -5,13 +5,17 @@ import com.whatsapp.api.domain.webhook.WebHook
 import io.cucumber.java.pt.Dado
 import io.cucumber.java.pt.Entao
 import io.cucumber.java.pt.Quando
+import org.springframework.transaction.annotation.Transactional
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Scope
+import org.springframework.stereotype.Component
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import ufrpe.sbpc.botpcd.entity.Attendance
 import ufrpe.sbpc.botpcd.entity.Attendant
 import ufrpe.sbpc.botpcd.entity.CommitteeMember
 import ufrpe.sbpc.botpcd.entity.Disability
@@ -19,7 +23,10 @@ import ufrpe.sbpc.botpcd.entity.MessageExchange
 import ufrpe.sbpc.botpcd.entity.Monitor
 import ufrpe.sbpc.botpcd.entity.MonitorAssistanceType
 import ufrpe.sbpc.botpcd.entity.PWD
+import ufrpe.sbpc.botpcd.entity.Provider
+import ufrpe.sbpc.botpcd.entity.ServiceType
 import ufrpe.sbpc.botpcd.entity.UserStatus
+import ufrpe.sbpc.botpcd.repository.AttendanceRepository
 import ufrpe.sbpc.botpcd.repository.AttendantRepository
 import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
@@ -27,9 +34,9 @@ import ufrpe.sbpc.botpcd.repository.MonitorRepository
 import ufrpe.sbpc.botpcd.repository.PWDRepository
 import ufrpe.sbpc.botpcd.service.AttendantStatusService
 import java.io.File
+import java.time.LocalDateTime
 // import java.math.BigInteger // Não é mais necessário para os steps de atendente
 import kotlin.test.assertTrue
-
 
 class StepDefinitions(
     private val mockMvc: MockMvc,
@@ -38,11 +45,13 @@ class StepDefinitions(
     val monitorRepository: MonitorRepository,
     val committeeMemberRepository: CommitteeMemberRepository,
     val attendantRepository: AttendantRepository,
-    val attendantStatusService: AttendantStatusService
+    val attendantStatusService: AttendantStatusService,
+    val attendanceRepository: AttendanceRepository
 ) {
     private var currentBotNumber: String = "15556557522"
     private val numberUserNotRegister: String = "558187654321"
     private val currentTestAttendantPhoneNumber: String = "5581999999901" // Número fixo para o atendente em teste
+    private val pwdInAttendancePhoneNumberForAttendantChangeStatus = "558179654321"
     val logger: Logger = LoggerFactory.getLogger(StepDefinitions::class.java)
 
     @Dado("usuário recebeu mensagem {string}")
@@ -161,17 +170,62 @@ class StepDefinitions(
             else -> throw IllegalArgumentException("Tipo de atendente desconhecido: $tipoAtendente")
         }
     }
-
-
     @Dado("que sou um {string} com status inicial {string}")
     fun `que sou um tipo_de_atendente com status inicial`(
         tipoAtendente: String,
         statusInicialStr: String
     ) {
         val status = UserStatus.valueOf(statusInicialStr.uppercase())
-        createAttendant(currentTestAttendantPhoneNumber, tipoAtendente, status)
-    }
+        val attendant = createAttendant(currentTestAttendantPhoneNumber, tipoAtendente, status)
+        if (status == UserStatus.BUSY) {
+            // Limpar PWD existente com este número para evitar conflitos
+            pwdRepository.findByPhoneNumber(pwdInAttendancePhoneNumberForAttendantChangeStatus)?.let { pwdToDelete ->
+                // Antes de deletar o PWD, deletar TODOS os atendimentos associados para evitar erro de FK
+                // Deletar todos os atendimentos iniciados associados a este PWD
+                while (true) {
+                    val startedAttendance = attendanceRepository.findStartedAttendanceOfPwd(pwdToDelete) ?: break
+                    attendanceRepository.delete(startedAttendance)
+                    // Forçar o flush pode ser necessário em alguns cenários para garantir que a deleção
+                    // seja enviada ao banco de dados imediatamente, antes da próxima iteração ou da deleção do PWD.
+                    attendanceRepository.flush()
+                }
 
+                // Após garantir que todos os atendimentos foram deletados e as deleções efetivadas,
+                // deletar o PWD.
+                pwdRepository.delete(pwdToDelete)
+                pwdRepository.flush() // Garante que a deleção do PWD seja efetivada antes de criar um novo.
+            }
+
+            val pwd = PWD(
+                name = "PCD em Atendimento Teste",
+                phoneNumber = pwdInAttendancePhoneNumberForAttendantChangeStatus,
+                disabilities = mutableSetOf(Disability.MOBILITY_IMPAIRED) // Deficiência padrão para o teste
+            )
+            pwdRepository.save(pwd)
+
+            // Determinar o tipo de serviço e provedor com base no tipo de atendente
+            val serviceType: ServiceType
+            val provider: Provider
+            if (attendant is Monitor) {
+                serviceType = ServiceType.Mobility // Exemplo, pode precisar ser mais dinâmico
+                provider = Provider.MONITOR
+            } else if (attendant is CommitteeMember) {
+                serviceType = ServiceType.Car // Exemplo, pode precisar ser mais dinâmico
+                provider = Provider.COMMITTEE_MEMBER
+            } else {
+                throw IllegalStateException("Tipo de atendente desconhecido durante a criação do atendimento de teste.")
+            }
+
+            val attendance = Attendance(
+                pwd = pwd,
+                attendant = attendant,
+                serviceType = serviceType,
+                attendantType = provider,
+                startDateTime = LocalDateTime.now()
+            )
+            attendanceRepository.save(attendance)
+        }
+    }
     @Quando("o {string} envia a mensagem {string}")
     fun `o tipo_de_atendente envia a mensagem`(
         tipoAtendente: String,
