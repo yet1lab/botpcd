@@ -32,7 +32,7 @@ import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.repository.MonitorRepository
 import ufrpe.sbpc.botpcd.repository.PWDRepository
-import ufrpe.sbpc.botpcd.service.AttendantStatusService
+import ufrpe.sbpc.botpcd.service.AttendanceService
 import java.io.File
 import java.time.LocalDateTime
 // import java.math.BigInteger // Não é mais necessário para os steps de atendente
@@ -45,7 +45,7 @@ class StepDefinitions(
     val monitorRepository: MonitorRepository,
     val committeeMemberRepository: CommitteeMemberRepository,
     val attendantRepository: AttendantRepository,
-    val attendantStatusService: AttendantStatusService,
+    val attendanceService: AttendanceService,
     val attendanceRepository: AttendanceRepository
 ) {
     private var currentBotNumber: String = "15556557522"
@@ -270,8 +270,8 @@ class StepDefinitions(
         statusAntigoStr: String
     ) {
         val statusAntigo = UserStatus.valueOf(statusAntigoStr.uppercase())
-        val expectedMessageContent = attendantStatusService.changeStatusTextOptionsFor[statusAntigo.name]
-            ?: throw IllegalArgumentException("Mensagem de opção não encontrada para status $statusAntigoStr no AttendantStatusService.changeStatusTextOptionsFor. Chaves disponíveis: ${attendantStatusService.changeStatusTextOptionsFor.keys}")
+        val expectedMessageContent = attendanceService.changeStatusTextOptionsFor[statusAntigo.name]
+            ?: throw IllegalArgumentException("Mensagem de opção não encontrada para status $statusAntigoStr no attendanceService.changeStatusTextOptionsFor. Chaves disponíveis: ${attendanceService.changeStatusTextOptionsFor.keys}")
 
         mockUserRecievedMessage(currentTestAttendantPhoneNumber, expectedMessageContent)
     }

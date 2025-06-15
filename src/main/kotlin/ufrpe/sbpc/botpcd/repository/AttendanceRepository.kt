@@ -13,7 +13,8 @@ import java.time.LocalDateTime
 interface AttendanceRepository : JpaRepository<Attendance, Long> {
 	@Query("SELECT COUNT(att) FROM Attendance att WHERE att.serviceType = :serviceType AND att.startDateTime IS NULL")
 	fun countRequestAttendanceOfService(serviceType: ServiceType): Long
-
+	@Query("SELECT att FROM Attendance att WHERE att.startDateTime IS NULL AND att.attendantType = 'COMMITTEE_MEMBER'")
+	fun findPendingCommitteeMemberAttendances(): List<Attendance>
   @Query("SELECT att from Attendance att where att.serviceType = :serviceType AND att.startDateTime is null order by att.requestDateTime asc")
   fun findRequestAttendanceOfService(serviceType: ServiceType) : Attendance?
 	

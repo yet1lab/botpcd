@@ -68,7 +68,12 @@ sealed class ServiceType(
                 .mapNotNull { it.objectInstance }
                 .filter { disability in it.disability }
         }
-
+        fun getServiceByMonitorAssistanceType(monitorAssistanceType: MonitorAssistanceType): ServiceType {
+            return ServiceType::class.sealedSubclasses
+                .mapNotNull { it.objectInstance }
+                .filterIsInstance<MonitorServiceType>()
+                .first { it.monitorAssistanceType == monitorAssistanceType } as ServiceType
+        }
     }
 }
 interface MonitorServiceType {
