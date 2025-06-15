@@ -15,24 +15,24 @@ Funcionalidade: Acessar serviços de assistência
       | neurodivergente         | suporte para pessoas neurodivergentes                                                      |
       | uma pessoa surdocega    | guia-intérprete                                                                            |
 
-  Esquema do Cenário Direcionar para o atendente(monitor ou membro da comissão)
-    Dado "<adjetivo_da_deficiencia>" recebeu mensagem de opcções de serviço
+  Esquema do Cenário: Direcionar para o atendente(monitor ou membro da comissão)
+    Dado que "<adjetivo_da_deficiencia>" PCD recebeu mensagem de opcções de serviço
     E atendente que se chama "<nome_do_atendente>" está disponível para o "<servico_desejado>"
-    Quando "<adjetivo_da_deficiencia>" PCD envia a mensagem "<servico_desejado>"
-    Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem O monitor "<nome_do_atendente>" irá realizar seu atendimento
+    Quando "<adjetivo_da_deficiencia>" PCD envia a mensagem "<numero_servico_desejado>"
+    Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem "O <tipo_de_atendente> <nome_do_atendente> irá realizar seu atendimento."
 
     Exemplos:
-      | servico_desejado       | tipo_de_atendente  |
-      | Informações em Libras  | monitor            |
-      | Intérprete de Libras   | membro da comissão |
-      | Assistência mobilidade | monitor            |
-      | carro                  | membro da comissão |
-      | Higiene e Nutrição     | membro da comissão |
-      | Audiodescrição         | membro da comissão |
-      | Apoio Neurodivergente  | monitor            |
-      | Guia-intérprete        | membro da comissão |
+      | adjetivo_da_deficiencia | nome_do_atendente | servico_desejado                       | numero_servico_desejado | tipo_de_atendente  |
+      | um pessoa surda         | Ana Monitor       | informações em Libras                  | 1                       | monitor            |
+      | um pessoa surda         | João Comissão     | atividade com interpretação em Libras  | 2                       | membro da comissão |
+      | mobilidade reduzida     | Pedro Monitor     | ajuda na mobilidade                    | 1                       | monitor            |
+      | deficiente físico       | Carla Comissão    | transporte para deslocamento no evento | 3                       | membro da comissão |
+      | deficiente físico       | Bia Comissão      | ajuda com alimentação e higiene        | 2                       | membro da comissão |
+      | uma pessoa cega         | Lucas Comissão    | programação com audiodescrição         | 2                       | membro da comissão |
+      | neurodivergente         | Fábio Monitor     | suporte para pessoas neurodivergentes  | 1                       | monitor            |
+      | uma pessoa surdocega    | Maria Comissão    | guia-intérprete                        | 1                       | membro da comissão |
 
-    Regra: PCD precisa receber mensagem informando que ele está na fila de espera
+  Regra: PCD precisa receber mensagem informando que ele está na fila de espera
       Cenário de Fundo: Dado que PCD recebeu a mensagem "<opção de serviço>"
         E não tem atendente disponível
 
