@@ -6,7 +6,9 @@ import com.whatsapp.api.domain.messages.Message
 import ufrpe.sbpc.botpcd.entity.MessageExchange
 import com.whatsapp.api.domain.messages.TextMessage
 import com.whatsapp.api.impl.WhatsappBusinessCloudApi
+import org.slf4j.LoggerFactory
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
+import kotlin.math.log
 
 
 @Service
@@ -14,6 +16,7 @@ class WhatsappService(
     private val cloudApi: WhatsappBusinessCloudApi,
     private val messageExchangeRepository: MessageExchangeRepository
 ) {
+	private val logger = LoggerFactory.getLogger(WhatsappService::class.java)
    fun sendMessage(botNumber: String, destinyNumberID: String, msg: String, author: String = "") {
 				val text = if (author != "") "*${author}:*\n ${msg}" else msg
 
@@ -33,6 +36,8 @@ class WhatsappService(
 							fromPhoneNumber = botNumber,
 							toPhoneNumber = destinyNumberID,
 							message = text))
+				} else {
+					logger.warn("Teve uma tentativa de enviar a mensagem ${message} para o número ${destinyNumberID}, mas ele não tinha mandando mensagem.")
 				}
     }
 }
