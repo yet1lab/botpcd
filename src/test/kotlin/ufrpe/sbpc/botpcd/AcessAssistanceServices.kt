@@ -143,30 +143,27 @@ class AcessAssistanceServices(
         numeroAtendente: String,
         tipoAssistenciaMonitorStr: String?
     ) {
-        // Limpa todos os atendentes do tipo antes de cadastrar o novo
+        val currentBotNumber = "15556557522" // igual ao do contexto do feature!
         when (tipoAtendente.lowercase()) {
-            "monitor" -> {
-                monitorRepository.findAll().forEach { monitorRepository.delete(it) }
-            }
-            "membro da comissão" -> {
-                committeeMemberRepository.findAll().forEach { committeeMemberRepository.delete(it) }
-            }
+            "monitor" -> monitorRepository.deleteAll()
+            "membro da comissão" -> committeeMemberRepository.deleteAll()
         }
 
         when (tipoAtendente.lowercase()) {
             "monitor" -> {
-                val assistanceType = tipoAssistenciaMonitorStr?.takeIf { it.isNotBlank() }?.let { 
-                    MonitorAssistanceType.entries.find { enum -> enum.name.equals(it, ignoreCase = true) }
-                }
-                assertNotNull(assistanceType, "Tipo de assistência do monitor não pode ser nulo ou vazio para Monitor.")
+                val tipoAssistencia = tipoAssistenciaMonitorStr?.let {
+                    MonitorAssistanceType.valueOf(it)
+                } ?: MonitorAssistanceType.MOBILITY_MONITOR
+
                 monitorRepository.save(
                     Monitor(
                         name = nomeAtendente,
                         phoneNumber = numeroAtendente,
                         status = UserStatus.AVAILABLE,
-                        assistanceType = assistanceType!!
+                        assistanceType = tipoAssistencia
                     )
                 )
+                println("Monitor cadastrado: $nomeAtendente, $numeroAtendente, tipo: $tipoAssistencia")
             }
             "membro da comissão" -> {
                 committeeMemberRepository.save(
@@ -176,27 +173,18 @@ class AcessAssistanceServices(
                         status = UserStatus.AVAILABLE
                     )
                 )
+                println("Membro da comissão cadastrado: $nomeAtendente, $numeroAtendente")
             }
-            else -> throw IllegalArgumentException("Tipo de atendente desconhecido: $tipoAtendente")
         }
         // Simula que o atendente enviou uma mensagem recentemente para ser considerado ativo
         messageExchangeRepository.save(
             MessageExchange(
                 fromPhoneNumber = numeroAtendente,
                 toPhoneNumber = currentBotNumber,
-                message = "Olá BotPCD, estou disponível.",
+                message = "Estou disponível para atendimento."
             )
         )
-        logger.info("Atendente disponível: $nomeAtendente, $numeroAtendente, Tipo: $tipoAtendente")
-
-        logger.info("Monitores cadastrados:")
-        monitorRepository.findAll().forEach {
-            logger.info("Monitor: ${it.name}, status: ${it.status}, tipo: ${it.assistanceType}, número: ${it.phoneNumber}")
-        }
-        logger.info("Membros da comissão cadastrados:")
-        committeeMemberRepository.findAll().forEach {
-            logger.info("Comissão: ${it.name}, status: ${it.status}, número: ${it.phoneNumber}")
-        }
+        println("Mensagem de disponibilidade salva para: $numeroAtendente -> $currentBotNumber")
     }
 
     @Dado("o PCD com número {string} recebeu a mensagem com as opções de serviço para sua deficiência")
@@ -204,12 +192,21 @@ class AcessAssistanceServices(
         userSendMessage("oi", numeroPcd)
         logger.info("PCD $numeroPcd enviou 'oi' para iniciar o fluxo e receber as opções de serviço.")
 
-        // Exemplo de mensagem esperada (ajuste conforme o texto real do bot)
-        val pwd = pwdRepository.findByPhoneNumber(numeroPcd)
+        val pwd = pwdRepository.findByPhoneNumberWithDisabilities(numeroPcd)
         assertNotNull(pwd)
         val disability = pwd!!.disabilities.first()
-        val opcoes = createOptions(listOf(disability.name)) // Corrigido: agora passa uma lista de String
-        testarUltimaMensagemRecebidaDoUsuario(opcoes, numeroPcd)
+        val nome = pwd.name ?: ""
+        val adjective = disability.adjective
+
+        val serviceList = ServiceType.getServicesByDisability(disability)
+        val header = "Olá $nome. Percebi que você ${if (disability == Disability.MOBILITY_IMPAIRED) "tem $adjective" else "é $adjective"}. Os serviços disponíveis para você são\n"
+
+        val mensagemEsperada = createOptions(
+            serviceList.map { it.description },
+            header = header
+        )
+
+        testarUltimaMensagemRecebidaDoUsuario(mensagemEsperada, numeroPcd)
     }
 
     @Quando("o PCD com número {string} envia a mensagem escolhendo a opção de serviço {string} que corresponde ao {string}")
@@ -245,14 +242,14 @@ class AcessAssistanceServices(
         numeroAtendente: String,
         servicoEscolhidoStr: String
     ) {
-        val pwd = pwdRepository.findByPhoneNumber(numeroPcd)
+        val pwd = pwdRepository.findByPhoneNumberWithDisabilities(numeroPcd)
         assertNotNull(pwd, "PCD com número $numeroPcd não encontrado.")
         val attendant = attendantRepository.findByPhoneNumber(numeroAtendente)
         assertNotNull(attendant, "Atendente com número $numeroAtendente não encontrado.")
 
         val serviceType = ServiceType::class.sealedSubclasses
             .mapNotNull { it.objectInstance }
-            .find { it::class.simpleName == servicoEscolhidoStr }
+            .find { it::class.simpleName.equals(servicoEscolhidoStr, ignoreCase = true) }
             ?: error("ServiceType '$servicoEscolhidoStr' não encontrado")
 
         val attendance = attendanceRepository.findStartedAttendanceOfPwd(pwd!!)
@@ -312,14 +309,14 @@ class AcessAssistanceServices(
         numeroPcd: String,
         servicoEscolhidoStr: String
     ) {
-        val pwd = pwdRepository.findByPhoneNumber(numeroPcd)
+        val pwd = pwdRepository.findByPhoneNumberWithDisabilities(numeroPcd)
         assertNotNull(pwd, "PCD com número $numeroPcd não encontrado.")
         val serviceType = ServiceType::class.sealedSubclasses
-    .mapNotNull { it.objectInstance }
-    .find { it::class.simpleName == servicoEscolhidoStr }
-    ?: error("ServiceType '$servicoEscolhidoStr' não encontrado")
-        val attendance = attendanceRepository.findAll().find { 
-            it.pwd?.id == pwd?.id && it.serviceType == serviceType && it.attendant == null
+            .mapNotNull { it.objectInstance }
+            .find { it::class.simpleName.equals(servicoEscolhidoStr, ignoreCase = true) }
+            ?: error("ServiceType '$servicoEscolhidoStr' não encontrado")
+        val attendance = attendanceRepository.findAll().find {
+            it.pwd.id == pwd!!.id && it.serviceType == serviceType && it.startDateTime == null
         }
         assertNotNull(attendance, "Nenhum atendimento solicitado (na fila) encontrado para o PCD $numeroPcd.")
     }
