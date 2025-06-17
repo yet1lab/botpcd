@@ -17,9 +17,9 @@ Funcionalidade: Acessar Serviços de Assistência
     E o status do Atendente com número "<numero_atendente>" muda para OCUPADO
 
     Exemplos:
-      | numero_pcd     | nome_pcd      | tipo_deficiencia   | tipo_atendente       | nome_atendente    | numero_atendente | tipo_assistencia_monitor | opcao_servico | servico_escolhido |
-      | 5581988880001 | Ana Silva   | deficiente físico  | Monitor            | Carlos Monitor  | 5581977770001  | MOBILITY_MONITOR       | 1           | Mobility        |
-      | 5581988880002 | Bruno Costa | um pessoa surda | Membro da Comissão | Sofia Comissão  | 5581977770002  |                          | 1           | Libras          |
+      | numero_pcd | nome_pcd | tipo_deficiencia | tipo_atendente | nome_atendente | numero_atendente | tipo_assistencia_monitor | opcao_servico | servico_escolhido |
+      | 5581988880001 | Ana Silva | deficiente físico | Monitor | Carlos Monitor | 5581977770001 | MOBILITY_MONITOR  | 1 | Mobility |
+      | 5581988880002 | Bruno Costa | um pessoa surda | Membro da Comissão | Sofia Comissão | 5581977770002  |   | 1 | Libras |
 
   Esquema do Cenário: PCD solicita serviço e é colocado na fila de espera
     Dado um PCD cadastrado com o número "<numero_pcd>", nome "<nome_pcd>" e deficiência "<tipo_deficiencia>"
@@ -30,6 +30,6 @@ Funcionalidade: Acessar Serviços de Assistência
     E um registro de atendimento é criado para o PCD com número "<numero_pcd>" com o serviço "<servico_escolhido>" e status solicitado aguardando atendente
 
     Exemplos:
-      | numero_pcd     | nome_pcd    | tipo_deficiencia   | tipo_atendente       | servico_escolhido | opcao_servico |
-      | 5581988880003 | Clara Luz | deficiente físico       | Monitor           | Mobility        | 1           |
-      | 5581988880004 | Davi Melo | uma pessoa cega | Membro da Comissão | AudioDescription| 1           |
+      | numero_pcd | nome_pcd | tipo_deficiencia | tipo_atendente | servico_escolhido | opcao_servico |
+      | 5581988880003 | Clara Luz | deficiente físico | Monitor | Mobility | 1 |
+      | 5581988880004 | Davi Melo | uma pessoa cega | Membro da Comissão | AudioDescription | 1 |
