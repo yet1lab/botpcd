@@ -25,16 +25,16 @@ Funcionalidade: Acessar serviços de assistência
       | adjetivo_da_deficiencia | nome_do_atendente | servico_desejado                       | numero_servico_desejado | tipo_de_atendente  |
       | um pessoa surda         | Ana Monitor       | informações em Libras                  | 1                       | monitor            |
       | um pessoa surda         | João Comissão     | atividade com interpretação em Libras  | 2                       | membro da comissão |
-      | mobilidade reduzida     | Pedro Monitor     | ajuda na mobilidade                    | 1                       | monitor            |
-      | deficiente físico       | Carla Comissão    | transporte para deslocamento no evento | 3                       | membro da comissão |
+      | mobilidade reduzida     | Pedro Monitor     | ajuda na mobilidade                    | 3                       | monitor            |
+      | deficiente físico       | Carla Comissão    | transporte para deslocamento no evento | 1                       | membro da comissão |
       | deficiente físico       | Bia Comissão      | ajuda com alimentação e higiene        | 2                       | membro da comissão |
-      | uma pessoa cega         | Lucas Comissão    | programação com audiodescrição         | 2                       | membro da comissão |
+      | uma pessoa cega         | Lucas Comissão    | programação com audiodescrição         | 1                       | membro da comissão |
       | neurodivergente         | Fábio Monitor     | suporte para pessoas neurodivergentes  | 1                       | monitor            |
       | uma pessoa surdocega    | Maria Comissão    | guia-intérprete                        | 1                       | membro da comissão |
 
   Regra: PCD precisa receber mensagem informando que ele está na fila de espera
       Cenário de Fundo: Dado que PCD recebeu a mensagem "<opção de serviço>"
-        E não tem atendente disponível
+        E não que tem atendente disponível
 
       Esquema do Cenário: PCD entra na fila de espera
         Quando PCD envia mensagem "<servico_desejado>"

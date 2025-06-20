@@ -74,6 +74,11 @@ sealed class ServiceType(
                 .filterIsInstance<MonitorServiceType>()
                 .first { it.monitorAssistanceType == monitorAssistanceType } as ServiceType
         }
+        fun getByDescription(description: String): ServiceType {
+            return ServiceType::class.sealedSubclasses
+                .mapNotNull { it.objectInstance }
+                .first { it.description == description } as ServiceType
+        }
     }
 }
 interface MonitorServiceType {

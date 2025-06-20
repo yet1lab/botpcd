@@ -2,16 +2,14 @@ package ufrpe.sbpc.botpcd
 
 import com.whatsapp.api.domain.webhook.Value
 import com.whatsapp.api.domain.webhook.WebHook
+import io.cucumber.java.After
 import io.cucumber.java.pt.Dado
 import io.cucumber.java.pt.Entao
 import io.cucumber.java.pt.Quando
-import org.springframework.transaction.annotation.Transactional
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.context.annotation.Scope
-import org.springframework.stereotype.Component
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -22,6 +20,7 @@ import ufrpe.sbpc.botpcd.entity.Disability
 import ufrpe.sbpc.botpcd.entity.MessageExchange
 import ufrpe.sbpc.botpcd.entity.Monitor
 import ufrpe.sbpc.botpcd.entity.MonitorAssistanceType
+import ufrpe.sbpc.botpcd.entity.MonitorServiceType
 import ufrpe.sbpc.botpcd.entity.PWD
 import ufrpe.sbpc.botpcd.entity.Provider
 import ufrpe.sbpc.botpcd.entity.ServiceType
@@ -46,7 +45,7 @@ class StepDefinitions(
     val committeeMemberRepository: CommitteeMemberRepository,
     val attendantRepository: AttendantRepository,
     val attendanceService: AttendanceService,
-    val attendanceRepository: AttendanceRepository
+    val attendanceRepository: AttendanceRepository,
 ) {
     private var currentBotNumber: String = "15556557522"
     private val numberUserNotRegister: String = "558187654321"
@@ -71,6 +70,98 @@ class StepDefinitions(
     fun pcdEstaCadastrado() {
         // Implementar lógica para garantir que o PCD está cadastrado no sistema
         // Ex: pwdRepository.save(PWD(name = "PCD Teste Completo", phoneNumber = numberUserNotRegister, disabilities = mutableSetOf(Disability.DEAFNESS)))
+    }
+    @Dado("que não tem atendente disponível")
+    fun `que não tem atendente disponível`() {
+
+    }
+    @Dado("que {string} PCD recebeu mensagem de opcções de serviço")
+    fun `pcd recebue mensagem de opção de serviço`(adjetivoPCD: String) {
+        // ver se existe ou crirar um pcd com adjetivoPCD
+        val pwd = createPWDIfNotExists(phoneNumber = pwdAcessarServicesPhoneNumber,  Disability.getByAdjective(adjetivoPCD))
+        val servicesText = attendanceService.createSendServicesMessage(pwd.disabilities.first(), pwd)
+        messageExchangeRepository.save(
+            MessageExchange(
+                fromPhoneNumber = currentBotNumber,
+                toPhoneNumber = pwdAcessarServicesPhoneNumber,
+                message = servicesText
+            )
+        )
+        // pegar no proprio código qual seria a mensagem de serviço
+    }
+    @After
+    fun cleanup() {
+        // Esta linha deleta os dados em uma ordem que evita erros de chave estrangeira
+        listOf(attendanceRepository, messageExchangeRepository, monitorRepository, committeeMemberRepository, pwdRepository, attendantRepository).forEach { it.deleteAllInBatch() }
+    }
+
+    /**
+     * Cria um atendente (Monitor ou Membro da Comissão) com o nome especificado,
+     * define seu status como DISPONÍVEL e garante que ele seja elegível para
+     * o serviço desejado. Também simula uma mensagem recente do atendente para
+     * que o sistema o considere ativo.
+     */
+    @Dado("atendente que se chama {string} está disponível para o {string}")
+    fun `atendente está disponível`(nomeAtendente: String, servicoDesejado: String) {
+        // Gera um número de telefone único para o atendente para evitar conflitos
+        attendantRepository.findByPhoneNumber(currentTestAttendantPhoneNumber)?.let { attendantRepository.delete(it) }
+        val serviceType = ServiceType.getByDescription(servicoDesejado)
+        val tipoAtendente = if (nomeAtendente.contains("Monitor", ignoreCase = true)) "monitor" else "membro da comissão"
+        val attendant: Attendant = when (tipoAtendente) {
+            "monitor" -> {
+                val monitorService = serviceType as? MonitorServiceType
+                    ?: throw IllegalArgumentException("Serviço '$servicoDesejado' não é compatível com Monitor")
+                monitorRepository.save(
+                    Monitor(
+                        name = nomeAtendente,
+                        phoneNumber = currentTestAttendantPhoneNumber,
+                        status = UserStatus.AVAILABLE,
+                        assistanceType = monitorService.monitorAssistanceType
+                    )
+                )
+            }
+            "membro da comissão" -> {
+                committeeMemberRepository.save(
+                    CommitteeMember(
+                        name = nomeAtendente,
+                        phoneNumber = currentTestAttendantPhoneNumber,
+                        status = UserStatus.AVAILABLE
+                    )
+                )
+            }
+            else -> throw IllegalArgumentException("Tipo de atendente desconhecido: $tipoAtendente")
+        }
+        messageExchangeRepository.save(
+            MessageExchange(
+                fromPhoneNumber = currentTestAttendantPhoneNumber,
+                toPhoneNumber = currentBotNumber,
+                message = "teste "
+            )
+        )
+        // Simula que o atendente enviou uma mensagem recentemente para ser considerado ativo
+        mockUserRecievedMessage(attendant.phoneNumber, "Estou online")
+    }
+
+    /**
+     * Simula o envio de uma mensagem pelo PCD para selecionar um serviço.
+     * O número do serviço corresponde à opção na lista de serviços recebida.
+     */
+    @Quando("{string} PCD envia a mensagem {string}")
+    fun `pcd envia mensagem de serviço`(adjetivoPCD: String, numeroServico: String) {
+        // O adjetivoPCD é usado para contexto, o número de telefone identifica o usuário
+        val pwd = createPWDIfNotExists(phoneNumber = pwdAcessarServicesPhoneNumber,  Disability.getByAdjective(adjetivoPCD))
+        userSendMessage(numeroServico, pwd.phoneNumber)
+    }
+
+    /**
+     * Verifica se o PCD recebeu a mensagem correta informando qual atendente
+     * irá realizar o seu atendimento.
+     */
+    @Entao("{string} PCD receberá mensagem {string}")
+    fun `pcd recebe mensagem de direcionamento`(adjetivoPCD: String, mensagemEsperada: String) {
+        // O adjetivoPCD é usado para contexto, a verificação é feita pelo número de telefone
+        testarUltimaMensagemRecebidaDoUsuario(mensagemEsperada, pwdAcessarServicesPhoneNumber)
+
     }
 
     @Dado("usuário não cadastrado")
@@ -287,7 +378,14 @@ class StepDefinitions(
         assertTrue(attendant != null, "Atendente com número $currentTestAttendantPhoneNumber não encontrado no banco de dados.")
         assertEquals(statusNovoEsperado, attendant!!.status, "Status do atendente não foi atualizado corretamente para $statusNovoEsperado. Estava ${attendant.status}.")
     }
-
+    fun createPWDIfNotExists(phoneNumber: String, disability: Disability): PWD {
+        var pwd = pwdRepository.findByPhoneNumber(phoneNumber)
+        if(pwd == null) {
+            return pwdRepository.save(PWD(phoneNumber = phoneNumber, disabilities = mutableSetOf(disability)))
+        } else {
+            return pwd
+        }
+    }
     fun mockUserRecievedMessage(userNumber: String, message: String) {
         messageExchangeRepository.save(
             MessageExchange(
