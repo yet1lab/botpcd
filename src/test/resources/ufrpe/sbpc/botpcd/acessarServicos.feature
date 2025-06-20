@@ -18,6 +18,7 @@ Funcionalidade: Acessar serviços de assistência
   Esquema do Cenário: Direcionar para o atendente(monitor ou membro da comissão)
     Dado que "<adjetivo_da_deficiencia>" PCD recebeu mensagem de opcções de serviço
     E atendente que se chama "<nome_do_atendente>" está disponível para o "<servico_desejado>"
+    E atendente enviou uma mensagem nas ultimas 24 horas para o bot
     Quando "<adjetivo_da_deficiencia>" PCD envia a mensagem "<numero_servico_desejado>"
     Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem "O <tipo_de_atendente> <nome_do_atendente> irá realizar seu atendimento."
 
