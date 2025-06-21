@@ -94,6 +94,16 @@ class StepDefinitions(
         // Esta linha deleta os dados em uma ordem que evita erros de chave estrangeira
         listOf(attendanceRepository, messageExchangeRepository, monitorRepository, committeeMemberRepository, pwdRepository, attendantRepository).forEach { it.deleteAllInBatch() }
     }
+    @Dado("atendente que se chama {string} enviou uma mensagem nas ultimas 24 horas para o bot")
+    fun `atendente enviou uma mensagem nas ultimas 24 horas`(nomeAtendente: String) {
+        messageExchangeRepository.save(
+            MessageExchange(
+                fromPhoneNumber = currentTestAttendantPhoneNumber,
+                toPhoneNumber = currentBotNumber,
+                message = "teste "
+            )
+        )
+    }
 
     /**
      * Cria um atendente (Monitor ou Membro da Comissão) com o nome especificado,
@@ -131,13 +141,6 @@ class StepDefinitions(
             }
             else -> throw IllegalArgumentException("Tipo de atendente desconhecido: $tipoAtendente")
         }
-        messageExchangeRepository.save(
-            MessageExchange(
-                fromPhoneNumber = currentTestAttendantPhoneNumber,
-                toPhoneNumber = currentBotNumber,
-                message = "teste "
-            )
-        )
         // Simula que o atendente enviou uma mensagem recentemente para ser considerado ativo
         mockUserRecievedMessage(attendant.phoneNumber, "Estou online")
     }
