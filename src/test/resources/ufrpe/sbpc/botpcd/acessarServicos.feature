@@ -24,32 +24,53 @@ Funcionalidade: Acessar serviços de assistência
 
     Exemplos:
       | adjetivo_da_deficiencia | nome_do_atendente | servico_desejado                       | numero_servico_desejado | tipo_de_atendente  |
+      # Deficiência Auditiva
       | um pessoa surda         | Ana Monitor       | informações em Libras                  | 1                       | monitor            |
       | um pessoa surda         | João Comissão     | atividade com interpretação em Libras  | 2                       | membro da comissão |
-      | mobilidade reduzida     | Pedro Monitor     | ajuda na mobilidade                    | 3                       | monitor            |
-      | deficiente físico       | Carla Comissão    | transporte para deslocamento no evento | 1                       | membro da comissão |
+      # Mobilidade Reduzida
+      | mobilidade reduzida     | Pedro Monitor     | ajuda na mobilidade                    | 1                       | monitor            |
+      | mobilidade reduzida     | Bia Comissão      | ajuda com alimentação e higiene        | 2                       | membro da comissão |
+      | mobilidade reduzida     | Carla Comissão    | transporte para deslocamento no evento | 3                       | membro da comissão |
+      # Deficiência Física
+      | deficiente físico       | Pedro Monitor     | ajuda na mobilidade                    | 1                       | monitor            |
       | deficiente físico       | Bia Comissão      | ajuda com alimentação e higiene        | 2                       | membro da comissão |
-      | uma pessoa cega         | Lucas Comissão    | programação com audiodescrição         | 1                       | membro da comissão |
+      | deficiente físico       | Carla Comissão    | transporte para deslocamento no evento | 3                       | membro da comissão |
+      # Deficiência Visual
+      | uma pessoa cega         | Pedro Monitor     | ajuda na mobilidade                    | 1                       | monitor            |
+      | uma pessoa cega         | Lucas Comissão    | programação com audiodescrição         | 2                       | membro da comissão |
+      # Neurodivergente
       | neurodivergente         | Fábio Monitor     | suporte para pessoas neurodivergentes  | 1                       | monitor            |
+      # Surdocegueira
       | uma pessoa surdocega    | Maria Comissão    | guia-intérprete                        | 1                       | membro da comissão |
 
-  Regra: PCD precisa receber mensagem informando que ele está na fila de espera
-      Cenário de Fundo: Dado que PCD recebeu a mensagem "<opção de serviço>"
-        E não que tem atendente disponível
 
-      Esquema do Cenário: PCD entra na fila de espera
-        Quando PCD envia mensagem "<servico_desejado>"
-        Entao PCD receberá mensagem "No momento não há atendentes disponíveis. Por favor, aguarde na fila de espera e retornaremos assim que possível."
-        Exemplos:
-          | servico_desejado       |                    |
-          | Informações em Libras  | monitor            |
-          | Intérprete de Libras   | membro da comissão |
-          | Assistência mobilidade | monitor            |
-          | carro                  | membro da comissão |
-          | Higiene e Nutrição     | membro da comissão |
-          | Audiodescrição         | membro da comissão |
-          | Apoio Neurodivergente  | monitor            |
-          | Guia-intérprete        | membro da comissão |
+  Regra: PCD precisa receber mensagem informando que ele está na fila de espera
+    Esquema do Cenário: PCD entra na fila de espera ao solicitar um serviço
+      Dado que "<adjetivo_da_deficiencia>" PCD recebeu mensagem de opcções de serviço
+      E que nenhum atendente para o "<servico_desejado>" está disponível
+      Quando "<adjetivo_da_deficiencia>" PCD envia a mensagem "<numero_servico_desejado>"
+      Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem "No momento não há atendentes disponíveis. Por favor, aguarde na fila de espera e retornaremos assim que possível."
+
+      Exemplos:
+        | adjetivo_da_deficiencia | servico_desejado                       | numero_servico_desejado |
+        # Deficiência Auditiva
+        | um pessoa surda         | informações em Libras                  | 1                       |
+        | um pessoa surda         | atividade com interpretação em Libras  | 2                       |
+        # Mobilidade Reduzida
+        | mobilidade reduzida     | ajuda na mobilidade                    | 1                       |
+        | mobilidade reduzida     | ajuda com alimentação e higiene        | 2                       |
+        | mobilidade reduzida     | transporte para deslocamento no evento | 3                       |
+        # Deficiência Física
+        | deficiente físico       | ajuda na mobilidade                    | 1                       |
+        | deficiente físico       | ajuda com alimentação e higiene        | 2                       |
+        | deficiente físico       | transporte para deslocamento no evento | 3                       |
+        # Deficiência Visual
+        | uma pessoa cega         | ajuda na mobilidade                    | 1                       |
+        | uma pessoa cega         | programação com audiodescrição         | 2                       |
+        # Neurodivergente
+        | neurodivergente         | suporte para pessoas neurodivergentes  | 1                       |
+        # Surdocegueira
+        | uma pessoa surdocega    | guia-intérprete                        | 1                       |
 
       Cenário: PCD está na fila de espera e manda mensagem novamente
         Dado PCD possuia serviço requisitado que ainda não foi iniciado
