@@ -95,18 +95,29 @@ Funcionalidade: Acessar serviços de assistência
     Quando atendente encerrou o atendimento
     Entao pcd receberá mensagem "Atendimento Encerrado"
 
-  Esquema do Cenário: Atendete quando entra no estado disponível é direcionado para o pcd
-    Dado pcd que solicitou <tipo_de_servico> estava na fila de espera
-    Quando atendente do <tipo_de_atendente> muda para o estado disponível
-    Entao atendente do <tipo_de_atendente> será direcionado para o pcd
+    Esquema do Cenário: Atendente disponível é direcionado para PCD na fila de espera
+      Dado que "<adjetivo_da_deficiencia>" PCD solicitou o serviço "<servico_desejado>" e está na fila de espera
+      E que o atendente "<nome_do_atendente>" do tipo "<tipo_de_atendente>" estava indisponível
+      Quando o atendente "<nome_do_atendente>" fica disponível
+      Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem "O <tipo_de_atendente> <nome_do_atendente> irá realizar seu atendimento."
 
-    Exemplos:
-      | tipo_de_servico       | tipo_de_atendente    |
-      | Libras                | MONITOR              |
-      | LibrasInterpreter     | COMMITTEE_MEMBER     |
-      | Mobility              | MONITOR              |
-      | AudioDescription      | COMMITTEE_MEMBER     |
-      | NeurodivergentSupport | MONITOR              |
-      | GuideInterpreter      | COMMITTEE_MEMBER     |
-      | HygieneAndNutrition   | COMMITTEE_MEMBER     |
-      | Car                   | COMMITTEE_MEMBER     |
+      Exemplos:
+        | adjetivo_da_deficiencia | servico_desejado                       | nome_do_atendente | tipo_de_atendente  |
+      # Deficiência Auditiva
+        | um pessoa surda         | informações em Libras                  | Ana Monitor       | monitor            |
+        | um pessoa surda         | atividade com interpretação em Libras  | João Comissão     | membro da comissão |
+      # Mobilidade Reduzida
+        | mobilidade reduzida     | ajuda na mobilidade                    | Pedro Monitor     | monitor            |
+        | mobilidade reduzida     | ajuda com alimentação e higiene        | Bia Comissão      | membro da comissão |
+        | mobilidade reduzida     | transporte para deslocamento no evento | Carla Comissão    | membro da comissão |
+      # Deficiência Física
+        | deficiente físico       | ajuda na mobilidade                    | Pedro Monitor     | monitor            |
+        | deficiente físico       | ajuda com alimentação e higiene        | Bia Comissão      | membro da comissão |
+        | deficiente físico       | transporte para deslocamento no evento | Carla Comissão    | membro da comissão |
+      # Deficiência Visual
+        | uma pessoa cega         | ajuda na mobilidade                    | Pedro Monitor     | monitor            |
+        | uma pessoa cega         | programação com audiodescrição         | Lucas Comissão    | membro da comissão |
+      # Neurodivergente
+        | neurodivergente         | suporte para pessoas neurodivergentes  | Fábio Monitor     | monitor            |
+      # Surdocegueira
+        | uma pessoa surdocega    | guia-intérprete                        | Maria Comissão    | membro da comissão |
