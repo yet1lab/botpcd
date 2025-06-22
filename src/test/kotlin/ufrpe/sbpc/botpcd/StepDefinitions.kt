@@ -56,7 +56,12 @@ class StepDefinitions(
 
     val logger: Logger = LoggerFactory.getLogger(StepDefinitions::class.java)
 
-    @Dado("usuário recebeu mensagem {string}")
+		@Dado("que nenhum atendente para o {string} está disponível")
+		fun nenhumAtendenteDisponivel(servicoDescricao: String) {
+			// repositorio comeca vazio, nao precisa fazer nada
+		}
+
+		@Dado("usuário recebeu mensagem {string}")
     fun `usuário recebeu mensagem`(message: String) {
         mockUserRecievedMessage(numberUserNotRegister, message)
     }
