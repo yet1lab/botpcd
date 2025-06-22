@@ -56,6 +56,40 @@ class StepDefinitions(
 
     val logger: Logger = LoggerFactory.getLogger(StepDefinitions::class.java)
 
+		@Dado("que {string} PCD solicitou o serviço {string} e está na fila de espera")
+		fun pcdSolicitouServicoFila(adjetivoDeficiencia: String, servicoDescricao: String) {
+				val service = ServiceType.getByDescription(servicoDescricao)
+
+				// Usa o método do enum para buscar pela forma textual do adjetivo
+				val disability = Disability.getByAdjective(adjetivoDeficiencia)
+				val phone = "81999999999"
+
+				// Cria ou reutiliza o PCD
+				val pcd = pwdRepository.findByPhoneNumber(phone) ?: pwdRepository.save(
+						PWD(
+								name = "PCD $adjetivoDeficiencia",
+								phoneNumber = phone,
+								disabilities = setOf(disability)
+						)
+				)
+
+				// Garante que existe uma solicitação em espera (não iniciada)
+				if (attendanceRepository.findRequestAttendanceOfPwd(pcd) == null) {
+						attendanceRepository.save(
+								Attendance(
+										pwd = pcd,
+										serviceType = service,
+										attendantType = service.attendantType,
+										attendant = null,
+										endDateTime = null,
+										startDateTime = null,
+										serviceLocation = null,
+										monitorArrivalDateTime = null
+								)
+						)
+				}
+		}
+	
 		@Dado("PCD possuia serviço requisitado que ainda não foi iniciado")
 		fun pcdPossuiServicoRequisitadoNaoIniciado() {
 				val phone = "81999999999"
