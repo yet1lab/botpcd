@@ -56,24 +56,22 @@ class StepDefinitions(
 
     val logger: Logger = LoggerFactory.getLogger(StepDefinitions::class.java)
 
-		@Dado("que o atendente {string} do tipo {string} estava indisponível")
-		fun atendenteIndisponivel(nome: String, tipoDeAtendente: String) {
-				val phone = "9999-${nome.replace(" ", "_")}"
 
-				// Mapeia diretamente o texto para o enum
+		@Dado("que o atendente {string} de {string} do tipo {string} estava indisponível")
+		fun atendenteIndisponivel(nome: String, numero: String, tipoDeAtendente: String) {
+
 				val provider = when (tipoDeAtendente.lowercase()) {
 						"monitor" -> Provider.MONITOR
 						"membro da comissão" -> Provider.COMMITTEE_MEMBER
 						else -> throw IllegalArgumentException("Tipo de atendente desconhecido: $tipoDeAtendente")
 				}
 
-				// Cria ou atualiza o atendente indisponível diretamente
 				if (provider == Provider.MONITOR) {
-						val monitor = monitorRepository.findByPhoneNumber(phone)
+						val monitor = monitorRepository.findByPhoneNumber(numero)
 								?: monitorRepository.save(
 										Monitor(
 												name = nome,
-												phoneNumber = phone,
+												phoneNumber = numero,
 												status = UserStatus.UNAVAILABLE,
 												assistanceType = MonitorAssistanceType.NEURODIVERGENT_SUPPORT_MONITOR // ou ajuste se quiser
 										)
@@ -81,12 +79,12 @@ class StepDefinitions(
 						monitor.status = UserStatus.UNAVAILABLE
 						monitorRepository.save(monitor)
 				} else if (provider == Provider.COMMITTEE_MEMBER) {
-						val member = attendantRepository.findByPhoneNumber(phone)
+						val member = attendantRepository.findByPhoneNumber(numero)
 								?: attendantRepository.save(
 										CommitteeMember(
 												name = nome,
-												phoneNumber = phone,
-												status = UserStatus.UNAVAILABLE,
+												phoneNumber = numero,
+												status = UserStatus.UNAVAILABLE
 										)
 								)
 						member.status = UserStatus.UNAVAILABLE
