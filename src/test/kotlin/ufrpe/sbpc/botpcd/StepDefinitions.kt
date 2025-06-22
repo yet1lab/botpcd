@@ -56,6 +56,39 @@ class StepDefinitions(
 
     val logger: Logger = LoggerFactory.getLogger(StepDefinitions::class.java)
 
+		@Dado("PCD possuia serviço requisitado que ainda não foi iniciado")
+		fun pcdPossuiServicoRequisitadoNaoIniciado() {
+				val phone = "81999999999"
+				val service = ServiceType.NeurodivergentSupport
+				val disabilities = service.disability
+
+				// Reutiliza ou cria o PCD com deficiências compatíveis com o serviço
+				val pcd = pwdRepository.findByPhoneNumber(phone) ?: pwdRepository.save(
+						PWD(
+								name = "PCD Teste",
+								phoneNumber = phone,
+								disabilities = disabilities
+						)
+				)
+
+				// Evita criar duplicata se já existir
+				val existente = attendanceRepository.findRequestAttendanceOfPwd(pcd)
+				if (existente == null) {
+						attendanceRepository.save(
+								Attendance(
+										pwd = pcd,
+										serviceType = service,
+										attendantType = service.attendantType,
+										attendant = null,
+										endDateTime = null,
+										startDateTime = null,
+										serviceLocation = null,
+										monitorArrivalDateTime = null
+								)
+						)
+				}
+		}
+
 		@Dado("que nenhum atendente para o {string} está disponível")
 		fun nenhumAtendenteDisponivel(servicoDescricao: String) {
 			// repositorio comeca vazio, nao precisa fazer nada
