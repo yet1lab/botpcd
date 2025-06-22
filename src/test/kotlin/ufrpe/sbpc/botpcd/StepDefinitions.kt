@@ -92,28 +92,26 @@ class StepDefinitions(
 				}
 		}
 
-		@Quando("o atendente {string} fica disponível")
-		fun atendenteFicaDisponivel(nome: String) {
-				val phone = "9999-${nome.replace(" ", "_")}"
-
-				// Tenta encontrar no repositório de monitores
-				val monitor = monitorRepository.findByPhoneNumber(phone)
+		@Quando("o atendente {string} de {string} fica disponível")
+		fun atendenteFicaDisponivel(nome: String, numero: String) {
+				// Tenta encontrar o atendente no repositório de monitores
+				val monitor = monitorRepository.findByPhoneNumber(numero)
 				if (monitor != null) {
 						monitor.status = UserStatus.AVAILABLE
 						monitorRepository.save(monitor)
 						return
 				}
 
-				// Se não encontrar no repositório de monitores, procura no de membros da comissão
-				val member = attendantRepository.findByPhoneNumber(phone)
+				// Tenta encontrar o atendente no repositório de membros da comissão
+				val member = attendantRepository.findByPhoneNumber(numero)
 				if (member != null) {
 						member.status = UserStatus.AVAILABLE
 						attendantRepository.save(member)
 						return
 				}
 
-				// Se não encontrou em nenhum dos dois
-				throw IllegalArgumentException("Atendente '$nome' não encontrado.")
+				// Se não encontrar nenhum atendente
+				throw IllegalArgumentException("Atendente '$nome' com número '$numero' não encontrado.")
 		}
 
 		@Dado("que {string} PCD solicitou o serviço {string} e está na fila de espera")
