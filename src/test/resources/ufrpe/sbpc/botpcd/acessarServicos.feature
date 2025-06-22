@@ -97,27 +97,28 @@ Funcionalidade: Acessar serviços de assistência
 
     Esquema do Cenário: Atendente disponível é direcionado para PCD na fila de espera
       Dado que "<adjetivo_da_deficiencia>" PCD solicitou o serviço "<servico_desejado>" e está na fila de espera
-      E que o atendente "<nome_do_atendente>" do tipo "<tipo_de_atendente>" estava indisponível
-      Quando o atendente "<nome_do_atendente>" fica disponível
+      E que o atendente "<nome_atendente>" de "<numero_atendente>" do tipo "<tipo_de_atendente>" estava indisponível
+      Quando o atendente "<nome_do_atendente>" de "<numero_atendente>" fica disponível
       Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem "O <tipo_de_atendente> <nome_do_atendente> irá realizar seu atendimento."
 
       Exemplos:
-        | adjetivo_da_deficiencia | servico_desejado                       | nome_do_atendente | tipo_de_atendente  |
+        | adjetivo_da_deficiencia | servico_desejado                       | nome_do_atendente | tipo_de_atendente  |  numero_atendente |
       # Deficiência Auditiva
-        | um pessoa surda         | informações em Libras                  | Ana Monitor       | monitor            |
-        | um pessoa surda         | atividade com interpretação em Libras  | João Comissão     | membro da comissão |
+        | um pessoa surda         | informações em Libras                  | Ana Monitor       | monitor            | (00)00000-0001    |
+        | um pessoa surda         | atividade com interpretação em Libras  | João Comissão     | membro da comissão | (00)00000-0002    |
       # Mobilidade Reduzida
-        | mobilidade reduzida     | ajuda na mobilidade                    | Pedro Monitor     | monitor            |
-        | mobilidade reduzida     | ajuda com alimentação e higiene        | Bia Comissão      | membro da comissão |
-        | mobilidade reduzida     | transporte para deslocamento no evento | Carla Comissão    | membro da comissão |
+        | mobilidade reduzida     | ajuda na mobilidade                    | Pedro Monitor     | monitor            | (00)00000-0003    |
+        | mobilidade reduzida     | ajuda com alimentação e higiene        | Bia Comissão      | membro da comissão | (00)00000-0004    |
+        | mobilidade reduzida     | transporte para deslocamento no evento | Carla Comissão    | membro da comissão | (00)00000-0005    |
       # Deficiência Física
-        | deficiente físico       | ajuda na mobilidade                    | Pedro Monitor     | monitor            |
-        | deficiente físico       | ajuda com alimentação e higiene        | Bia Comissão      | membro da comissão |
-        | deficiente físico       | transporte para deslocamento no evento | Carla Comissão    | membro da comissão |
+        | deficiente físico       | ajuda na mobilidade                    | Pedro Monitor     | monitor            | (00)00000-0006    |
+        | deficiente físico       | ajuda com alimentação e higiene        | Bia Comissão      | membro da comissão | (00)00000-0007    |
+        | deficiente físico       | transporte para deslocamento no evento | Carla Comissão    | membro da comissão | (00)00000-0008    |
       # Deficiência Visual
-        | uma pessoa cega         | ajuda na mobilidade                    | Pedro Monitor     | monitor            |
-        | uma pessoa cega         | programação com audiodescrição         | Lucas Comissão    | membro da comissão |
+        | uma pessoa cega         | ajuda na mobilidade                    | Pedro Monitor     | monitor            | (00)00000-0009    |
+        | uma pessoa cega         | programação com audiodescrição         | Lucas Comissão    | membro da comissão | (00)00000-0010    |
       # Neurodivergente
-        | neurodivergente         | suporte para pessoas neurodivergentes  | Fábio Monitor     | monitor            |
+        | neurodivergente         | suporte para pessoas neurodivergentes  | Fábio Monitor     | monitor            | (00)00000-0011    |
       # Surdocegueira
-        | uma pessoa surdocega    | guia-intérprete                        | Maria Comissão    | membro da comissão |
+				| uma pessoa surdocega    | guia-intérprete                        | Maria Comissão    | membro da comissão | (00)00000-0012    |
+
