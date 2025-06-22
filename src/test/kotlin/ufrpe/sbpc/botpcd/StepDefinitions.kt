@@ -39,7 +39,6 @@ import kotlin.test.assertTrue
 
 class StepDefinitions(
     private val mockMvc: MockMvc,
-		val provider: Provider,
     val pwdRepository: PWDRepository,
     val monitorRepository: MonitorRepository,
     val attendanceService: AttendanceService,
@@ -58,43 +57,41 @@ class StepDefinitions(
     val logger: Logger = LoggerFactory.getLogger(StepDefinitions::class.java)
 
 		@Dado("que o atendente {string} do tipo {string} estava indisponível")
-		fun atendenteIndisponivel(nome: String, tipo: String) {
-			val phone = "9999-${nome.replace(" ", "_")}"
-			val tipo = when (tipo.lowercase()) {
-					"monitor" -> provider.MONITOR
-					"membro da comissão" -> provider.COMMITTEE_MEMBER
-					else -> throw IllegalArgumentException("Tipo de atendente desconhecido: $tipo")
-			}
+		fun atendenteIndisponivel(nome: String, tipoDeAtendente: String) {
+				val phone = "9999-${nome.replace(" ", "_")}"
 
-			when (tipo) {
-					provider.MONITOR -> {
-							val monitor = monitorRepository.findByPhoneNumber(phone)
-									?: monitorRepository.save(
-											Monitor(
-													name = nome,
-													phoneNumber = phone,
-													status = UserStatus.UNAVAILABLE,
-													assistanceType = MonitorAssistanceType.NEURODIVERGENT_SUPPORT_MONITOR // ou escolha correta
-											)
-									)
-							monitor.status = UserStatus.UNAVAILABLE
-							monitorRepository.save(monitor)
-					}
+				// Mapeia diretamente o texto para o enum
+				val provider = when (tipoDeAtendente.lowercase()) {
+						"monitor" -> Provider.MONITOR
+						"membro da comissão" -> Provider.COMMITTEE_MEMBER
+						else -> throw IllegalArgumentException("Tipo de atendente desconhecido: $tipoDeAtendente")
+				}
 
-					provider.COMMITTEE_MEMBER -> {
-							val member = attendantRepository.findByPhoneNumber(phone)
-									?: attendantRepository.save(
-											CommitteeMember(
-													name = nome,
-													phoneNumber = phone,
-													status = UserStatus.UNAVAILABLE,
-													provider = provider
-											)
-									)
-							member.status = UserStatus.UNAVAILABLE
-							attendantRepository.save(member)
-					}
-			}
+				// Cria ou atualiza o atendente indisponível diretamente
+				if (provider == Provider.MONITOR) {
+						val monitor = monitorRepository.findByPhoneNumber(phone)
+								?: monitorRepository.save(
+										Monitor(
+												name = nome,
+												phoneNumber = phone,
+												status = UserStatus.UNAVAILABLE,
+												assistanceType = MonitorAssistanceType.NEURODIVERGENT_SUPPORT_MONITOR // ou ajuste se quiser
+										)
+								)
+						monitor.status = UserStatus.UNAVAILABLE
+						monitorRepository.save(monitor)
+				} else if (provider == Provider.COMMITTEE_MEMBER) {
+						val member = attendantRepository.findByPhoneNumber(phone)
+								?: attendantRepository.save(
+										CommitteeMember(
+												name = nome,
+												phoneNumber = phone,
+												status = UserStatus.UNAVAILABLE,
+										)
+								)
+						member.status = UserStatus.UNAVAILABLE
+						attendantRepository.save(member)
+				}
 		}
 
 		@Dado("que {string} PCD solicitou o serviço {string} e está na fila de espera")
