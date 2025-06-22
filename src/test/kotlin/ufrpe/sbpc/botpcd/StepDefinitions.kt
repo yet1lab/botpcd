@@ -22,9 +22,9 @@ import ufrpe.sbpc.botpcd.entity.Monitor
 import ufrpe.sbpc.botpcd.entity.MonitorAssistanceType
 import ufrpe.sbpc.botpcd.entity.MonitorServiceType
 import ufrpe.sbpc.botpcd.entity.PWD
-import ufrpe.sbpc.botpcd.entity.Provider
 import ufrpe.sbpc.botpcd.entity.ServiceType
 import ufrpe.sbpc.botpcd.entity.UserStatus
+import ufrpe.sbpc.botpcd.entity.Provider
 import ufrpe.sbpc.botpcd.repository.AttendanceRepository
 import ufrpe.sbpc.botpcd.repository.AttendantRepository
 import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
@@ -39,13 +39,14 @@ import kotlin.test.assertTrue
 
 class StepDefinitions(
     private val mockMvc: MockMvc,
+		val provider: Provider,
     val pwdRepository: PWDRepository,
-    val messageExchangeRepository: MessageExchangeRepository,
     val monitorRepository: MonitorRepository,
-    val committeeMemberRepository: CommitteeMemberRepository,
-    val attendantRepository: AttendantRepository,
     val attendanceService: AttendanceService,
+    val attendantRepository: AttendantRepository,
     val attendanceRepository: AttendanceRepository,
+    val messageExchangeRepository: MessageExchangeRepository,
+    val committeeMemberRepository: CommitteeMemberRepository,
 ) {
     private var currentBotNumber: String = "15556557522"
     private val numberUserNotRegister: String = "558187654321"
@@ -55,6 +56,46 @@ class StepDefinitions(
     private val possibleItialsMessages = mutableListOf("Oi", "Olá", "Bom dia", "Boa noite", "Boa Tarde", "teste")
 
     val logger: Logger = LoggerFactory.getLogger(StepDefinitions::class.java)
+
+		@Dado("que o atendente {string} do tipo {string} estava indisponível")
+		fun atendenteIndisponivel(nome: String, tipo: String) {
+			val phone = "9999-${nome.replace(" ", "_")}"
+			val tipo = when (tipo.lowercase()) {
+					"monitor" -> provider.MONITOR
+					"membro da comissão" -> provider.COMMITTEE_MEMBER
+					else -> throw IllegalArgumentException("Tipo de atendente desconhecido: $tipo")
+			}
+
+			when (tipo) {
+					provider.MONITOR -> {
+							val monitor = monitorRepository.findByPhoneNumber(phone)
+									?: monitorRepository.save(
+											Monitor(
+													name = nome,
+													phoneNumber = phone,
+													status = UserStatus.UNAVAILABLE,
+													assistanceType = MonitorAssistanceType.NEURODIVERGENT_SUPPORT_MONITOR // ou escolha correta
+											)
+									)
+							monitor.status = UserStatus.UNAVAILABLE
+							monitorRepository.save(monitor)
+					}
+
+					provider.COMMITTEE_MEMBER -> {
+							val member = attendantRepository.findByPhoneNumber(phone)
+									?: attendantRepository.save(
+											CommitteeMember(
+													name = nome,
+													phoneNumber = phone,
+													status = UserStatus.UNAVAILABLE,
+													provider = provider
+											)
+									)
+							member.status = UserStatus.UNAVAILABLE
+							attendantRepository.save(member)
+					}
+			}
+		}
 
 		@Dado("que {string} PCD solicitou o serviço {string} e está na fila de espera")
 		fun pcdSolicitouServicoFila(adjetivoDeficiencia: String, servicoDescricao: String) {
