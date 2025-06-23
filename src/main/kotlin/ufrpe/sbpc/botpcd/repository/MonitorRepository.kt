@@ -8,6 +8,7 @@ import ufrpe.sbpc.botpcd.entity.UserStatus
 
 interface MonitorRepository : JpaRepository<Monitor, Long>{
     fun findByPhoneNumber(phoneNumber: String): Monitor?
+    fun findByName(phoneName: String): Monitor?
     fun findByStatus(status: UserStatus): List<Monitor>
     @Query("SELECT m from Monitor m where m.status = :status and m.assistanceType = :assistanceType")
     fun findAvailableMonitor(status: UserStatus, assistanceType: MonitorAssistanceType): List<Monitor>

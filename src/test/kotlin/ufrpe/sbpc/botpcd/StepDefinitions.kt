@@ -34,8 +34,11 @@ import ufrpe.sbpc.botpcd.repository.PWDRepository
 import ufrpe.sbpc.botpcd.service.AttendanceService
 import java.io.File
 import java.time.LocalDateTime
+import kotlin.assert
+import kotlin.test.assertFalse
 // import java.math.BigInteger // Não é mais necessário para os steps de atendente
 import kotlin.test.assertTrue
+import kotlin.text.contains
 
 class StepDefinitions(
     private val mockMvc: MockMvc,
@@ -55,9 +58,160 @@ class StepDefinitions(
     private val possibleItialsMessages = mutableListOf("Oi", "Olá", "Bom dia", "Boa noite", "Boa Tarde", "teste")
 
     val logger: Logger = LoggerFactory.getLogger(StepDefinitions::class.java)
+    @Dado("que o atendente {string} de telefone {string} enviou mensagem nas últimas 24 horas")
+    fun `atendente enviou mensagem recente`(nomeAtendente: String, telefoneAtendente: String) {
+        monitorRepository.save(
+            Monitor(
+                name = nomeAtendente,
+                phoneNumber = telefoneAtendente,
+                status = UserStatus.AVAILABLE,
+                assistanceType = MonitorAssistanceType.NEURODIVERGENT_SUPPORT_MONITOR
+            )
+        )
+        userSendMessage("Olá, estou ativo.", telefoneAtendente)
+    }
+
+    @Dado("que o PCD {string} de telefone {string} enviou mensagem nas últimas 24 horas")
+    fun `pcd enviou mensagem recente`(nomePcd: String, telefonePcd: String) {
+        pwdRepository.save(
+            PWD(
+                name = nomePcd,
+                phoneNumber = telefonePcd,
+                disabilities = setOf(Disability.NEURODIVERGENT)
+            )
+        )
+        userSendMessage("Olá, estou ativo.", telefonePcd)
+    }
+
+    @Dado(
+        "que o atendente {string} de telefone {string} está em atendimento com o PCD {string} de telefone {string}"
+    )
+    fun atendenteEmAtendimentoComPCD(
+        nomeAtendente: String,
+        telefoneAtendente: String,
+        nomePcd: String,
+        telefonePcd: String
+    ) {
+        val pcd = pwdRepository.findByPhoneNumber(telefonePcd)!!
+        val monitor = monitorRepository.findByPhoneNumber(telefoneAtendente)
+        val attendance = Attendance(
+            serviceType = ServiceType.NeurodivergentSupport,
+            pwd = pcd,
+            attendant = monitor,
+            attendantType = Provider.MONITOR,
+            startDateTime = LocalDateTime.now()
+        )
+        attendanceRepository.save(attendance)
+    }
+
+    @Dado(
+        "que o PCD {string} de telefone {string} não está em atendimento com {string}"
+    )
+    fun pcdNaoEstaEmAtendimentoCom(nomePcd: String, telefonePcd: String, nomeAtendente: String) {
+        val pcd = pwdRepository.findByPhoneNumber(telefonePcd)!!
+        attendanceRepository.deleteAllByPwd(pcd)
+    }
+
+    @Quando("o atendente {string} de telefone {string} envia a mensagem {string}")
+    fun atendenteEnviaMensagem(nomeAtendente: String, telefoneAtendente: String, mensagem: String) {
+        userSendMessage(mensagem, telefoneAtendente)
+    }
+
+    @Entao("o PCD {string} de telefone {string} deve receber a mensagem {string} do atendente {string}")
+    fun pcdDeveReceberMensagemDoAtendente(
+        nomePcd: String,
+        telefonePcd: String,
+        mensagem: String,
+        nomeAtendente: String
+    ) {
+        val telefoneAtendente = monitorRepository.findByName(nomeAtendente)!!.phoneNumber
+        val ultimaMensagem = messageExchangeRepository.lastExchangeMessage(
+            toPhoneNumber = telefonePcd,
+            fromPhoneNumber = telefoneAtendente
+        )
+
+        assert(ultimaMensagem != null && ultimaMensagem!!.message.contains(mensagem)) {
+            "O PCD $nomePcd não recebeu a mensagem esperada \"$mensagem\" do atendente $nomeAtendente."
+        }
+    }
+
+    @Entao("o PCD {string} de telefone {string} não deve receber nenhuma nova mensagem de {string}")
+    fun pcdNaoDeveReceberMensagem(nomePcd: String, telefonePcd: String, nomeAtendete: String) {
+        val attendant = attendantRepository.findByName(nomeAtendete)
+        val lastMessage = messageExchangeRepository.lastExchangeMessage(
+            toPhoneNumber = telefonePcd,
+            fromPhoneNumber = currentBotNumber// Ou ajuste conforme sua lógica para buscar todas
+        )!!.message
+
+        assertFalse (lastMessage!!contains(attendant))
+    }
+
+    @Quando("o atendente {string} de telefone {string} encerra o atendimento")
+    fun atendenteEncerraAtendimento(nomeAtendente: String, telefoneAtendente: String) {
+        userSendMessage("botpcd", telefoneAtendente)
+        userSendMessage("1", telefoneAtendente)
+    }
+
+    @Entao("o PCD {string} de telefone {string} deve receber a mensagem {string} do bot")
+    fun pcdDeveReceberMensagem(nomePcd: String, telefonePcd: String, mensagem: String) {
+        val ultimaMensagem = messageExchangeRepository.lastExchangeMessage(
+            toPhoneNumber = telefonePcd,
+            fromPhoneNumber = currentBotNumber
+        )?.message
+
+        assert(ultimaMensagem != null && ultimaMensagem.contains(mensagem)) {
+            "O PCD $nomePcd não recebeu a mensagem esperada \"$mensagem\"."
+        }
+    }
 
 
-		@Dado("que o atendente {string} de {string} do tipo {string} estava indisponível")
+    @Dado(
+        "que o atendente {string} de telefone {string} está disponível, mas não em atendimento"
+    )
+    fun atendenteDisponivelNaoEmAtendimento(nomeAtendente: String, telefoneAtendente: String) {
+        monitorRepository.findByPhoneNumber(telefoneAtendente) ?: monitorRepository.save(
+            Monitor(
+                name = nomeAtendente,
+                phoneNumber = telefoneAtendente,
+                status = UserStatus.AVAILABLE,
+                assistanceType = MonitorAssistanceType.NEURODIVERGENT_SUPPORT_MONITOR // Tipo genérico
+            )
+        )
+    }
+
+    @Quando("o PCD {string} de telefone {string} envia a mensagem {string}")
+    fun pcdEnviaMensagem(nomePcd: String, telefonePcd: String, mensagem: String) {
+        // O nome do PCD é usado apenas para clareza no teste.
+        userSendMessage(mensagem, telefonePcd)
+    }
+
+    @Entao("o atendente {string} de telefone {string} deve receber a mensagem {string} do PCD {string}")
+    fun atendenteDeveReceberMensagem(
+        nomeAtendente: String,
+        telefoneAtendente: String,
+        mensagem: String,
+        nomePcd: String
+    ) {
+        // O nome do atendente é para clareza no teste.
+        val mensagemEsperada = """
+        *${nomePcd}*:
+        $mensagem
+    """.trimIndent()
+
+        testarUltimaMensagemRecebidaDoUsuario(mensagemEsperada, telefoneAtendente)
+    }
+
+    @Entao("o atendente {string} de telefone {string} não deve receber nenhuma nova mensagem do pcd {string}")
+    fun atendenteNaoDeveReceberMensagem(nomeAtendente: String, telefoneAtendente: String, nomePCD: String) {
+        val lastMensage = messageExchangeRepository.lastExchangeMessage(
+            toPhoneNumber = telefoneAtendente,
+            fromPhoneNumber = currentBotNumber
+        )!!.message
+
+        assertFalse(lastMensage.contains(nomePCD))
+    }
+
+    @Dado("que o atendente {string} de {string} do tipo {string} estava indisponível")
 		fun atendenteIndisponivel(nome: String, numero: String, tipoDeAtendente: String) {
 
 				val provider = when (tipoDeAtendente.lowercase()) {
@@ -147,18 +301,17 @@ class StepDefinitions(
 						)
 				}
 		}
-	
+
 		@Dado("PCD possuia serviço requisitado que ainda não foi iniciado")
 		fun pcdPossuiServicoRequisitadoNaoIniciado() {
-				val phone = "81999999999"
 				val service = ServiceType.NeurodivergentSupport
 				val disabilities = service.disability
 
 				// Reutiliza ou cria o PCD com deficiências compatíveis com o serviço
-				val pcd = pwdRepository.findByPhoneNumber(phone) ?: pwdRepository.save(
+				val pcd = pwdRepository.findByPhoneNumber(pwdAcessarServicesPhoneNumber) ?: pwdRepository.save(
 						PWD(
 								name = "PCD Teste",
-								phoneNumber = phone,
+								phoneNumber = pwdAcessarServicesPhoneNumber,
 								disabilities = disabilities
 						)
 				)
@@ -415,6 +568,15 @@ class StepDefinitions(
             }
             else -> throw IllegalArgumentException("Tipo de atendente desconhecido: $tipoAtendente")
         }
+    }
+    @Quando("PCD mandar qualquer mensagem")
+    fun `PCD mandar qualquer mensagem`() {
+        val message = possibleItialsMessages.random()
+        userSendMessage(message, pwdAcessarServicesPhoneNumber)
+    }
+    @Entao("PCD receberá mensagem {string}")
+    fun `PCD recebera mensagem`(mensagemEsperada: String) {
+        testarUltimaMensagemRecebidaDoUsuario(mensagemEsperada, pwdAcessarServicesPhoneNumber)
     }
     @Dado("que sou um {string} com status inicial {string}")
     fun `que sou um tipo_de_atendente com status inicial`(

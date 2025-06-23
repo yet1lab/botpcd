@@ -25,15 +25,14 @@ Funcionalidade: Acessar serviços de assistência
     Exemplos:
       | adjetivo_da_deficiencia | nome_do_atendente | servico_desejado                       | numero_servico_desejado | tipo_de_atendente  |
       # Deficiência Auditiva
-      | um pessoa surda         | Ana Monitor       | informações em Libras                  | 1                       | monitor            |
-      | um pessoa surda         | João Comissão     | atividade com interpretação em Libras  | 2                       | membro da comissão |
+      | um pessoa surda         | João Comissão     | atividade com interpretação em Libras  | 1                       | membro da comissão |
+      | um pessoa surda         | Ana Monitor       | informações em Libras                  | 2                       | monitor            |
       # Mobilidade Reduzida
       | mobilidade reduzida     | Pedro Monitor     | ajuda na mobilidade                    | 1                       | monitor            |
-      | mobilidade reduzida     | Bia Comissão      | ajuda com alimentação e higiene        | 2                       | membro da comissão |
-      | mobilidade reduzida     | Carla Comissão    | transporte para deslocamento no evento | 3                       | membro da comissão |
+      | mobilidade reduzida     | Carla Comissão    | transporte para deslocamento no evento | 2                       | membro da comissão |
       # Deficiência Física
-      | deficiente físico       | Pedro Monitor     | ajuda na mobilidade                    | 1                       | monitor            |
-      | deficiente físico       | Bia Comissão      | ajuda com alimentação e higiene        | 2                       | membro da comissão |
+      | deficiente físico       | Bia Comissão      | ajuda com alimentação e higiene        | 1                       | membro da comissão |
+      | deficiente físico       | Pedro Monitor     | ajuda na mobilidade                    | 2                       | monitor            |
       | deficiente físico       | Carla Comissão    | transporte para deslocamento no evento | 3                       | membro da comissão |
       # Deficiência Visual
       | uma pessoa cega         | Pedro Monitor     | ajuda na mobilidade                    | 1                       | monitor            |
@@ -52,48 +51,56 @@ Funcionalidade: Acessar serviços de assistência
       Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem "No momento não há atendentes disponíveis. Por favor, aguarde na fila de espera e retornaremos assim que possível."
 
       Exemplos:
-        | adjetivo_da_deficiencia | servico_desejado                       | numero_servico_desejado |
+        | adjetivo_da_deficiencia | nome_do_atendente | servico_desejado                       | numero_servico_desejado |
         # Deficiência Auditiva
-        | um pessoa surda         | informações em Libras                  | 1                       |
-        | um pessoa surda         | atividade com interpretação em Libras  | 2                       |
+        | um pessoa surda         | João Comissão     | atividade com interpretação em Libras  | 1                       |
+        | um pessoa surda         | Ana Monitor       | informações em Libras                  | 2                       |
         # Mobilidade Reduzida
-        | mobilidade reduzida     | ajuda na mobilidade                    | 1                       |
-        | mobilidade reduzida     | ajuda com alimentação e higiene        | 2                       |
-        | mobilidade reduzida     | transporte para deslocamento no evento | 3                       |
+        | mobilidade reduzida     | Pedro Monitor     | ajuda na mobilidade                    | 1                       |
+        | mobilidade reduzida     | Carla Comissão    | transporte para deslocamento no evento | 2                       |
         # Deficiência Física
-        | deficiente físico       | ajuda na mobilidade                    | 1                       |
-        | deficiente físico       | ajuda com alimentação e higiene        | 2                       |
-        | deficiente físico       | transporte para deslocamento no evento | 3                       |
+        | deficiente físico       | Bia Comissão      | ajuda com alimentação e higiene        | 1                       |
+        | deficiente físico       | Pedro Monitor     | ajuda na mobilidade                    | 2                       |
+        | deficiente físico       | Carla Comissão    | transporte para deslocamento no evento | 3                       |
         # Deficiência Visual
-        | uma pessoa cega         | ajuda na mobilidade                    | 1                       |
-        | uma pessoa cega         | programação com audiodescrição         | 2                       |
+        | uma pessoa cega         | Pedro Monitor     | ajuda na mobilidade                    | 1                       |
+        | uma pessoa cega         | Lucas Comissão    | programação com audiodescrição         | 2                       |
         # Neurodivergente
-        | neurodivergente         | suporte para pessoas neurodivergentes  | 1                       |
+        | neurodivergente         | Fábio Monitor     | suporte para pessoas neurodivergentes  | 1                       |
         # Surdocegueira
-        | uma pessoa surdocega    | guia-intérprete                        | 1                       |
+        | uma pessoa surdocega    | Maria Comissão    | guia-intérprete                        | 1                       |
+
 
       Cenário: PCD está na fila de espera e manda mensagem novamente
         Dado PCD possuia serviço requisitado que ainda não foi iniciado
         Quando PCD mandar qualquer mensagem
         Então PCD receberá mensagem "No momento não há atendentes disponíveis. Por favor, aguarde na fila de espera e retornaremos assim que possível."
 
+   Regra: Bot envia mensagem apenas para o usuário que mandaram mensagem nas últimas 24 horas
 
-  Cenário: Bot direciona mensagem do PCD para o atendente correto
-    Dado Atendente aceitou o atendimento do PCD
-    Quando pcd envia qualquer mensagem para o bot
-    Então o Atendente deve receber a mensagem do PCD contendo o nome do PCD
-    E nemhum outro Atendente ou PCD deve receber a mesma mensagem
+     Cenário de Fundo: que o atendente "Carlos" de telefone "558100000001" enviou mensagem nas últimas 24 horas
+       E que o PCD "João" de telefone "558100000002" enviou mensagem nas últimas 24 horas
+       E que o atendente "Ana" de telefone "558100000003" enviou mensagem nas últimas 24 horas
+       E que o PCD "Maria" de telefone "558100000004" enviou mensagem nas útlimas 24 horas
 
-  Cenário: Bot direciona mensagem do atendente para o PCD correto
-    Dado que o Atendente aceitou o atendimento do PCD
-    Quando atendente envia uma mensagem para o bot
-    Então PCD deve receber a mensagem do Atendente contendo nome do atendente
-    E nemhum outro PCD ou Atendente deve receber a mesma mensagem
+     Cenário: Bot direciona mensagem do PCD para o atendente correto
+       Dado que o atendente "Carlos" de telefone "558100000001" está em atendimento com o PCD "João" de telefone "558100000002"
+       E que o atendente "Ana" de telefone "558100000003" está disponível, mas não em atendimento
+       Quando o PCD "João" de telefone "558100000002" envia a mensagem "Onde fica o banheiro mais próximo?"
+       Então o atendente "Carlos" de telefone "558100000001" deve receber a mensagem "Onde fica o banheiro mais próximo?" do PCD "João"
+       E o atendente "Ana" de telefone "558100000003" não deve receber nenhuma nova mensagem do pcd "João"
 
-  Cenario: Avisar que o atendimento foi encerrado
-    Dado atendente estava em atendimento com um pcd
-    Quando atendente encerrou o atendimento
-    Entao pcd receberá mensagem "Atendimento Encerrado"
+     Cenário: Bot direciona mensagem do atendente para o PCD correto em um atendimento ativo
+       Dado que o atendente "Carlos" de telefone "558100000001" está em atendimento com o PCD "João" de telefone "558100000002"
+       E que o PCD "Maria" de telefone "558100000004" não está em atendimento com "Carlos"
+       Quando o atendente "Carlos" de telefone "558100000001" envia a mensagem "Estou a caminho para ajudar."
+       Então o PCD "João" de telefone "558100000002" deve receber a mensagem "Estou a caminho para ajudar." do atendente "Carlos"
+       E o PCD "Maria" de telefone "558100000004" não deve receber nenhuma nova mensagem de "Carlos"
+
+     Cenário: Atendente encerra o atendimento e PCD é notificado
+       Dado que o atendente "Carlos" de telefone "558100000001" está em atendimento com o PCD "João" de telefone "558100000002"
+       Quando o atendente "Carlos" de telefone "558100000001" encerra o atendimento
+       Então o PCD "João" de telefone "558100000002" deve receber a mensagem "Atendimento encerrado" do bot
 
     Esquema do Cenário: Atendente disponível é direcionado para PCD na fila de espera
       Dado que "<adjetivo_da_deficiencia>" PCD solicitou o serviço "<servico_desejado>" e está na fila de espera
@@ -108,7 +115,6 @@ Funcionalidade: Acessar serviços de assistência
         | um pessoa surda         | atividade com interpretação em Libras  | João Comissão     | membro da comissão | (00)00000-0002    |
       # Mobilidade Reduzida
         | mobilidade reduzida     | ajuda na mobilidade                    | Pedro Monitor     | monitor            | (00)00000-0003    |
-        | mobilidade reduzida     | ajuda com alimentação e higiene        | Bia Comissão      | membro da comissão | (00)00000-0004    |
         | mobilidade reduzida     | transporte para deslocamento no evento | Carla Comissão    | membro da comissão | (00)00000-0005    |
       # Deficiência Física
         | deficiente físico       | ajuda na mobilidade                    | Pedro Monitor     | monitor            | (00)00000-0006    |
