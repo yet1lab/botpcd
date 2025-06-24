@@ -51,24 +51,18 @@ Funcionalidade: Acessar serviços de assistência
       Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem "No momento não há atendentes disponíveis. Por favor, aguarde na fila de espera e retornaremos assim que possível."
 
       Exemplos:
-        | adjetivo_da_deficiencia | nome_do_atendente | servico_desejado                       | numero_servico_desejado |
-        # Deficiência Auditiva
-        | um pessoa surda         | João Comissão     | atividade com interpretação em Libras  | 1                       |
-        | um pessoa surda         | Ana Monitor       | informações em Libras                  | 2                       |
-        # Mobilidade Reduzida
-        | mobilidade reduzida     | Pedro Monitor     | ajuda na mobilidade                    | 1                       |
-        | mobilidade reduzida     | Carla Comissão    | transporte para deslocamento no evento | 2                       |
-        # Deficiência Física
-        | deficiente físico       | Bia Comissão      | ajuda com alimentação e higiene        | 1                       |
-        | deficiente físico       | Pedro Monitor     | ajuda na mobilidade                    | 2                       |
-        | deficiente físico       | Carla Comissão    | transporte para deslocamento no evento | 3                       |
-        # Deficiência Visual
-        | uma pessoa cega         | Pedro Monitor     | ajuda na mobilidade                    | 1                       |
-        | uma pessoa cega         | Lucas Comissão    | programação com audiodescrição         | 2                       |
-        # Neurodivergente
-        | neurodivergente         | Fábio Monitor     | suporte para pessoas neurodivergentes  | 1                       |
-        # Surdocegueira
-        | uma pessoa surdocega    | Maria Comissão    | guia-intérprete                        | 1                       |
+        | adjetivo_da_deficiencia | servico_desejado                       | numero_servico_desejado |
+        | um pessoa surda         | atividade com interpretação em Libras  | 1                       |
+        | um pessoa surda         | informações em Libras                  | 2                       |
+        | mobilidade reduzida     | ajuda na mobilidade                    | 1                       |
+        | mobilidade reduzida     | transporte para deslocamento no evento | 2                       |
+        | deficiente físico       | ajuda com alimentação e higiene        | 1                       |
+        | deficiente físico       | ajuda na mobilidade                    | 2                       |
+        | deficiente físico       | transporte para deslocamento no evento | 3                       |
+        | uma pessoa cega         | ajuda na mobilidade                    | 1                       |
+        | uma pessoa cega         | programação com audiodescrição         | 2                       |
+        | neurodivergente         | suporte para pessoas neurodivergentes  | 1                       |
+        | uma pessoa surdocega    | guia-intérprete                        | 1                       |
 
 
       Cenário: PCD está na fila de espera e manda mensagem novamente
@@ -103,29 +97,23 @@ Funcionalidade: Acessar serviços de assistência
        Quando o atendente "Carlos" de telefone "558100000001" encerra o atendimento
        Então o PCD "João" de telefone "558100000002" deve receber a mensagem "Atendimento encerrado" do bot
 
+  Regra: Um atendente fica disponível é redirecionado para um pcd na fila de espera
     Esquema do Cenário: Atendente disponível é direcionado para PCD na fila de espera
-      Dado que "<adjetivo_da_deficiencia>" PCD solicitou o serviço "<servico_desejado>" e está na fila de espera
-      E que o atendente "<nome_atendente>" de "<numero_atendente>" do tipo "<tipo_de_atendente>" estava indisponível
-      Quando o atendente "<nome_do_atendente>" de "<numero_atendente>" fica disponível
-      Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem "O <tipo_de_atendente> <nome_do_atendente> irá realizar seu atendimento."
+     Dado que "<adjetivo_da_deficiencia>" PCD de número "<numero_pcd>" solicitou o serviço "<servico_desejado>" e está na fila de espera
+     E que o atendente "<nome_do_atendente>" de "<numero_atendente>" do tipo "<tipo_de_atendente>" que presta serviço "<servico_desejado>" estava indisponível
+     Quando o atendente "<nome_do_atendente>" de "<numero_atendente>" fica disponível
+     Então "<adjetivo_da_deficiencia>" PCD de número "<numero_pcd>" receberá mensagem "O <tipo_de_atendente> <nome_do_atendente> irá realizar seu atendimento."
 
-      Exemplos:
-        | adjetivo_da_deficiencia | servico_desejado                       | nome_do_atendente | tipo_de_atendente  |  numero_atendente |
-      # Deficiência Auditiva
-        | um pessoa surda         | informações em Libras                  | Ana Monitor       | monitor            | (00)00000-0001    |
-        | um pessoa surda         | atividade com interpretação em Libras  | João Comissão     | membro da comissão | (00)00000-0002    |
-      # Mobilidade Reduzida
-        | mobilidade reduzida     | ajuda na mobilidade                    | Pedro Monitor     | monitor            | (00)00000-0003    |
-        | mobilidade reduzida     | transporte para deslocamento no evento | Carla Comissão    | membro da comissão | (00)00000-0005    |
-      # Deficiência Física
-        | deficiente físico       | ajuda na mobilidade                    | Pedro Monitor     | monitor            | (00)00000-0006    |
-        | deficiente físico       | ajuda com alimentação e higiene        | Bia Comissão      | membro da comissão | (00)00000-0007    |
-        | deficiente físico       | transporte para deslocamento no evento | Carla Comissão    | membro da comissão | (00)00000-0008    |
-      # Deficiência Visual
-        | uma pessoa cega         | ajuda na mobilidade                    | Pedro Monitor     | monitor            | (00)00000-0009    |
-        | uma pessoa cega         | programação com audiodescrição         | Lucas Comissão    | membro da comissão | (00)00000-0010    |
-      # Neurodivergente
-        | neurodivergente         | suporte para pessoas neurodivergentes  | Fábio Monitor     | monitor            | (00)00000-0011    |
-      # Surdocegueira
-				| uma pessoa surdocega    | guia-intérprete                        | Maria Comissão    | membro da comissão | (00)00000-0012    |
-
+     Exemplos:
+       | adjetivo_da_deficiencia | numero_pcd   | servico_desejado                       | nome_do_atendente | tipo_de_atendente  | numero_atendente |
+       | um pessoa surda         | 558100000021 | informações em Libras                  | Sara Monitor      | monitor            | 558100000031     |
+       | um pessoa surda         | 558100000022 | atividade com interpretação em Libras  | João Comissão     | membro da comissão | 558100000002     |
+       | mobilidade reduzida     | 558100000023 | ajuda na mobilidade                    | Joana Monitor     | monitor            | 558100000033     |
+       | mobilidade reduzida     | 558100000024 | transporte para deslocamento no evento | Carla Comissão    | membro da comissão | 558100000005     |
+       | deficiente físico       | 558100000025 | ajuda na mobilidade                    | Pedro Monitor     | monitor            | 558100000006     |
+       | deficiente físico       | 558100000026 | ajuda com alimentação e higiene        | Bia Comissão      | membro da comissão | 558100000007     |
+       | deficiente físico       | 558100000027 | transporte para deslocamento no evento | Carla Comissão    | membro da comissão | 558100000008     |
+       | uma pessoa cega         | 558100000028 | ajuda na mobilidade                    | Pedro Monitor     | monitor            | 558100000009     |
+       | uma pessoa cega         | 558100000029 | programação com audiodescrição         | Lucas Comissão    | membro da comissão | 558100000010     |
+       | neurodivergente         | 558100000030 | suporte para pessoas neurodivergentes  | Fábio Monitor     | monitor            | 558100000011     |
+       | uma pessoa surdocega    | 558100000031 | guia-intérprete                        | Maria Comissão    | membro da comissão | 558100000012     |
