@@ -160,7 +160,6 @@ class StepDefinitions(
         }
     }
 
-
     @Dado(
         "que o atendente {string} de telefone {string} está disponível, mas não em atendimento"
     )
@@ -315,7 +314,7 @@ class StepDefinitions(
 
     }
 
-    @Dado("que {string} PCD recebeu mensagem de opcções de serviço")
+    @Dado("que {string} PCD recebeu mensagem de opções de serviço")
     fun `pcd recebue mensagem de opção de serviço`(adjetivoPCD: String) {
         // ver se existe ou crirar um pcd com adjetivoPCD
         val pwd =
@@ -508,7 +507,7 @@ class StepDefinitions(
         )
     }
 
-    @Entao("{string} PCD receberá mensagem de opcções de serviço {string}")
+    @Entao("{string} PCD receberá mensagem de opções de serviço {string}")
     fun `bot enviará opcçoes de seviço de acordo com a deficiência do pcd`(
         tipoDeDeficiencia: String,
         opcoesDeServico: String

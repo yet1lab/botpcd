@@ -4,10 +4,10 @@ Funcionalidade: Acessar serviços de assistência
 
   Esquema do Cenário Listar serviços de acordo com meu tipo de deficiência
     Quando PCD "<adjetivo_da_deficiencia>" mandar qualquer mensagem
-    Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem de opcções de serviço "<opcções_de_serviço>"
+    Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem de opções de serviço "<opções_de_serviço>"
 
     Exemplos:
-      | adjetivo_da_deficiencia | opcções_de_serviço                                                                         |
+      | adjetivo_da_deficiencia | opções_de_serviço                                                                         |
       | um pessoa surda         | informações em Libras,atividade com interpretação em Libras                                |
       | mobilidade reduzida     | ajuda na mobilidade,transporte para deslocamento no evento                                 |
       | deficiente físico       | ajuda na mobilidade,ajuda com alimentação e higiene,transporte para deslocamento no evento |
@@ -16,7 +16,7 @@ Funcionalidade: Acessar serviços de assistência
       | uma pessoa surdocega    | guia-intérprete                                                                            |
 
   Esquema do Cenário: Direcionar para o atendente(monitor ou membro da comissão)
-    Dado que "<adjetivo_da_deficiencia>" PCD recebeu mensagem de opcções de serviço
+    Dado que "<adjetivo_da_deficiencia>" PCD recebeu mensagem de opções de serviço
     E atendente que se chama "<nome_do_atendente>" está disponível para o "<servico_desejado>"
     E atendente que se chama "<nome_do_atendente>" enviou uma mensagem nas ultimas 24 horas para o bot
     Quando "<adjetivo_da_deficiencia>" PCD envia a mensagem "<numero_servico_desejado>"
@@ -45,7 +45,7 @@ Funcionalidade: Acessar serviços de assistência
 
   Regra: PCD precisa receber mensagem informando que ele está na fila de espera
     Esquema do Cenário: PCD entra na fila de espera ao solicitar um serviço
-      Dado que "<adjetivo_da_deficiencia>" PCD recebeu mensagem de opcções de serviço
+      Dado que "<adjetivo_da_deficiencia>" PCD recebeu mensagem de opções de serviço
       E que nenhum atendente para o "<servico_desejado>" está disponível
       Quando "<adjetivo_da_deficiencia>" PCD envia a mensagem "<numero_servico_desejado>"
       Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem "No momento não há atendentes disponíveis. Por favor, aguarde na fila de espera e retornaremos assim que possível."
