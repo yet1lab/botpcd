@@ -5,9 +5,9 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import ufrpe.sbpc.botpcd.entity.Attendance
-import ufrpe.sbpc.botpcd.entity.ServiceType
 import ufrpe.sbpc.botpcd.entity.Attendant
 import ufrpe.sbpc.botpcd.entity.PWD
+import ufrpe.sbpc.botpcd.entity.ServiceType
 import java.time.LocalDateTime
 
 interface AttendanceRepository : JpaRepository<Attendance, Long> {
@@ -38,4 +38,8 @@ interface AttendanceRepository : JpaRepository<Attendance, Long> {
 	@Modifying(flushAutomatically = true, clearAutomatically = true) // Modificação aqui
 	@Query("DELETE FROM Attendance a WHERE a.pwd = :pwd")
 	fun deleteAllByPwd(@Param("pwd") pwd: PWD)
+
+	@Modifying(flushAutomatically = true, clearAutomatically = true) // Modificação aqui
+	@Query("DELETE FROM Attendance a WHERE a.attendant = :att")
+	fun deleteAllByAttendant(@Param("att") att: Attendant)
 }

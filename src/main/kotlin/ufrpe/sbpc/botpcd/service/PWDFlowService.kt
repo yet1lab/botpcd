@@ -37,14 +37,6 @@ class PWDFlowService(
                 whatsappService.sendMessage(botNumber, phoneNumber, "Cadastro realizado.")
                 attendanceService.sendServices(botNumber, pwd)
             }
-            isChoosingService(lastBotMessage, pwd) -> {
-                if (isValidService(message, disability)) {
-                    val service = ServiceType.getServicesByDisability(disability)[message.toInt() - 1]
-                    attendanceService.startAttendance(pwd = pwd, botNumber = botNumber, service = service)
-                } else {
-                    attendanceService.sendServices(botNumber, pwd)
-                }
-            }
             attendance != null -> {
                 if (attendance.attendant == null) {
                     logger?.error("Atendimento com id ${attendance.id} foi iniciado com atendente Nulo!")
@@ -55,6 +47,14 @@ class PWDFlowService(
                         attendance.attendant!!,
                         pwd
                     )
+                }
+            }
+            isChoosingService(lastBotMessage, pwd) -> {
+                if (isValidService(message, disability)) {
+                    val service = ServiceType.getServicesByDisability(disability)[message.toInt() - 1]
+                    attendanceService.startAttendance(pwd = pwd, botNumber = botNumber, service = service)
+                } else {
+                    attendanceService.sendServices(botNumber, pwd)
                 }
             }
             else -> {

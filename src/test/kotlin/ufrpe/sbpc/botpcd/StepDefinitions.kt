@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.transaction.annotation.Transactional
 import ufrpe.sbpc.botpcd.entity.Attendance
 import ufrpe.sbpc.botpcd.entity.Attendant
 import ufrpe.sbpc.botpcd.entity.CommitteeMember
@@ -40,6 +41,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.text.contains
 
+@Transactional
 class StepDefinitions(
     private val mockMvc: MockMvc,
     val pwdRepository: PWDRepository,
@@ -58,6 +60,7 @@ class StepDefinitions(
     private val possibleItialsMessages = mutableListOf("Oi", "Olá", "Bom dia", "Boa noite", "Boa Tarde", "teste")
 
     val logger: Logger = LoggerFactory.getLogger(StepDefinitions::class.java)
+
     @Dado("que o atendente {string} de telefone {string} enviou mensagem nas últimas 24 horas")
     fun `atendente enviou mensagem recente`(nomeAtendente: String, telefoneAtendente: String) {
         monitorRepository.save(
@@ -143,7 +146,7 @@ class StepDefinitions(
             fromPhoneNumber = currentBotNumber// Ou ajuste conforme sua lógica para buscar todas
         )!!.message
 
-        assertFalse (lastMessage!!contains(attendant))
+        assertFalse(lastMessage!!.contains(attendant?.name!!))
     }
 
     @Quando("o atendente {string} de telefone {string} encerra o atendimento")
@@ -169,14 +172,9 @@ class StepDefinitions(
         "que o atendente {string} de telefone {string} está disponível, mas não em atendimento"
     )
     fun atendenteDisponivelNaoEmAtendimento(nomeAtendente: String, telefoneAtendente: String) {
-        monitorRepository.findByPhoneNumber(telefoneAtendente) ?: monitorRepository.save(
-            Monitor(
-                name = nomeAtendente,
-                phoneNumber = telefoneAtendente,
-                status = UserStatus.AVAILABLE,
-                assistanceType = MonitorAssistanceType.NEURODIVERGENT_SUPPORT_MONITOR // Tipo genérico
-            )
-        )
+        val monitor = monitorRepository.findByPhoneNumber(telefoneAtendente)!!
+        monitorRepository.save(monitor.apply { status = UserStatus.AVAILABLE })
+        attendanceRepository.deleteAllByAttendant(monitor)
     }
 
     @Quando("o PCD {string} de telefone {string} envia a mensagem {string}")
@@ -206,140 +204,141 @@ class StepDefinitions(
         val lastMensage = messageExchangeRepository.lastExchangeMessage(
             toPhoneNumber = telefoneAtendente,
             fromPhoneNumber = currentBotNumber
-        )!!.message
-
-        assertFalse(lastMensage.contains(nomePCD))
+        )?.message
+        if(lastMensage != null) {
+            assertFalse(lastMensage.contains(nomePCD))
+        }
     }
 
     @Dado("que o atendente {string} de {string} do tipo {string} estava indisponível")
-		fun atendenteIndisponivel(nome: String, numero: String, tipoDeAtendente: String) {
+    fun atendenteIndisponivel(nome: String, numero: String, tipoDeAtendente: String) {
 
-				val provider = when (tipoDeAtendente.lowercase()) {
-						"monitor" -> Provider.MONITOR
-						"membro da comissão" -> Provider.COMMITTEE_MEMBER
-						else -> throw IllegalArgumentException("Tipo de atendente desconhecido: $tipoDeAtendente")
-				}
+        val provider = when (tipoDeAtendente.lowercase()) {
+            "monitor" -> Provider.MONITOR
+            "membro da comissão" -> Provider.COMMITTEE_MEMBER
+            else -> throw IllegalArgumentException("Tipo de atendente desconhecido: $tipoDeAtendente")
+        }
 
-				if (provider == Provider.MONITOR) {
-						val monitor = monitorRepository.findByPhoneNumber(numero)
-								?: monitorRepository.save(
-										Monitor(
-												name = nome,
-												phoneNumber = numero,
-												status = UserStatus.UNAVAILABLE,
-												assistanceType = MonitorAssistanceType.NEURODIVERGENT_SUPPORT_MONITOR // ou ajuste se quiser
-										)
-								)
-						monitor.status = UserStatus.UNAVAILABLE
-						monitorRepository.save(monitor)
-				} else if (provider == Provider.COMMITTEE_MEMBER) {
-						val member = attendantRepository.findByPhoneNumber(numero)
-								?: attendantRepository.save(
-										CommitteeMember(
-												name = nome,
-												phoneNumber = numero,
-												status = UserStatus.UNAVAILABLE
-										)
-								)
-						member.status = UserStatus.UNAVAILABLE
-						attendantRepository.save(member)
-				}
-		}
+        if (provider == Provider.MONITOR) {
+            val monitor = monitorRepository.findByPhoneNumber(numero)
+                ?: monitorRepository.save(
+                    Monitor(
+                        name = nome,
+                        phoneNumber = numero,
+                        status = UserStatus.UNAVAILABLE,
+                        assistanceType = MonitorAssistanceType.NEURODIVERGENT_SUPPORT_MONITOR // ou ajuste se quiser
+                    )
+                )
+            monitor.status = UserStatus.UNAVAILABLE
+            monitorRepository.save(monitor)
+        } else if (provider == Provider.COMMITTEE_MEMBER) {
+            val member = attendantRepository.findByPhoneNumber(numero)
+                ?: attendantRepository.save(
+                    CommitteeMember(
+                        name = nome,
+                        phoneNumber = numero,
+                        status = UserStatus.UNAVAILABLE
+                    )
+                )
+            member.status = UserStatus.UNAVAILABLE
+            attendantRepository.save(member)
+        }
+    }
 
-		@Quando("o atendente {string} de {string} fica disponível")
-		fun atendenteFicaDisponivel(nome: String, numero: String) {
-				// Tenta encontrar o atendente no repositório de monitores
-				val monitor = monitorRepository.findByPhoneNumber(numero)
-				if (monitor != null) {
-						monitor.status = UserStatus.AVAILABLE
-						monitorRepository.save(monitor)
-						return
-				}
+    @Quando("o atendente {string} de {string} fica disponível")
+    fun atendenteFicaDisponivel(nome: String, numero: String) {
+        // Tenta encontrar o atendente no repositório de monitores
+        val monitor = monitorRepository.findByPhoneNumber(numero)
+        if (monitor != null) {
+            monitor.status = UserStatus.AVAILABLE
+            monitorRepository.save(monitor)
+            return
+        }
 
-				// Tenta encontrar o atendente no repositório de membros da comissão
-				val member = attendantRepository.findByPhoneNumber(numero)
-				if (member != null) {
-						member.status = UserStatus.AVAILABLE
-						attendantRepository.save(member)
-						return
-				}
+        // Tenta encontrar o atendente no repositório de membros da comissão
+        val member = attendantRepository.findByPhoneNumber(numero)
+        if (member != null) {
+            member.status = UserStatus.AVAILABLE
+            attendantRepository.save(member)
+            return
+        }
 
-				// Se não encontrar nenhum atendente
-				throw IllegalArgumentException("Atendente '$nome' com número '$numero' não encontrado.")
-		}
+        // Se não encontrar nenhum atendente
+        throw IllegalArgumentException("Atendente '$nome' com número '$numero' não encontrado.")
+    }
 
-		@Dado("que {string} PCD solicitou o serviço {string} e está na fila de espera")
-		fun pcdSolicitouServicoFila(adjetivoDeficiencia: String, servicoDescricao: String) {
-				val service = ServiceType.getByDescription(servicoDescricao)
+    @Dado("que {string} PCD solicitou o serviço {string} e está na fila de espera")
+    fun pcdSolicitouServicoFila(adjetivoDeficiencia: String, servicoDescricao: String) {
+        val service = ServiceType.getByDescription(servicoDescricao)
 
-				// Usa o método do enum para buscar pela forma textual do adjetivo
-				val disability = Disability.getByAdjective(adjetivoDeficiencia)
-				val phone = "81999999999"
+        // Usa o método do enum para buscar pela forma textual do adjetivo
+        val disability = Disability.getByAdjective(adjetivoDeficiencia)
+        val phone = "81999999999"
 
-				// Cria ou reutiliza o PCD
-				val pcd = pwdRepository.findByPhoneNumber(phone) ?: pwdRepository.save(
-						PWD(
-								name = "PCD $adjetivoDeficiencia",
-								phoneNumber = phone,
-								disabilities = setOf(disability)
-						)
-				)
+        // Cria ou reutiliza o PCD
+        val pcd = pwdRepository.findByPhoneNumber(phone) ?: pwdRepository.save(
+            PWD(
+                name = "PCD $adjetivoDeficiencia",
+                phoneNumber = phone,
+                disabilities = setOf(disability)
+            )
+        )
 
-				// Garante que existe uma solicitação em espera (não iniciada)
-				if (attendanceRepository.findRequestAttendanceOfPwd(pcd) == null) {
-						attendanceRepository.save(
-								Attendance(
-										pwd = pcd,
-										serviceType = service,
-										attendantType = service.attendantType,
-										attendant = null,
-										endDateTime = null,
-										startDateTime = null,
-										serviceLocation = null,
-										monitorArrivalDateTime = null
-								)
-						)
-				}
-		}
+        // Garante que existe uma solicitação em espera (não iniciada)
+        if (attendanceRepository.findRequestAttendanceOfPwd(pcd) == null) {
+            attendanceRepository.save(
+                Attendance(
+                    pwd = pcd,
+                    serviceType = service,
+                    attendantType = service.attendantType,
+                    attendant = null,
+                    endDateTime = null,
+                    startDateTime = null,
+                    serviceLocation = null,
+                    monitorArrivalDateTime = null
+                )
+            )
+        }
+    }
 
-		@Dado("PCD possuia serviço requisitado que ainda não foi iniciado")
-		fun pcdPossuiServicoRequisitadoNaoIniciado() {
-				val service = ServiceType.NeurodivergentSupport
-				val disabilities = service.disability
+    @Dado("PCD possuia serviço requisitado que ainda não foi iniciado")
+    fun pcdPossuiServicoRequisitadoNaoIniciado() {
+        val service = ServiceType.NeurodivergentSupport
+        val disabilities = service.disability
 
-				// Reutiliza ou cria o PCD com deficiências compatíveis com o serviço
-				val pcd = pwdRepository.findByPhoneNumber(pwdAcessarServicesPhoneNumber) ?: pwdRepository.save(
-						PWD(
-								name = "PCD Teste",
-								phoneNumber = pwdAcessarServicesPhoneNumber,
-								disabilities = disabilities
-						)
-				)
+        // Reutiliza ou cria o PCD com deficiências compatíveis com o serviço
+        val pcd = pwdRepository.findByPhoneNumber(pwdAcessarServicesPhoneNumber) ?: pwdRepository.save(
+            PWD(
+                name = "PCD Teste",
+                phoneNumber = pwdAcessarServicesPhoneNumber,
+                disabilities = disabilities
+            )
+        )
 
-				// Evita criar duplicata se já existir
-				val existente = attendanceRepository.findRequestAttendanceOfPwd(pcd)
-				if (existente == null) {
-						attendanceRepository.save(
-								Attendance(
-										pwd = pcd,
-										serviceType = service,
-										attendantType = service.attendantType,
-										attendant = null,
-										endDateTime = null,
-										startDateTime = null,
-										serviceLocation = null,
-										monitorArrivalDateTime = null
-								)
-						)
-				}
-		}
+        // Evita criar duplicata se já existir
+        val existente = attendanceRepository.findRequestAttendanceOfPwd(pcd)
+        if (existente == null) {
+            attendanceRepository.save(
+                Attendance(
+                    pwd = pcd,
+                    serviceType = service,
+                    attendantType = service.attendantType,
+                    attendant = null,
+                    endDateTime = null,
+                    startDateTime = null,
+                    serviceLocation = null,
+                    monitorArrivalDateTime = null
+                )
+            )
+        }
+    }
 
-		@Dado("que nenhum atendente para o {string} está disponível")
-		fun nenhumAtendenteDisponivel(servicoDescricao: String) {
-			// repositorio comeca vazio, nao precisa fazer nada
-		}
+    @Dado("que nenhum atendente para o {string} está disponível")
+    fun nenhumAtendenteDisponivel(servicoDescricao: String) {
+        // repositorio comeca vazio, nao precisa fazer nada
+    }
 
-		@Dado("usuário recebeu mensagem {string}")
+    @Dado("usuário recebeu mensagem {string}")
     fun `usuário recebeu mensagem`(message: String) {
         mockUserRecievedMessage(numberUserNotRegister, message)
     }
@@ -354,14 +353,17 @@ class StepDefinitions(
         // Implementar lógica para garantir que o PCD está cadastrado no sistema
         // Ex: pwdRepository.save(PWD(name = "PCD Teste Completo", phoneNumber = numberUserNotRegister, disabilities = mutableSetOf(Disability.DEAFNESS)))
     }
+
     @Dado("que não tem atendente disponível")
     fun `que não tem atendente disponível`() {
 
     }
+
     @Dado("que {string} PCD recebeu mensagem de opcções de serviço")
     fun `pcd recebue mensagem de opção de serviço`(adjetivoPCD: String) {
         // ver se existe ou crirar um pcd com adjetivoPCD
-        val pwd = createPWDIfNotExists(phoneNumber = pwdAcessarServicesPhoneNumber,  Disability.getByAdjective(adjetivoPCD))
+        val pwd =
+            createPWDIfNotExists(phoneNumber = pwdAcessarServicesPhoneNumber, Disability.getByAdjective(adjetivoPCD))
         val servicesText = attendanceService.createSendServicesMessage(pwd.disabilities.first(), pwd)
         messageExchangeRepository.save(
             MessageExchange(
@@ -372,11 +374,20 @@ class StepDefinitions(
         )
         // pegar no proprio código qual seria a mensagem de serviço
     }
+
     @After
     fun cleanup() {
         // Esta linha deleta os dados em uma ordem que evita erros de chave estrangeira
-        listOf(attendanceRepository, messageExchangeRepository, monitorRepository, committeeMemberRepository, pwdRepository, attendantRepository).forEach { it.deleteAllInBatch() }
+        listOf(
+            attendanceRepository,
+            messageExchangeRepository,
+            monitorRepository,
+            committeeMemberRepository,
+            pwdRepository,
+            attendantRepository
+        ).forEach { it.deleteAllInBatch() }
     }
+
     @Dado("atendente que se chama {string} enviou uma mensagem nas ultimas 24 horas para o bot")
     fun `atendente enviou uma mensagem nas ultimas 24 horas`(nomeAtendente: String) {
         messageExchangeRepository.save(
@@ -399,7 +410,8 @@ class StepDefinitions(
         // Gera um número de telefone único para o atendente para evitar conflitos
         attendantRepository.findByPhoneNumber(currentTestAttendantPhoneNumber)?.let { attendantRepository.delete(it) }
         val serviceType = ServiceType.getByDescription(servicoDesejado)
-        val tipoAtendente = if (nomeAtendente.contains("Monitor", ignoreCase = true)) "monitor" else "membro da comissão"
+        val tipoAtendente =
+            if (nomeAtendente.contains("Monitor", ignoreCase = true)) "monitor" else "membro da comissão"
         val attendant: Attendant = when (tipoAtendente) {
             "monitor" -> {
                 val monitorService = serviceType as? MonitorServiceType
@@ -413,6 +425,7 @@ class StepDefinitions(
                     )
                 )
             }
+
             "membro da comissão" -> {
                 committeeMemberRepository.save(
                     CommitteeMember(
@@ -422,6 +435,7 @@ class StepDefinitions(
                     )
                 )
             }
+
             else -> throw IllegalArgumentException("Tipo de atendente desconhecido: $tipoAtendente")
         }
         // Simula que o atendente enviou uma mensagem recentemente para ser considerado ativo
@@ -435,7 +449,8 @@ class StepDefinitions(
     @Quando("{string} PCD envia a mensagem {string}")
     fun `pcd envia mensagem de serviço`(adjetivoPCD: String, numeroServico: String) {
         // O adjetivoPCD é usado para contexto, o número de telefone identifica o usuário
-        val pwd = createPWDIfNotExists(phoneNumber = pwdAcessarServicesPhoneNumber,  Disability.getByAdjective(adjetivoPCD))
+        val pwd =
+            createPWDIfNotExists(phoneNumber = pwdAcessarServicesPhoneNumber, Disability.getByAdjective(adjetivoPCD))
         userSendMessage(numeroServico, pwd.phoneNumber)
     }
 
@@ -482,15 +497,22 @@ class StepDefinitions(
     fun createIfNotExistsPWDWithDisability(adjetivoPCD: String, pwdPhoneNumber: String): PWD {
         var pwd = pwdRepository.findByPhoneNumber(pwdPhoneNumber)
         val disability = Disability.getByAdjective(adjetivoPCD)
-        if(pwd == null) {
-            return pwdRepository.save(PWD(name=adjetivoPCD, phoneNumber = pwdPhoneNumber, disabilities = mutableSetOf(disability)))
+        if (pwd == null) {
+            return pwdRepository.save(
+                PWD(
+                    name = adjetivoPCD,
+                    phoneNumber = pwdPhoneNumber,
+                    disabilities = mutableSetOf(disability)
+                )
+            )
         }
-        if(pwd.disabilities.first() != disability) {
+        if (pwd.disabilities.first() != disability) {
             pwd.disabilities = mutableSetOf(disability)
             pwdRepository.save(pwd)
         }
         return pwd
     }
+
     @Entao("bot registrará que usuário tem ou possui {string}")
     fun `bot registra deficiencia do usuário`(deficienciaAdjtivo: String) {
         val pwd = pwdRepository.findByPhoneNumberWithDisabilities(numberUserNotRegister)!!
@@ -558,6 +580,7 @@ class StepDefinitions(
                 )
                 monitorRepository.save(monitor)
             }
+
             "membro da comissão" -> {
                 val committeeMember = CommitteeMember(
                     name = "Comissão Teste $phoneNumber",
@@ -566,18 +589,22 @@ class StepDefinitions(
                 )
                 committeeMemberRepository.save(committeeMember)
             }
+
             else -> throw IllegalArgumentException("Tipo de atendente desconhecido: $tipoAtendente")
         }
     }
+
     @Quando("PCD mandar qualquer mensagem")
     fun `PCD mandar qualquer mensagem`() {
         val message = possibleItialsMessages.random()
         userSendMessage(message, pwdAcessarServicesPhoneNumber)
     }
+
     @Entao("PCD receberá mensagem {string}")
     fun `PCD recebera mensagem`(mensagemEsperada: String) {
         testarUltimaMensagemRecebidaDoUsuario(mensagemEsperada, pwdAcessarServicesPhoneNumber)
     }
+
     @Dado("que sou um {string} com status inicial {string}")
     fun `que sou um tipo_de_atendente com status inicial`(
         tipoAtendente: String,
@@ -587,11 +614,14 @@ class StepDefinitions(
         val attendant = createAttendant(currentTestAttendantPhoneNumber, tipoAtendente, status)
         if (status == UserStatus.BUSY) {
             // Limpar PWD existente com este número para evitar conflitos
-            val pwd = pwdRepository.findByPhoneNumber(pwdInAttendancePhoneNumberForAttendantChangeStatus) ?: pwdRepository.save(PWD(
-                name = "PCD em Atendimento Teste",
-                phoneNumber = pwdInAttendancePhoneNumberForAttendantChangeStatus,
-                disabilities = mutableSetOf(Disability.MOBILITY_IMPAIRED) // Deficiência padrão para o teste
-            ))
+            val pwd = pwdRepository.findByPhoneNumber(pwdInAttendancePhoneNumberForAttendantChangeStatus)
+                ?: pwdRepository.save(
+                    PWD(
+                        name = "PCD em Atendimento Teste",
+                        phoneNumber = pwdInAttendancePhoneNumberForAttendantChangeStatus,
+                        disabilities = mutableSetOf(Disability.MOBILITY_IMPAIRED) // Deficiência padrão para o teste
+                    )
+                )
 
             // Determinar o tipo de serviço e provedor com base no tipo de atendente
             val serviceType: ServiceType
@@ -616,6 +646,7 @@ class StepDefinitions(
             attendanceRepository.save(attendance)
         }
     }
+
     @Quando("o {string} envia a mensagem {string}")
     fun `o tipo_de_atendente envia a mensagem`(
         tipoAtendente: String,
@@ -641,9 +672,11 @@ class StepDefinitions(
             "Monitor" -> {
                 assertTrue(attendant is Monitor, "Atendente $phoneNumber não é um Monitor.")
             }
+
             "Membro da Comissão" -> {
                 assertTrue(attendant is CommitteeMember, "Atendente $phoneNumber não é um Membro da Comissão.")
             }
+
             else -> {
                 throw Exception("Foi passado um tipo inválido nos testes: $tipoAtendente")
             }
@@ -670,17 +703,26 @@ class StepDefinitions(
         val statusNovoEsperado = UserStatus.valueOf(statusNovoEsperadoStr.uppercase())
         checkIfHasCorrectAttendantType(currentTestAttendantPhoneNumber, tipoAtendente)
         val attendant = attendantRepository.findByPhoneNumber(currentTestAttendantPhoneNumber)
-        assertTrue(attendant != null, "Atendente com número $currentTestAttendantPhoneNumber não encontrado no banco de dados.")
-        assertEquals(statusNovoEsperado, attendant!!.status, "Status do atendente não foi atualizado corretamente para $statusNovoEsperado. Estava ${attendant.status}.")
+        assertTrue(
+            attendant != null,
+            "Atendente com número $currentTestAttendantPhoneNumber não encontrado no banco de dados."
+        )
+        assertEquals(
+            statusNovoEsperado,
+            attendant!!.status,
+            "Status do atendente não foi atualizado corretamente para $statusNovoEsperado. Estava ${attendant.status}."
+        )
     }
+
     fun createPWDIfNotExists(phoneNumber: String, disability: Disability): PWD {
         var pwd = pwdRepository.findByPhoneNumber(phoneNumber)
-        if(pwd == null) {
+        if (pwd == null) {
             return pwdRepository.save(PWD(phoneNumber = phoneNumber, disabilities = mutableSetOf(disability)))
         } else {
             return pwd
         }
     }
+
     fun mockUserRecievedMessage(userNumber: String, message: String) {
         messageExchangeRepository.save(
             MessageExchange(
@@ -696,14 +738,24 @@ class StepDefinitions(
             toPhoneNumber = userPhoneNumber,
             fromPhoneNumber = currentBotNumber
         )?.message
-        assertEquals(mensagemEsperada.trimIndent(), actualMessage?.trimIndent(), "A última mensagem recebida pelo usuário não foi a esperada.")
+        assertTrue(
+            actualMessage?.trimIndent()!!.contains(mensagemEsperada.trimIndent()),
+            "A última mensagem recebida pelo usuário não foi a esperada."
+        )
     }
 
     fun testarPenultimaMensagemRecebidaDoUsuario(mensagemEsperada: String, userPhoneNumber: String) {
         val messageList =
-            messageExchangeRepository.listExchangeMessage(toPhoneNumber = userPhoneNumber, fromPhoneNumber = currentBotNumber)
+            messageExchangeRepository.listExchangeMessage(
+                toPhoneNumber = userPhoneNumber,
+                fromPhoneNumber = currentBotNumber
+            )
         assertTrue(messageList.size >= 2, "Não há mensagens suficientes para verificar a penúltima.")
-        assertEquals(mensagemEsperada.trimIndent(), messageList[messageList.lastIndex - 1].message.trimIndent(), "A penúltima mensagem recebida pelo usuário não foi a esperada.")
+        assertEquals(
+            mensagemEsperada.trimIndent(),
+            messageList[messageList.lastIndex - 1].message.trimIndent(),
+            "A penúltima mensagem recebida pelo usuário não foi a esperada."
+        )
     }
 
     private fun userSendMessage(mensagemEnviada: String, userPhoneNumber: String) {

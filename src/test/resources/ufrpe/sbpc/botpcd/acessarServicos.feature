@@ -78,10 +78,11 @@ Funcionalidade: Acessar serviços de assistência
 
    Regra: Bot envia mensagem apenas para o usuário que mandaram mensagem nas últimas 24 horas
 
-     Cenário de Fundo: que o atendente "Carlos" de telefone "558100000001" enviou mensagem nas últimas 24 horas
+     Cenário de Fundo:
+       Dado que o atendente "Carlos" de telefone "558100000001" enviou mensagem nas últimas 24 horas
        E que o PCD "João" de telefone "558100000002" enviou mensagem nas últimas 24 horas
        E que o atendente "Ana" de telefone "558100000003" enviou mensagem nas últimas 24 horas
-       E que o PCD "Maria" de telefone "558100000004" enviou mensagem nas útlimas 24 horas
+       E que o PCD "Maria" de telefone "558100000004" enviou mensagem nas últimas 24 horas
 
      Cenário: Bot direciona mensagem do PCD para o atendente correto
        Dado que o atendente "Carlos" de telefone "558100000001" está em atendimento com o PCD "João" de telefone "558100000002"
