@@ -97,14 +97,8 @@ class StepDefinitions(
     ) {
         val pcd = pwdRepository.findByPhoneNumber(telefonePcd)!!
         val monitor = monitorRepository.findByPhoneNumber(telefoneAtendente)
-        val attendance = Attendance(
-            serviceType = ServiceType.NeurodivergentSupport,
-            pwd = pcd,
-            attendant = monitor,
-            attendantType = Provider.MONITOR,
-            startDateTime = LocalDateTime.now()
-        )
-        attendanceRepository.save(attendance)
+        userSendMessage("oi", telefonePcd)
+        userSendMessage("1", telefonePcd)
     }
 
     @Dado(
@@ -130,7 +124,7 @@ class StepDefinitions(
         val telefoneAtendente = monitorRepository.findByName(nomeAtendente)!!.phoneNumber
         val ultimaMensagem = messageExchangeRepository.lastExchangeMessage(
             toPhoneNumber = telefonePcd,
-            fromPhoneNumber = telefoneAtendente
+            fromPhoneNumber = currentBotNumber
         )
         assert(ultimaMensagem != null && ultimaMensagem!!.message.contains(mensagem)) {
             "O PCD $nomePcd não recebeu a mensagem esperada \"$mensagem\" do atendente $nomeAtendente."

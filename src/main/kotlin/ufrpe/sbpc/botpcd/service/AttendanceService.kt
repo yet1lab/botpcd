@@ -18,7 +18,6 @@ import ufrpe.sbpc.botpcd.repository.AttendanceRepository
 import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.repository.MonitorRepository
-import ufrpe.sbpc.botpcd.service.QueueService
 import ufrpe.sbpc.botpcd.util.createOptions
 import java.time.LocalDateTime
 
@@ -142,23 +141,13 @@ class AttendanceService(
                     when (userResponse.lowercase()) {
                         "1" -> {
                             updateAttendantStatus(botNumber, attendant, UserStatus.AVAILABLE)
-                            whatsappService.sendMessage(
-                                botPhoneNumber,
-                                attendance.pwd.phoneNumber,
-                                "Atendimento encerrado",
-                                "BotPCD"
-                            )
+                            sendFinishedAttendanceMessage(botPhoneNumber, attendance)
                             confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Disponível."
                             finishAttendance(attendance)
                         }
                         "2" -> {
                             updateAttendantStatus(botNumber, attendant, UserStatus.UNAVAILABLE)
-                            whatsappService.sendMessage(
-                                botPhoneNumber,
-                                attendance.pwd.phoneNumber,
-                                "Atendimento encerrado",
-                                "BotPCD"
-                            )
+                            sendFinishedAttendanceMessage(botPhoneNumber, attendance)
                             confirmationMessage = "Atendimento encerrado. Seu status foi atualizado para Indisponível."
                             finishAttendance(attendance)
                         }
@@ -180,6 +169,15 @@ class AttendanceService(
         confirmationMessage?.let {
             whatsappService.sendMessage(botPhoneNumber, userPhoneNumber, it, "BotPCD")
         }
+    }
+
+    private fun sendFinishedAttendanceMessage(botPhoneNumber: String, attendance: Attendance) {
+        whatsappService.sendMessage(
+            botPhoneNumber,
+            attendance.pwd.phoneNumber,
+            "Atendimento encerrado",
+            "BotPCD"
+        )
     }
 
     fun findAvailableMonitors(): List<Monitor> {
