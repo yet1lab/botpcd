@@ -18,6 +18,5 @@ class MessageExchange(
     @Column(columnDefinition = "TEXT")
     var message: String
 ) {
-    @CreationTimestamp
-    lateinit var createAt: LocalDateTime
+     var createAt: LocalDateTime = LocalDateTime.now()
 }

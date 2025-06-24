@@ -78,11 +78,11 @@ Olá, qual sua deficiência?
     E usuário possui deficiência cadastrada de "<adjetivo_da_deficiencia>"
     Quando usuário envia mensagem "João Victor"
     Entao A penúltima mensagem recebida pelo usuário será "Cadastro realizado."
-      E bot enviará opcções de serviço "<opcções_de_serviço>" de acordo com a deficiência "<adjetivo_da_deficiencia>" do pcd
+      E "<adjetivo_da_deficiencia>" PCD receberá mensagem de opções de serviço "<opções_de_serviço>"
       E bot salvará o nome do usuário "João Victor"
 
     Exemplos:
-      | adjetivo_da_deficiencia | opcções_de_serviço                                                                         |
+      | adjetivo_da_deficiencia | opções_de_serviço                                                                         |
       | um pessoa surda         | informações em Libras,atividade com interpretação em Libras                                |
       | mobilidade reduzida     | ajuda na mobilidade,transporte para deslocamento no evento                                 |
       | deficiente físico       | ajuda na mobilidade,ajuda com alimentação e higiene,transporte para deslocamento no evento |

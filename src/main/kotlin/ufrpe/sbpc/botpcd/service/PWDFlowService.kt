@@ -27,19 +27,15 @@ class PWDFlowService(
     ) {
         val disability = pwd.disabilities.first()
         val attendance = attendanceRepository.findStartedAttendanceOfPwd(pwd)
+        val requestAttendancePWD = attendanceRepository.findRequestAttendanceOfPwd(pwd)
         when {
+            requestAttendancePWD != null -> {
+                attendanceService.sendWaitListMessage(botNumber, pwd)
+            }
             isRegisteringName(lastBotMessage, pwd) -> {
                 registerPWDService.registerName(pwd, message)
                 whatsappService.sendMessage(botNumber, phoneNumber, "Cadastro realizado.")
                 attendanceService.sendServices(botNumber, pwd)
-            }
-            isChoosingService(lastBotMessage, pwd) -> {
-                if (isValidService(message, disability)) {
-                    val service = ServiceType.getServicesByDisability(disability)[message.toInt() - 1]
-                    attendanceService.startAttendance(pwd = pwd, botNumber = botNumber, service = service)
-                } else {
-                    attendanceService.sendServices(botNumber, pwd)
-                }
             }
             attendance != null -> {
                 if (attendance.attendant == null) {
@@ -51,6 +47,14 @@ class PWDFlowService(
                         attendance.attendant!!,
                         pwd
                     )
+                }
+            }
+            isChoosingService(lastBotMessage, pwd) -> {
+                if (isValidService(message, disability)) {
+                    val service = ServiceType.getServicesByDisability(disability)[message.toInt() - 1]
+                    attendanceService.startAttendance(pwd = pwd, botNumber = botNumber, service = service)
+                } else {
+                    attendanceService.sendServices(botNumber, pwd)
                 }
             }
             else -> {

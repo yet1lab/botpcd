@@ -1,5 +1,6 @@
 package ufrpe.sbpc.botpcd.service
 
+import jakarta.transaction.Transactional
 import java.time.LocalDateTime
 import ufrpe.sbpc.botpcd.entity.PWD
 import ufrpe.sbpc.botpcd.entity.Attendance
@@ -18,7 +19,7 @@ class QueueService(private val attendanceRepository: AttendanceRepository){
 	fun len(service: ServiceType): Long {
 		return attendanceRepository.countRequestAttendanceOfService(service)
 	}
-
+	@Transactional
 	fun pop(service: ServiceType): Attendance? {
 		val firstAtt = attendanceRepository.findRequestAttendanceOfService(service)
 

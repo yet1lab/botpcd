@@ -27,7 +27,6 @@ class FirstContactService(
     private val whatsappService: WhatsappService,
     private val attendanceService: AttendanceService,
     private val messageExchangeRepository: MessageExchangeRepository,
-    private val attendantStatusService: AttendantStatusService,
     private val attendanceRepository: AttendanceRepository,
     private val monitorRepository: MonitorRepository,
     private val committeeMemberRepository: CommitteeMemberRepository,

@@ -51,7 +51,7 @@ sealed class ServiceType(
 
     object HygieneAndNutrition : ServiceType(
         attendantType = Provider.COMMITTEE_MEMBER,
-        disability = mutableSetOf(Disability.MOBILITY_IMPAIRED, Disability.PHYSICAL_DISABILITY),
+        disability = mutableSetOf(Disability.PHYSICAL_DISABILITY),
         description = "ajuda com alimentação e higiene"
     )
 
@@ -66,11 +66,24 @@ sealed class ServiceType(
         fun getServicesByDisability(disability: Disability): List<ServiceType> {
             return ServiceType::class.sealedSubclasses
                 .mapNotNull { it.objectInstance }
-                .filter { disability in it.disability }
+                .filter { disability in it.disability }.sortedBy { it.description.getAlphabeticOrder() }
         }
-
+        fun getServiceByMonitorAssistanceType(monitorAssistanceType: MonitorAssistanceType): ServiceType {
+            return ServiceType::class.sealedSubclasses
+                .mapNotNull { it.objectInstance }
+                .filterIsInstance<MonitorServiceType>()
+                .first { it.monitorAssistanceType == monitorAssistanceType } as ServiceType
+        }
+        fun getByDescription(description: String): ServiceType {
+            return ServiceType::class.sealedSubclasses
+                .mapNotNull { it.objectInstance }
+                .first { it.description == description } as ServiceType
+        }
     }
 }
+
+fun String.getAlphabeticOrder() = this.replace("[^a-zA-Z]".toRegex(), "").slice(0..9).reduce {prev, curr -> prev + curr.code}
+
 interface MonitorServiceType {
     val monitorAssistanceType: MonitorAssistanceType
 }
