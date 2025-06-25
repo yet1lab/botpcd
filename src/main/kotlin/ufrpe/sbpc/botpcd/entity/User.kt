@@ -1,5 +1,6 @@
 package ufrpe.sbpc.botpcd.entity
 
+import jakarta.annotation.Nullable
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -25,6 +26,7 @@ import org.hibernate.validator.constraints.UniqueElements
 @Table(name = "tb_user")
 abstract class User(
     @Id @GeneratedValue
+    @Nullable
     var id: Long? = null,
     var name: String? = null,
     @NotEmpty(message = "The User needs to have a phone number")

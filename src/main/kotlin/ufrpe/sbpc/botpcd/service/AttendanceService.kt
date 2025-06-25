@@ -22,8 +22,8 @@ import ufrpe.sbpc.botpcd.util.createOptions
 import java.time.LocalDateTime
 
 @Service
+@Transactional
 class AttendanceService(
-		private val queryService: QueueService,
     private val attendanceRepository: AttendanceRepository,
     private val whatsappService: WhatsappService,
     private val monitorRepository: MonitorRepository,
@@ -48,8 +48,9 @@ class AttendanceService(
                 setMonitorStatus(attendant, newStatus)
                 if(newStatus == UserStatus.AVAILABLE) {
                     val serviceType = ServiceType.getServiceByMonitorAssistanceType(attendant.assistanceType)
-                    attendanceRepository.findRequestAttendanceOfService(serviceType)?.let{requestAttendance ->
-                        directToAvailableAttendant(botNumber, requestAttendance.pwd, serviceType)
+                    val attendances = attendanceRepository.findRequestAttendanceOfService(serviceType)
+                    attendances.firstOrNull()?.let{ requestAttendance ->
+                    directToAvailableAttendant(botNumber, requestAttendance.pwd, serviceType)
                     }
                 }
             }
@@ -234,7 +235,12 @@ class AttendanceService(
     }
 
     fun requestAttendance(pwd: PWD, service: ServiceType) {
-        attendanceRepository.save(Attendance(serviceType = service, pwd = pwd, attendantType = service.attendantType))
+        val alreadyRequestAttendance = attendanceRepository.findRequestAttendanceOfPwd(pwd)
+        if (alreadyRequestAttendance != null) {
+            logger.warn("O PCD com número ${pwd.phoneNumber} está tentando pedir um serviço, mas ele já tem um serviço em aberto")
+        } else {
+            attendanceRepository.save(Attendance(serviceType = service, pwd = pwd, attendantType = service.attendantType))
+        }
     }
 
     fun startAttendance(
@@ -247,7 +253,7 @@ class AttendanceService(
     }
 
     fun directToAvailableAttendant(botNumber: String, pwd: PWD, service: ServiceType) {
-        val attendance = attendanceRepository.findRequestAttendanceOfPwd(pwd)
+        val attendance = attendanceRepository.findRequestAttendanceOfPwd(pwd=pwd)
         if(attendance == null) {
             logger.warn("Um atendimento que não foi requsitado está tentando ser começado.")
             return

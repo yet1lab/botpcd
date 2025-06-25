@@ -16,9 +16,9 @@ interface AttendanceRepository : JpaRepository<Attendance, Long> {
 	@Query("SELECT att FROM Attendance att WHERE att.startDateTime IS NULL AND att.attendantType = 'COMMITTEE_MEMBER'")
 	fun findPendingCommitteeMemberAttendances(): List<Attendance>
   @Query("SELECT att from Attendance att where att.serviceType = :serviceType AND att.startDateTime is null order by att.requestDateTime asc")
-  fun findRequestAttendanceOfService(serviceType: ServiceType) : Attendance?
+  fun findRequestAttendanceOfService(serviceType: ServiceType) : List<Attendance>
 	
-	@Query("SELECT att from Attendance att where att.pwd = :pwd AND att.startDateTime is null order by att.requestDateTime asc")
+  @Query("SELECT att from Attendance att where att.pwd = :pwd AND att.startDateTime is null order by att.requestDateTime asc")
   fun findRequestAttendanceOfPwd(pwd: PWD) : Attendance?
   
 	@Query("SELECT att from Attendance att where att.pwd = :pwd AND att.startDateTime is not null and att.endDateTime is null order by att.requestDateTime desc")

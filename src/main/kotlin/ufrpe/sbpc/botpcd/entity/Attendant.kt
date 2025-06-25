@@ -9,8 +9,9 @@ import jakarta.validation.constraints.NotEmpty
 @Entity
 @Table(name = "tb_attendant")
 abstract class Attendant(
+    id: Long,
     name: String,
     phoneNumber: String,
     @Enumerated(EnumType.STRING)
     var status: UserStatus = UserStatus.AVAILABLE
-) : User(name = name, phoneNumber = phoneNumber)
+) : User(id = id, name = name, phoneNumber = phoneNumber)

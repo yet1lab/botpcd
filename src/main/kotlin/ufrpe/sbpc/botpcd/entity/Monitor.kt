@@ -9,10 +9,11 @@ import jakarta.validation.constraints.NotEmpty
 @Entity
 @Table(name = "tb_monitor")
 class Monitor(
+    id: Long,
     name: String,
     phoneNumber: String,
     status: UserStatus,
     @Enumerated(value = EnumType.STRING)
     @NotEmpty(message = "Monitor needs to have an assistance type")
     var assistanceType: MonitorAssistanceType
-) : Attendant(name = name, phoneNumber = phoneNumber, status = status)
+) : Attendant(name = name, phoneNumber = phoneNumber, status = status, id= id)

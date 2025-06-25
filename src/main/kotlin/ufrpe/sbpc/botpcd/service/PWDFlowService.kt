@@ -27,7 +27,7 @@ class PWDFlowService(
     ) {
         val disability = pwd.disabilities.first()
         val attendance = attendanceRepository.findStartedAttendanceOfPwd(pwd)
-        val requestAttendancePWD = attendanceRepository.findRequestAttendanceOfPwd(pwd)
+        val requestAttendancePWD = attendanceRepository.findRequestAttendanceOfPwd(pwd=pwd)
         when {
             requestAttendancePWD != null -> {
                 attendanceService.sendWaitListMessage(botNumber, pwd)
