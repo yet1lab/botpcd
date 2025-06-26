@@ -235,7 +235,7 @@ class AttendanceService(
     }
 
     fun requestAttendance(pwd: PWD, service: ServiceType) {
-        val alreadyRequestAttendance = attendanceRepository.findRequestAttendanceOfPwd(pwd)
+        val alreadyRequestAttendance = attendanceRepository.findRequestAttendanceOfPwd(pwd = pwd)
         if (alreadyRequestAttendance != null) {
             logger.warn("O PCD com número ${pwd.phoneNumber} está tentando pedir um serviço, mas ele já tem um serviço em aberto")
         } else {

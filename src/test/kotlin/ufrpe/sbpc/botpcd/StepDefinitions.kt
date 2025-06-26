@@ -34,6 +34,8 @@ import ufrpe.sbpc.botpcd.repository.MonitorRepository
 import ufrpe.sbpc.botpcd.repository.PWDRepository
 import ufrpe.sbpc.botpcd.service.AttendanceService
 import java.io.File
+import java.sql.Timestamp
+import java.time.Instant
 import java.time.LocalDateTime
 import kotlin.assert
 import kotlin.test.assertFalse
@@ -71,7 +73,7 @@ class StepDefinitions(
                 assistanceType = MonitorAssistanceType.NEURODIVERGENT_SUPPORT_MONITOR
             )
         )
-        userSendMessage("Olá, estou ativo.", telefoneAtendente)
+        userSendMessage(messagemEnviada="Olá, estou ativo.", userPhoneNumber=telefoneAtendente, currentBotNumber=currentBotNumber, mockMvc=mockMvc)
     }
 
     @Dado("que o PCD {string} de telefone {string} enviou mensagem nas últimas 24 horas")
@@ -271,7 +273,7 @@ class StepDefinitions(
         )
 
         // Evita criar duplicata se já existir
-        val existente = attendanceRepository.findRequestAttendanceOfPwd(pcd)
+        val existente = attendanceRepository.findRequestAttendanceOfPwd(pwd = pcd)
         if (existente == null) {
             attendanceRepository.save(
                 Attendance(
@@ -720,18 +722,6 @@ class StepDefinitions(
         )
     }
 
-    private fun userSendMessage(mensagemEnviada: String, userPhoneNumber: String) {
-        val payload = loadPayload("src/test/resources/ufrpe/sbpc/botpcd/mocks/usuario-manda-oi.json")
-            .changeUserNumber(userPhoneNumber)
-            .changeUserMessage(mensagemEnviada)
-            .changeBotNumber(currentBotNumber)
-        mockMvc.perform(
-            post("/webhooks")
-                .content(payload)
-                .contentType("application/json")
-        ).andExpect(status().isOk)
-    }
-
     @Quando("O PCD com a deficiência de {string} envia mensagem {string}")
     fun pcdComDeficienciaMandaMensagem(deficiencia: String, mensagem: String) {
         logger.warn("Step 'O PCD com a deficiência de \"$deficiencia\" envia mensagem \"$mensagem\"' não implementado completamente.")
@@ -743,6 +733,18 @@ class StepDefinitions(
     }
 }
 
+fun userSendMessage(mensagemEnviada: String, userPhoneNumber: String, currentBotNumber:String, mockMvc: MockMvc) {
+    val payload = loadPayload("src/test/resources/ufrpe/sbpc/botpcd/mocks/usuario-manda-oi.json")
+        .changeUserNumber(userPhoneNumber)
+        .changeUserMessage(mensagemEnviada)
+        .changeBotNumber(currentBotNumber)
+    mockMvc.perform(
+        post("/webhooks")
+            .content(payload)
+            .contentType("application/json")
+    ).andExpect(status().isOk)
+}
+
 fun loadPayload(filePath: String): String {
     return File(filePath).readText(Charsets.UTF_8)
 }
@@ -750,7 +752,9 @@ fun loadPayload(filePath: String): String {
 fun String.changeUserNumber(newNumber: String): String {
     return this.replace(Regex("(?<=\"wa_id\": \")\\d+(?=\")"), newNumber)
 }
-
+fun String.ChangeTimestamp(newTimestamp: Instant) {
+    return this.replace(Regex("(?<=\"timestamp\": \")\\d+(?=\")"), newTimestamp.epochSecond.toString())
+}
 fun String.changeUserMessage(newMessage: String): String {
     val escapedNewMessage = newMessage
         .replace("\\", "\\\\")

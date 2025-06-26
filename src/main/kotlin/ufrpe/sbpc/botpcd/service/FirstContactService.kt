@@ -18,6 +18,7 @@ import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.repository.MonitorRepository
 import ufrpe.sbpc.botpcd.repository.PWDRepository
+import java.time.Instant
 
 @Service
 class FirstContactService(
@@ -42,7 +43,8 @@ class FirstContactService(
             MessageExchange(
                 fromPhoneNumber = phoneNumber,
                 toPhoneNumber = botNumber,
-                message = message
+                message = message,
+                sendAt = Instant.ofEpochSecond(change.value.messages[0].timestamp.toLong())
             )
         )
         val lastBotMessage =

@@ -8,6 +8,7 @@ import com.whatsapp.api.domain.messages.TextMessage
 import com.whatsapp.api.impl.WhatsappBusinessCloudApi
 import org.slf4j.LoggerFactory
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
+import java.time.Instant
 import kotlin.math.log
 
 
@@ -35,7 +36,7 @@ class WhatsappService(
 						messageExchangeRepository.save(MessageExchange(
 							fromPhoneNumber = botNumber,
 							toPhoneNumber = destinyNumberID,
-							message = text))
+							message = text, sendAt = Instant.now()))
 				} else {
 					logger.warn("Teve uma tentativa de enviar a mensagem ${message} para o número ${destinyNumberID}, mas ele não tinha mandando mensagem.")
 				}

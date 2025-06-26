@@ -1,0 +1,39 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1944143699658447",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "15556557522",
+              "phone_number_id": "610886818782897"
+            },
+            "contacts": [
+              {
+                "profile": {
+                  "name": "Victor Yghor"
+                },
+                "wa_id": "112233445566"
+              }
+            ],
+            "messages": [
+              {
+                "from": "112233445566",
+                "id": "wamid.HBgMNTU4MTg4MTU3OTQ4FQIAEhggMzJCQTA1NTAwRkZBNDc3QTkxMDc2NDBCMDlERkI4NkUA",
+                "timestamp": "1750946520",
+                "text": {
+                  "body": "Bot pcd"
+                },
+                "type": "text"
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}

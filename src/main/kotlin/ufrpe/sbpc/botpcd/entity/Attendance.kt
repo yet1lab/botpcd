@@ -22,7 +22,7 @@ class Attendance(
     @ManyToOne
     @JoinColumn(name = "pwd_id")
     @NotNull(message = "The PWD is required")
-    var pwd: PWD,
+    val pwd: PWD,
 
     @ManyToOne
     @JoinColumn(name = "attendant_id")
