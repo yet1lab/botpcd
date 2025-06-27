@@ -27,7 +27,7 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-queires
+/queires
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
