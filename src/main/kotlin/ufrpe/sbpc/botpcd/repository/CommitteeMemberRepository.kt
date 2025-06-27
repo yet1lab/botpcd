@@ -10,6 +10,15 @@ import ufrpe.sbpc.botpcd.entity.UserStatus
 interface CommitteeMemberRepository: JpaRepository<CommitteeMember, Long> {
     fun findByPhoneNumber(phoneNumber: String): CommitteeMember?
     fun findByStatus(status: UserStatus): List<CommitteeMember>
-    @Query("SELECT cm from CommitteeMember cm where cm.status = :status")
+    @Query(
+        """
+  SELECT cm
+  FROM CommitteeMember cm
+  LEFT JOIN Attendance a ON a.attendant.id = cm.id
+  WHERE cm.status = :status
+  ORDER BY CASE WHEN a.endDateTime IS NULL THEN 0 ELSE 1 END,
+           a.endDateTime ASC
+"""
+    )
     fun findAvailableCommitteeMember(status: UserStatus): List<CommitteeMember>
 }
