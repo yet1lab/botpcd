@@ -33,6 +33,7 @@ import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.repository.MonitorRepository
 import ufrpe.sbpc.botpcd.repository.PWDRepository
 import ufrpe.sbpc.botpcd.service.AttendanceService
+import ufrpe.sbpc.botpcd.util.hmacSha256Hex
 import java.io.File
 import java.sql.Timestamp
 import java.time.Instant
@@ -60,7 +61,6 @@ class StepDefinitions(
     private val pwdInAttendancePhoneNumberForAttendantChangeStatus = "558179654321"
     private val pwdAcessarServicesPhoneNumber = "551965741234"
     private val possibleItialsMessages = mutableListOf("Oi", "Olá", "Bom dia", "Boa noite", "Boa Tarde", "teste")
-
     val logger: Logger = LoggerFactory.getLogger(StepDefinitions::class.java)
 
     @Dado("que o atendente {string} de telefone {string} enviou mensagem nas últimas 24 horas")
@@ -826,9 +826,14 @@ fun userSendMessage(mensagemEnviada: String, userPhoneNumber: String, currentBot
         .changeUserMessage(mensagemEnviada)
         .changeBotNumber(currentBotNumber)
         .changeTimestamp(sentAt)
+    val appSecret = "fakeappsecret"
     mockMvc.perform(
         post("/webhooks")
             .content(payload)
+            .header(
+                "X-Hub-Signature-256",
+                hmacSha256Hex(appSecret, payload)
+            )
             .contentType("application/json")
     ).andExpect(status().isOk)
 }

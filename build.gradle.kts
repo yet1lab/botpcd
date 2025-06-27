@@ -28,6 +28,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("reflect"))
+    implementation("com.google.guava:guava:33.4.8-jre")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("com.github.Bindambc:whatsapp-business-java-api:v0.6.1")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
