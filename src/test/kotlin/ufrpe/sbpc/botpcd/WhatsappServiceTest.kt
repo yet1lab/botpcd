@@ -9,6 +9,7 @@ import org.mockito.Mockito.*
 import org.mockito.junit.jupiter.MockitoExtension
 import ufrpe.sbpc.botpcd.entity.MessageExchange
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
+import java.time.Instant
 import java.time.LocalDateTime
 
 
@@ -33,7 +34,8 @@ class WhatsappServiceTest {
             MessageExchange(
                 fromPhoneNumber = userNumber,
                 toPhoneNumber = botNumber,
-                message = sampleMessage
+                message = sampleMessage,
+                sendAt = Instant.now()
             )
         )
         service.sendMessage(botNumber, userNumber, sampleMessage)
@@ -52,7 +54,8 @@ class WhatsappServiceTest {
             MessageExchange(
                 fromPhoneNumber = userNumber,
                 toPhoneNumber = botNumber,
-                message = sampleMessage
+                message = sampleMessage,
+                sendAt = Instant.now()
             ).apply {
                 createAt = LocalDateTime.now().minusHours(25)
             }
@@ -73,7 +76,8 @@ class WhatsappServiceTest {
             MessageExchange(
                 fromPhoneNumber = userNumber,
                 toPhoneNumber = botNumber,
-                message = sampleMessage
+                message = sampleMessage,
+                sendAt = Instant.now()
             ).apply {
                 createAt = LocalDateTime.now()
             }

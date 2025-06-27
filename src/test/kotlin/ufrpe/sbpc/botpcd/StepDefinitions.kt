@@ -73,7 +73,12 @@ class StepDefinitions(
                 assistanceType = MonitorAssistanceType.NEURODIVERGENT_SUPPORT_MONITOR
             )
         )
-        userSendMessage(messagemEnviada="Olá, estou ativo.", userPhoneNumber=telefoneAtendente, currentBotNumber=currentBotNumber, mockMvc=mockMvc)
+        userSendMessage(
+            mensagemEnviada = "Olá, estou ativo.",
+            userPhoneNumber = telefoneAtendente,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
     }
 
     @Dado("que o PCD {string} de telefone {string} enviou mensagem nas últimas 24 horas")
@@ -85,7 +90,12 @@ class StepDefinitions(
                 disabilities = setOf(Disability.NEURODIVERGENT)
             )
         )
-        userSendMessage("Olá, estou ativo.", telefonePcd)
+        userSendMessage(
+            mensagemEnviada = "Olá, estou ativo.",
+            userPhoneNumber = telefonePcd,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
     }
 
     @Dado(
@@ -99,8 +109,18 @@ class StepDefinitions(
     ) {
         val pcd = pwdRepository.findByPhoneNumber(telefonePcd)!!
         val monitor = monitorRepository.findByPhoneNumber(telefoneAtendente)
-        userSendMessage("oi", telefonePcd)
-        userSendMessage("1", telefonePcd)
+        userSendMessage(
+            mensagemEnviada = "oi",
+            userPhoneNumber = telefonePcd,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
+        userSendMessage(
+            mensagemEnviada = "1",
+            userPhoneNumber = telefonePcd,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
     }
 
     @Dado(
@@ -113,7 +133,12 @@ class StepDefinitions(
 
     @Quando("o atendente {string} de telefone {string} envia a mensagem {string}")
     fun atendenteEnviaMensagem(nomeAtendente: String, telefoneAtendente: String, mensagem: String) {
-        userSendMessage(mensagem, telefoneAtendente)
+        userSendMessage(
+            mensagemEnviada = mensagem,
+            userPhoneNumber = telefoneAtendente,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
     }
 
     @Entao("o PCD {string} de telefone {string} deve receber a mensagem {string} do atendente {string}")
@@ -146,8 +171,18 @@ class StepDefinitions(
 
     @Quando("o atendente {string} de telefone {string} encerra o atendimento")
     fun atendenteEncerraAtendimento(nomeAtendente: String, telefoneAtendente: String) {
-        userSendMessage("botpcd", telefoneAtendente)
-        userSendMessage("1", telefoneAtendente)
+        userSendMessage(
+            mensagemEnviada = "botpcd",
+            userPhoneNumber = telefoneAtendente,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
+        userSendMessage(
+            mensagemEnviada = "1",
+            userPhoneNumber = telefoneAtendente,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
     }
 
     @Entao("o PCD {string} de telefone {string} deve receber a mensagem {string} do bot")
@@ -174,7 +209,12 @@ class StepDefinitions(
     @Quando("o PCD {string} de telefone {string} envia a mensagem {string}")
     fun pcdEnviaMensagem(nomePcd: String, telefonePcd: String, mensagem: String) {
         // O nome do PCD é usado apenas para clareza no teste.
-        userSendMessage(mensagem, telefonePcd)
+        userSendMessage(
+            mensagemEnviada = mensagem,
+            userPhoneNumber = telefonePcd,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
     }
 
     @Entao("o atendente {string} de telefone {string} deve receber a mensagem {string} do PCD {string}")
@@ -237,8 +277,18 @@ class StepDefinitions(
 
     @Quando("o atendente {string} de {string} fica disponível")
     fun atendenteFicaDisponivel(nome: String, numero: String) {
-        userSendMessage(userPhoneNumber = numero, mensagemEnviada = "Bot PCD")
-        userSendMessage(userPhoneNumber = numero, mensagemEnviada =  "1")
+        userSendMessage(
+            mensagemEnviada = "Bot PCD",
+            userPhoneNumber = numero,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
+        userSendMessage(
+            mensagemEnviada = "1",
+            userPhoneNumber = numero,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
     }
 
     @Dado("que {string} PCD de número {string} solicitou o serviço {string} e está na fila de espera")
@@ -254,8 +304,18 @@ class StepDefinitions(
                 disabilities = setOf(disability)
             )
         )
-        userSendMessage(mensagemEnviada = "Oi", numeroPcd)
-        userSendMessage((ServiceType.getServicesByDisability(disability).indexOfFirst { it.description == servicoDescricao } + 1).toString(), numeroPcd)
+        userSendMessage(
+            mensagemEnviada = "Oi",
+            userPhoneNumber = numeroPcd,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
+        userSendMessage(
+            mensagemEnviada = (ServiceType.getServicesByDisability(disability).indexOfFirst { it.description == servicoDescricao } + 1).toString(),
+            userPhoneNumber = numeroPcd,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
     }
 
     @Dado("PCD possuia serviço requisitado que ainda não foi iniciado")
@@ -326,7 +386,8 @@ class StepDefinitions(
             MessageExchange(
                 fromPhoneNumber = currentBotNumber,
                 toPhoneNumber = pwdAcessarServicesPhoneNumber,
-                message = servicesText
+                message = servicesText,
+                sendAt = Instant.now()
             )
         )
         // pegar no proprio código qual seria a mensagem de serviço
@@ -347,12 +408,12 @@ class StepDefinitions(
 
     @Dado("atendente que se chama {string} enviou uma mensagem nas ultimas 24 horas para o bot")
     fun `atendente enviou uma mensagem nas ultimas 24 horas`(nomeAtendente: String) {
-        messageExchangeRepository.save(
-            MessageExchange(
-                fromPhoneNumber = currentTestAttendantPhoneNumber,
-                toPhoneNumber = currentBotNumber,
-                message = "teste "
-            )
+       val attendant = attendantRepository.findByName(nomeAtendente)
+        userSendMessage(
+            mensagemEnviada = "olá estou ativo",
+            userPhoneNumber = attendant!!.phoneNumber,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
         )
     }
 
@@ -408,7 +469,12 @@ class StepDefinitions(
         // O adjetivoPCD é usado para contexto, o número de telefone identifica o usuário
         val pwd =
             createPWDIfNotExists(phoneNumber = pwdAcessarServicesPhoneNumber, Disability.getByAdjective(adjetivoPCD))
-        userSendMessage(numeroServico, pwd.phoneNumber)
+        userSendMessage(
+            mensagemEnviada = numeroServico,
+            userPhoneNumber = pwd.phoneNumber,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
     }
 
     /**
@@ -448,14 +514,24 @@ class StepDefinitions(
 
     @Quando("usuário envia mensagem {string}")
     fun `usuario envia mensagem`(mensagemEnviada: String) {
-        userSendMessage(mensagemEnviada, numberUserNotRegister)
+        userSendMessage(
+            mensagemEnviada = mensagemEnviada,
+            userPhoneNumber = numberUserNotRegister,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
     }
 
     @Quando("PCD {string} mandar qualquer mensagem")
     fun `PCD mandar qualquer mensagem`(adjetivoPCD: String) {
         val message = possibleItialsMessages.random()
         val pwd = createIfNotExistsPWDWithDisability(adjetivoPCD, pwdAcessarServicesPhoneNumber)
-        userSendMessage(message, pwd.phoneNumber)
+        userSendMessage(
+            mensagemEnviada = message,
+            userPhoneNumber = pwd.phoneNumber,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
     }
 
     fun createIfNotExistsPWDWithDisability(adjetivoPCD: String, pwdPhoneNumber: String): PWD {
@@ -561,7 +637,12 @@ class StepDefinitions(
     @Quando("PCD mandar qualquer mensagem")
     fun `PCD mandar qualquer mensagem`() {
         val message = possibleItialsMessages.random()
-        userSendMessage(message, pwdAcessarServicesPhoneNumber)
+        userSendMessage(
+            mensagemEnviada = message,
+            userPhoneNumber = pwdAcessarServicesPhoneNumber,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
     }
 
     @Entao("PCD receberá mensagem {string}")
@@ -617,7 +698,12 @@ class StepDefinitions(
         mensagemEnviada: String
     ) {
         checkIfHasCorrectAttendantType(currentTestAttendantPhoneNumber, tipoAtendente)
-        userSendMessage(mensagemEnviada, currentTestAttendantPhoneNumber)
+        userSendMessage(
+            mensagemEnviada = mensagemEnviada,
+            userPhoneNumber = currentTestAttendantPhoneNumber,
+            currentBotNumber = currentBotNumber,
+            mockMvc = mockMvc
+        )
     }
 
     @Entao("o {string} receberá a mensagem") // Para DocString
@@ -692,7 +778,8 @@ class StepDefinitions(
             MessageExchange(
                 fromPhoneNumber = currentBotNumber,
                 toPhoneNumber = userNumber,
-                message = message.trimIndent()
+                message = message.trimIndent(),
+                sendAt = Instant.now()
             )
         )
     }
@@ -733,11 +820,12 @@ class StepDefinitions(
     }
 }
 
-fun userSendMessage(mensagemEnviada: String, userPhoneNumber: String, currentBotNumber:String, mockMvc: MockMvc) {
+fun userSendMessage(mensagemEnviada: String, userPhoneNumber: String, currentBotNumber:String, mockMvc: MockMvc, sentAt: Instant = Instant.now()) {
     val payload = loadPayload("src/test/resources/ufrpe/sbpc/botpcd/mocks/usuario-manda-oi.json")
         .changeUserNumber(userPhoneNumber)
         .changeUserMessage(mensagemEnviada)
         .changeBotNumber(currentBotNumber)
+        .changeTimestamp(sentAt)
     mockMvc.perform(
         post("/webhooks")
             .content(payload)
@@ -752,7 +840,7 @@ fun loadPayload(filePath: String): String {
 fun String.changeUserNumber(newNumber: String): String {
     return this.replace(Regex("(?<=\"wa_id\": \")\\d+(?=\")"), newNumber)
 }
-fun String.ChangeTimestamp(newTimestamp: Instant) {
+fun String.changeTimestamp(newTimestamp: Instant): String {
     return this.replace(Regex("(?<=\"timestamp\": \")\\d+(?=\")"), newTimestamp.epochSecond.toString())
 }
 fun String.changeUserMessage(newMessage: String): String {

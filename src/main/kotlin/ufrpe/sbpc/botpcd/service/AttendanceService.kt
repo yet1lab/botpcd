@@ -50,7 +50,7 @@ class AttendanceService(
                     val serviceType = ServiceType.getServiceByMonitorAssistanceType(attendant.assistanceType)
                     val attendances = attendanceRepository.findRequestAttendanceOfService(serviceType)
                     attendances.firstOrNull()?.let{ requestAttendance ->
-                    directToAvailableAttendant(botNumber, requestAttendance.pwd, serviceType)
+                        directToAvailableAttendant(botNumber, requestAttendance.pwd, serviceType)
                     }
                 }
             }
@@ -208,11 +208,9 @@ class AttendanceService(
         )
     }
     val logger: Logger = LoggerFactory.getLogger(AttendanceService::class.java)
-
     fun sendServices(botNumber: String, pwd: PWD) {
         whatsappService.sendMessage(botNumber, pwd.phoneNumber, createSendServicesMessage(pwd.disabilities.first(), pwd))
     }
-
     fun createSendServicesMessage(disability: Disability, pwd: PWD): String {
         val serviceList = ServiceType.getServicesByDisability(disability)
         val adjective = disability.adjective

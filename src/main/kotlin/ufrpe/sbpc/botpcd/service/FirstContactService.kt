@@ -18,7 +18,9 @@ import ufrpe.sbpc.botpcd.repository.CommitteeMemberRepository
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
 import ufrpe.sbpc.botpcd.repository.MonitorRepository
 import ufrpe.sbpc.botpcd.repository.PWDRepository
+import java.time.Duration
 import java.time.Instant
+import java.time.temporal.TemporalAmount
 
 @Service
 class FirstContactService(
@@ -36,23 +38,33 @@ class FirstContactService(
 ) {
     val logger: Logger = LoggerFactory.getLogger(WhatsappWebhookController::class.java)
 
+    fun isOutdatedMessage(lastBotMessage: MessageExchange?, userMessageExchange: MessageExchange): Boolean {
+        return if(lastBotMessage != null) {
+            lastBotMessage.sendAt > userMessageExchange.sendAt + Duration.ofMinutes(1L)
+        } else {
+            false
+        }
+    }
+
     fun redirectFluxByUserType(phoneNumber: String, change: Change) {
         val botNumber = change.value.metadata.phoneNumberId
         val message = change.value.messages[0].text.body.trim().sanitizeInput()
-        messageExchangeRepository.save(
-            MessageExchange(
-                fromPhoneNumber = phoneNumber,
-                toPhoneNumber = botNumber,
-                message = message,
-                sendAt = Instant.ofEpochSecond(change.value.messages[0].timestamp.toLong())
-            )
+        val userMessageExchange = MessageExchange(
+            fromPhoneNumber = phoneNumber,
+            toPhoneNumber = botNumber,
+            message = message,
+            sendAt = Instant.ofEpochSecond(change.value.messages[0].timestamp.toLong())
         )
+        messageExchangeRepository.save(userMessageExchange)
         val lastBotMessage =
             messageExchangeRepository.lastExchangeMessage(fromPhoneNumber = botNumber, toPhoneNumber = phoneNumber)
         val lastBotMessageText = lastBotMessage?.message
         val attendant: Attendant? =
             monitorRepository.findByPhoneNumber(phoneNumber) ?: committeeMemberRepository.findByPhoneNumber(phoneNumber)
         val pwd = pwdRepository.findByPhoneNumber(phoneNumber)
+        if(isOutdatedMessage(lastBotMessage = lastBotMessage, userMessageExchange = userMessageExchange)) {
+            return
+        }
         when {
             attendant != null -> attendantFlowService.redirect(botNumber, lastBotMessageText, attendant, message)
              pwd != null -> pwdFlowService.redirect(pwd = pwd, botNumber = botNumber, phoneNumber = phoneNumber, message = message, lastBotMessage = lastBotMessage)
@@ -65,7 +77,6 @@ class FirstContactService(
             }
         }
     }
-
     fun String.sanitizeInput(): String {
         val dangerousKeywords = listOf(
             "select", "drop", "insert", "delete", "update", "truncate", "exec",
