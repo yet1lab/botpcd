@@ -1,0 +1,47 @@
+name: CI_CD
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Run tests
+        run: ./gradlew test
+
+      - uses: actions/checkout@v4
+
+      - name: Login Dockerhub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: docker build --no-cache -t victoryghor/botpcd .
+
+      - name: Push to Dockerhub
+        run: docker push victoryghor/botpcd:latest
+
+  build:
+    runs-on: self-hosted
+    needs: test
+    steps:
+      - name: Login Dockerhub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Pull Docker image
+        run: docker pull victoryghor/botpcd:latest
+      - name: Delete Old docker container
+        run: docker rm -f botpcd-container || true
+      - name: Run Docker Container
+        run: docker run -e WHATSAPP_VERIFY_TOKEN=${{secrets.WHATSAPP_VERIFY_TOKEN}} -e WHATSAPP_API_TOKEN=${{secrets.WHATSAPP_API_TOKEN }} -e DB_USERNAME=${{secrets.DB_USER}} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e DB_HOST=${{ secrets.DB_HOST }} -d -p 8080:8080 --name botpcd-container victoryghor/botpcd:latest
+

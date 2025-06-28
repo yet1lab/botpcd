@@ -11,7 +11,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -22,16 +22,19 @@ configurations {
 }
 
 repositories {
+    maven { url = uri("https://jitpack.io") }
     mavenCentral()
 }
 
 dependencies {
+    implementation(kotlin("reflect"))
+    implementation("com.google.guava:guava:33.4.8-jre")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("com.github.Bindambc:whatsapp-business-java-api:v0.6.1")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-hateoas")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
-    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
@@ -40,16 +43,22 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("com.h2database:h2")
-    runtimeOnly("io.r2dbc:r2dbc-h2")
+    implementation(platform("com.google.cloud:spring-cloud-gcp-dependencies:6.2.1"))
     runtimeOnly("org.postgresql:postgresql")
-    runtimeOnly("org.postgresql:r2dbc-postgresql")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
-    testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("io.cucumber:cucumber-spring:7.23.0")
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.23.0"))
+    testImplementation(platform("org.assertj:assertj-bom:3.27.3"))
+    testImplementation("io.cucumber:cucumber-java")
+    testImplementation("io.cucumber:cucumber-junit-platform-engine")
+    testImplementation("org.junit.platform:junit-platform-suite")
+    testImplementation("org.assertj:assertj-core")
 }
 
 kotlin {
@@ -66,4 +75,7 @@ allOpen {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    // Work around. Gradle does not include enough information to disambiguate
+    // between different examples and scenarios.
+    systemProperty("cucumber.junit-platform.naming-strategy", "long")
 }
