@@ -553,7 +553,7 @@ class StepDefinitions(
         return pwd
     }
 
-    @Entao("bot registrará que usuário tem ou possui {string}")
+    @Entao("bot registrará que usuário é {string}")
     fun `bot registra deficiencia do usuário`(deficienciaAdjtivo: String) {
         val pwd = pwdRepository.findByPhoneNumberWithDisabilities(numberUserNotRegister)!!
         assertEquals(pwd.disabilities.first().adjective, deficienciaAdjtivo)

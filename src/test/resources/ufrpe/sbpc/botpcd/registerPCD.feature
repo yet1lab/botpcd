@@ -30,7 +30,7 @@ Olá, qual sua deficiência?
 """
 
     Cenario: O usuário responde que não precisa de suporte
-      Quando usuário envia mensagem "7"
+      Quando usuário envia mensagem "6"
       Então usuário receberá mensagem "Agradecemos o contato! Este canal é exclusivo para atendimento de pessoas com deficiência ou mobilidade reduzida que participarão do evento. Desejamos a você uma excelente participação na 77ª Reunião Anual da SBPC."
 
     Cenario:
@@ -57,7 +57,7 @@ Olá, qual sua deficiência?
 - Digite 6 para Não preciso de suporte.
 """
       Quando usuário envia mensagem "<numero_da_deficiencia>"
-      Então bot registrará que usuário tem ou possui "<adjetivo_da_deficiencia>"
+      Então bot registrará que usuário é "<adjetivo_da_deficiencia>"
       E usuário receberá mensagem "Qual o seu nome?"
 
       Exemplos:
