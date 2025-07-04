@@ -43,18 +43,6 @@ sealed class ServiceType(
         override val monitorAssistanceType = MonitorAssistanceType.NEURODIVERGENT_SUPPORT_MONITOR
     }
 
-    object GuideInterpreter : ServiceType(
-        attendantType = Provider.COMMITTEE_MEMBER,
-        disability = mutableSetOf(Disability.DEAFBLINDNESS),
-        description = "guia-intérprete"
-    )
-
-    object HygieneAndNutrition : ServiceType(
-        attendantType = Provider.COMMITTEE_MEMBER,
-        disability = mutableSetOf(Disability.PHYSICAL_DISABILITY),
-        description = "ajuda com alimentação e higiene"
-    )
-
     object Car : ServiceType(
         attendantType = Provider.COMMITTEE_MEMBER,
         disability = mutableSetOf(Disability.PHYSICAL_DISABILITY, Disability.MOBILITY_IMPAIRED),

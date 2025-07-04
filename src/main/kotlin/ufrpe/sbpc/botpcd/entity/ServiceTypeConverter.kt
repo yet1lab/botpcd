@@ -16,8 +16,6 @@ class ServiceTypeConverter : AttributeConverter<ServiceType, String> {
             "Mobility" -> ServiceType.Mobility
             "AudioDescription" -> ServiceType.AudioDescription
             "NeurodivergentSupport" -> ServiceType.NeurodivergentSupport
-            "GuideInterpreter" -> ServiceType.GuideInterpreter
-            "HygieneAndNutrition" -> ServiceType.HygieneAndNutrition
             "Car" -> ServiceType.Car
             else -> null
         }

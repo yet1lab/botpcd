@@ -7,13 +7,12 @@ Funcionalidade: Acessar serviços de assistência
     Entao "<adjetivo_da_deficiencia>" PCD receberá mensagem de opções de serviço "<opções_de_serviço>"
 
     Exemplos:
-      | adjetivo_da_deficiencia | opções_de_serviço                                                                         |
-      | um pessoa surda         | informações em Libras,atividade com interpretação em Libras                                |
-      | mobilidade reduzida     | ajuda na mobilidade,transporte para deslocamento no evento                                 |
-      | deficiente físico       | ajuda na mobilidade,ajuda com alimentação e higiene,transporte para deslocamento no evento |
-      | uma pessoa cega         | ajuda na mobilidade,programação com audiodescrição                                         |
-      | neurodivergente         | suporte para pessoas neurodivergentes                                                      |
-      | uma pessoa surdocega    | guia-intérprete                                                                            |
+      | adjetivo_da_deficiencia | opções_de_serviço                                           |
+      | um pessoa surda         | informações em Libras,atividade com interpretação em Libras |
+      | mobilidade reduzida     | ajuda na mobilidade,transporte para deslocamento no evento  |
+      | deficiente físico       | ajuda na mobilidade,transporte para deslocamento no evento  |
+      | uma pessoa cega         | ajuda na mobilidade,programação com audiodescrição          |
+      | neurodivergente         | suporte para pessoas neurodivergentes                       |
 
   Esquema do Cenário: Direcionar para o atendente(monitor ou membro da comissão)
     Dado que "<adjetivo_da_deficiencia>" PCD recebeu mensagem de opções de serviço
@@ -24,23 +23,15 @@ Funcionalidade: Acessar serviços de assistência
 
     Exemplos:
       | adjetivo_da_deficiencia | nome_do_atendente | servico_desejado                       | numero_servico_desejado | tipo_de_atendente  |
-      # Deficiência Auditiva
       | um pessoa surda         | João Comissão     | atividade com interpretação em Libras  | 1                       | membro da comissão |
       | um pessoa surda         | Ana Monitor       | informações em Libras                  | 2                       | monitor            |
-      # Mobilidade Reduzida
       | mobilidade reduzida     | Pedro Monitor     | ajuda na mobilidade                    | 1                       | monitor            |
       | mobilidade reduzida     | Carla Comissão    | transporte para deslocamento no evento | 2                       | membro da comissão |
-      # Deficiência Física
-      | deficiente físico       | Bia Comissão      | ajuda com alimentação e higiene        | 1                       | membro da comissão |
       | deficiente físico       | Pedro Monitor     | ajuda na mobilidade                    | 2                       | monitor            |
       | deficiente físico       | Carla Comissão    | transporte para deslocamento no evento | 3                       | membro da comissão |
-      # Deficiência Visual
       | uma pessoa cega         | Pedro Monitor     | ajuda na mobilidade                    | 1                       | monitor            |
       | uma pessoa cega         | Lucas Comissão    | programação com audiodescrição         | 2                       | membro da comissão |
-      # Neurodivergente
       | neurodivergente         | Fábio Monitor     | suporte para pessoas neurodivergentes  | 1                       | monitor            |
-      # Surdocegueira
-      | uma pessoa surdocega    | Maria Comissão    | guia-intérprete                        | 1                       | membro da comissão |
 
 
   Regra: PCD precisa receber mensagem informando que ele está na fila de espera
@@ -56,13 +47,11 @@ Funcionalidade: Acessar serviços de assistência
         | um pessoa surda         | informações em Libras                  | 2                       |
         | mobilidade reduzida     | ajuda na mobilidade                    | 1                       |
         | mobilidade reduzida     | transporte para deslocamento no evento | 2                       |
-        | deficiente físico       | ajuda com alimentação e higiene        | 1                       |
         | deficiente físico       | ajuda na mobilidade                    | 2                       |
         | deficiente físico       | transporte para deslocamento no evento | 3                       |
         | uma pessoa cega         | ajuda na mobilidade                    | 1                       |
         | uma pessoa cega         | programação com audiodescrição         | 2                       |
         | neurodivergente         | suporte para pessoas neurodivergentes  | 1                       |
-        | uma pessoa surdocega    | guia-intérprete                        | 1                       |
 
 
       Cenário: PCD está na fila de espera e manda mensagem novamente
@@ -111,9 +100,7 @@ Funcionalidade: Acessar serviços de assistência
        | mobilidade reduzida     | 558100000023 | ajuda na mobilidade                    | Joana Monitor     | monitor            | 558100000033     |
        | mobilidade reduzida     | 558100000024 | transporte para deslocamento no evento | Carla Comissão    | membro da comissão | 558100000005     |
        | deficiente físico       | 558100000025 | ajuda na mobilidade                    | Pedro Monitor     | monitor            | 558100000006     |
-       | deficiente físico       | 558100000026 | ajuda com alimentação e higiene        | Bia Comissão      | membro da comissão | 558100000007     |
        | deficiente físico       | 558100000027 | transporte para deslocamento no evento | Carla Comissão    | membro da comissão | 558100000008     |
        | uma pessoa cega         | 558100000028 | ajuda na mobilidade                    | Pedro Monitor     | monitor            | 558100000009     |
        | uma pessoa cega         | 558100000029 | programação com audiodescrição         | Lucas Comissão    | membro da comissão | 558100000010     |
        | neurodivergente         | 558100000030 | suporte para pessoas neurodivergentes  | Fábio Monitor     | monitor            | 558100000011     |
-       | uma pessoa surdocega    | 558100000031 | guia-intérprete                        | Maria Comissão    | membro da comissão | 558100000012     |

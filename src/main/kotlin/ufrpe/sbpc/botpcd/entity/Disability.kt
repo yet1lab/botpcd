@@ -4,7 +4,6 @@ package ufrpe.sbpc.botpcd.entity
 enum class Disability(val textOption: String, val adjective: String) {
 	BLINDED("Deficiência visual", "uma pessoa cega"),
 	DEAFNESS("Deficiência auditiva/surdez", "um pessoa surda"),
-	DEAFBLINDNESS("Surdocegueira", "uma pessoa surdocega"),
 	NEURODIVERGENT("Transtorno do Espectro Autista/Neurodivergente", "neurodivergente"),
 	PHYSICAL_DISABILITY("Deficiência física", "deficiente físico"),
 	MOBILITY_IMPAIRED("Não tenho deficiência, mas tenho mobilidade reduzida", "mobilidade reduzida");
