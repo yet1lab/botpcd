@@ -27,8 +27,8 @@ Funcionalidade: Acessar serviços de assistência
       | um pessoa surda         | Ana Monitor       | informações em Libras                  | 2                       | monitor            |
       | mobilidade reduzida     | Pedro Monitor     | ajuda na mobilidade                    | 1                       | monitor            |
       | mobilidade reduzida     | Carla Comissão    | transporte para deslocamento no evento | 2                       | membro da comissão |
-      | deficiente físico       | Pedro Monitor     | ajuda na mobilidade                    | 2                       | monitor            |
-      | deficiente físico       | Carla Comissão    | transporte para deslocamento no evento | 3                       | membro da comissão |
+      | deficiente físico       | Pedro Monitor     | ajuda na mobilidade                    | 1                       | monitor            |
+      | deficiente físico       | Carla Comissão    | transporte para deslocamento no evento | 2                       | membro da comissão |
       | uma pessoa cega         | Pedro Monitor     | ajuda na mobilidade                    | 1                       | monitor            |
       | uma pessoa cega         | Lucas Comissão    | programação com audiodescrição         | 2                       | membro da comissão |
       | neurodivergente         | Fábio Monitor     | suporte para pessoas neurodivergentes  | 1                       | monitor            |
@@ -47,14 +47,14 @@ Funcionalidade: Acessar serviços de assistência
         | um pessoa surda         | informações em Libras                  | 2                       |
         | mobilidade reduzida     | ajuda na mobilidade                    | 1                       |
         | mobilidade reduzida     | transporte para deslocamento no evento | 2                       |
-        | deficiente físico       | ajuda na mobilidade                    | 2                       |
-        | deficiente físico       | transporte para deslocamento no evento | 3                       |
+        | deficiente físico       | ajuda na mobilidade                    | 1                       |
+        | deficiente físico       | transporte para deslocamento no evento | 2                       |
         | uma pessoa cega         | ajuda na mobilidade                    | 1                       |
         | uma pessoa cega         | programação com audiodescrição         | 2                       |
         | neurodivergente         | suporte para pessoas neurodivergentes  | 1                       |
 
 
-      Cenário: PCD está na fila de espera e manda mensagem novamente
+    Cenário: PCD está na fila de espera e manda mensagem novamente
         Dado PCD possuia serviço requisitado que ainda não foi iniciado
         Quando PCD mandar qualquer mensagem
         Então PCD receberá mensagem "No momento não há atendentes disponíveis. Por favor, aguarde na fila de espera e retornaremos assim que possível."

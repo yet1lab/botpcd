@@ -791,7 +791,12 @@ class StepDefinitions(
         )?.message
         assertTrue(
             actualMessage?.trimIndent()!!.contains(mensagemEsperada.trimIndent()),
-            "A última mensagem recebida pelo usuário não foi a esperada."
+            """A última mensagem recebida pelo usuário não foi a esperada.
+                <Actual>
+                    ${actualMessage.trimIndent()}
+                <Expect>
+                    ${mensagemEsperada.trimIndent()}
+            """.trimMargin()
         )
     }
 
