@@ -1,6 +1,7 @@
 FROM gradle:7.6-jdk17-alpine AS build
 WORKDIR /app
 COPY . /app
+RUN gradle clean test
 RUN gradle clean bootJar
 
 FROM openjdk:17-alpine
