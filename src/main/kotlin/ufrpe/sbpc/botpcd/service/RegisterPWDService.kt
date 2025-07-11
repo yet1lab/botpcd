@@ -9,6 +9,7 @@ import ufrpe.sbpc.botpcd.entity.Disability
 import ufrpe.sbpc.botpcd.entity.MessageExchange
 import ufrpe.sbpc.botpcd.entity.PWD
 import ufrpe.sbpc.botpcd.repository.MessageExchangeRepository
+import ufrpe.sbpc.botpcd.util.NumberOptionDontNeedSupport
 
 @Service
 class RegisterPWDService(
@@ -18,13 +19,13 @@ class RegisterPWDService(
 ) {
 	private val logger = LoggerFactory.getLogger(RegisterPWDService::class.java)
 	fun shouldRegisterNewUser(lastBotMessageText: String?, message: String) =
-		(lastBotMessageText ?: "") == Disability.getOptions() && message in Disability.entries.map { (it.ordinal + 1).toString() }.toMutableList().also { it.add("7") }
+		(lastBotMessageText ?: "") == Disability.getOptions() && message in Disability.entries.map { (it.ordinal + 1).toString() }.toMutableList().also { it.add(NumberOptionDontNeedSupport.toString()) }
 
 	fun handleDisabilitySelected(botNumber: String, message: String, phoneNumber: String) {
 		val disabilityNumber = message.toInt()
 		val ordinalDisability = disabilityNumber - 1
 		val disability = Disability.getByOrdinal(ordinalDisability)
-		if (disabilityNumber == 7) {
+		if (disabilityNumber == NumberOptionDontNeedSupport) {
 			whatsappService.sendMessage(
 				botNumber,
 				phoneNumber,

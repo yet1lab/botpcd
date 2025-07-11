@@ -1,15 +1,17 @@
 package ufrpe.sbpc.botpcd.entity
 
+import ufrpe.sbpc.botpcd.util.NumberOptionDontNeedSupport
+
 
 enum class Disability(val textOption: String, val adjective: String) {
 	BLINDED("Deficiência visual", "uma pessoa cega"),
 	DEAFNESS("Deficiência auditiva/surdez", "um pessoa surda"),
-	DEAFBLINDNESS("Surdocegueira", "uma pessoa surdocega"),
 	NEURODIVERGENT("Transtorno do Espectro Autista/Neurodivergente", "neurodivergente"),
 	PHYSICAL_DISABILITY("Deficiência física", "deficiente físico"),
 	MOBILITY_IMPAIRED("Não tenho deficiência, mas tenho mobilidade reduzida", "mobilidade reduzida");
 
 	companion object {
+		fun getMaxOptionNumber() = entries.maxOf { it.ordinal } + 1
 		fun getByTextOption(text: String): Disability {
 			val disability = Disability.entries.find { it.textOption.equals(text, ignoreCase = true) }
 			if (disability == null) {
@@ -29,7 +31,7 @@ enum class Disability(val textOption: String, val adjective: String) {
 			for (disability in Disability.entries) {
 				message += "- Digite ${disability.ordinal + 1} para ${disability.textOption}\n"
 			}
-			message += "- Digite 7 para Não preciso de suporte."
+			message += "- Digite $NumberOptionDontNeedSupport para Não preciso de suporte."
 			return message
 		}
 		fun getByOrdinal(ordinal: Int) = Disability.entries.find { it.ordinal == ordinal }
